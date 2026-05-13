@@ -23,6 +23,20 @@ export class UnauthorizedError extends ApplicationError {
   }
 }
 
+export class NotFoundError extends ApplicationError {
+  constructor(message = "Not found") {
+    super(message, "NOT_FOUND", 404);
+    this.name = "NotFoundError";
+  }
+}
+
+export class ValidationError extends ApplicationError {
+  constructor(message = "Validation failed") {
+    super(message, "VALIDATION_ERROR", 422);
+    this.name = "ValidationError";
+  }
+}
+
 export class TenantScopeError extends ForbiddenError {
   constructor(message = "Record does not belong to the active tenant.") {
     super(message);

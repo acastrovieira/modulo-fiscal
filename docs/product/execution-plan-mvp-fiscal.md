@@ -13,7 +13,7 @@ A regra central e simples: construir primeiro a base fiscal auditavel e segura, 
 | 0 | Planejamento e governanca | Concluida | 100% | PM/PO/architect revisados | Codex + @pm/@po + @architect |
 | 1 | Schema operacional e migrations | Concluida | 100% | Prisma validate/generate OK | Codex + @architect |
 | 2 | Fundacao RBAC, tenant e auditoria | Concluida | 100% | Comandos criticos protegidos | Codex + @qa |
-| 3 | Documentos e importacoes | Nao iniciada | 0% | Importacao auditada por tenant | Codex |
+| 3 | Documentos e importacoes | Concluida | 100% | Importacao auditada por tenant | Codex + @qa |
 | 4 | Candidatos fiscais e fingerprint | Nao iniciada | 0% | Candidato sem regra em UI | Codex + Claude |
 | 5 | Inconsistencias e revisao humana | Nao iniciada | 0% | Bloqueios e justificativas auditaveis | Codex + Claude + @qa |
 | 6 | Lotes simulados sem emissao | Nao iniciada | 0% | Fluxo sem provider externo | Codex + Claude |
