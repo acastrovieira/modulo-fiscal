@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+enum UserStatus {
+  ACTIVE
+  INVITED
+  DISABLED
+}
+
+enum MembershipStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+}
+
+enum TenantRole {
+  OWNER
+  ADMIN
+  FISCAL_MANAGER
+  FISCAL_OPERATOR
+  FINANCIAL_OPERATOR
+  ACCOUNTANT
+  AUDITOR
+}
+
+model Tenant {
+  id          String             @id @default(uuid()) @db.Uuid
+  name        String
+  legalName   String?
+  cnpj        String?            @unique
+  status      TenantStatus       @default(ACTIVE)
+  createdAt   DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime           @updatedAt @db.Timestamptz(6)
+  memberships TenantMembership[]
+  auditEvents AuditEvent[]
+  documents   DocumentFile[]
+
+  @@map("tenants")
+}
+
+model Profile {
+  id          String             @id @db.Uuid
+  email       String             @unique
+  name        String?
+  status      UserStatus         @default(ACTIVE)
+  createdAt   DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime           @updatedAt @db.Timestamptz(6)
+  memberships TenantMembership[]
+  auditEvents AuditEvent[]       @relation("AuditActor")
+  documents   DocumentFile[]     @relation("DocumentCreator")
+
+  @@map("profiles")
+}
+
+model TenantMembership {
+  id        String           @id @default(uuid()) @db.Uuid
+  tenantId  String           @db.Uuid
+  userId    String           @db.Uuid
+  role      TenantRole
+  status    MembershipStatus @default(ACTIVE)
+  createdAt DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime         @updatedAt @db.Timestamptz(6)
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([tenantId, role])
+  @@index([userId])
+  @@map("tenant_memberships")
+}
+
+model AuditEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  tenantId      String   @db.Uuid
+  actorId       String?  @db.Uuid
+  eventType     String
+  entityType    String
+  entityId      String?
+  beforePayload Json?
+  afterPayload  Json?
+  metadata      Json?
+  correlationId String
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  actor         Profile? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, createdAt])
+  @@index([correlationId])
+  @@index([entityType, entityId])
+  @@map("audit_events")
+}
+
+model DocumentFile {
+  id             String   @id @default(uuid()) @db.Uuid
+  tenantId       String   @db.Uuid
+  fileName       String
+  fileType       String
+  mimeType       String
+  storagePath    String
+  checksumSha256 String
+  sizeBytes      BigInt
+  createdBy      String?  @db.Uuid
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  creator        Profile? @relation("DocumentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, createdAt])
+  @@index([checksumSha256])
+  @@map("document_files")
+}
