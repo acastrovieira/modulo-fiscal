@@ -1,4 +1,4 @@
-import { ForbiddenError } from "@/shared/errors/application-error";
+import { TenantScopeError } from "@/shared/errors/application-error";
 
 export type TenantScopedRecord = {
   tenantId: string;
@@ -6,6 +6,12 @@ export type TenantScopedRecord = {
 
 export function assertTenantScope(activeTenantId: string, record: TenantScopedRecord): void {
   if (record.tenantId !== activeTenantId) {
-    throw new ForbiddenError("Record does not belong to the active tenant.");
+    throw new TenantScopeError();
+  }
+}
+
+export function assertTenantScopes(activeTenantId: string, records: readonly TenantScopedRecord[]): void {
+  for (const record of records) {
+    assertTenantScope(activeTenantId, record);
   }
 }

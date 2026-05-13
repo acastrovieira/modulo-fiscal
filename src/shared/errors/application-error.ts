@@ -22,3 +22,17 @@ export class UnauthorizedError extends ApplicationError {
     this.name = "UnauthorizedError";
   }
 }
+
+export class TenantScopeError extends ForbiddenError {
+  constructor(message = "Record does not belong to the active tenant.") {
+    super(message);
+    this.name = "TenantScopeError";
+  }
+}
+
+export class InvalidStateError extends ApplicationError {
+  constructor(message = "Invalid state transition") {
+    super(message, "INVALID_STATE", 409);
+    this.name = "InvalidStateError";
+  }
+}

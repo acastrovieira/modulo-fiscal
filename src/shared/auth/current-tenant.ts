@@ -13,8 +13,8 @@ export async function currentTenant(): Promise<CurrentTenant> {
 
   return {
     id: "11111111-1111-4111-8111-111111111111",
-    name: "Clínica VetFiscal Demo",
-    legalName: "Clínica VetFiscal Demo LTDA",
+    name: "Clinica VetFiscal Demo",
+    legalName: "Clinica VetFiscal Demo LTDA",
     role: "OWNER"
   };
 }
