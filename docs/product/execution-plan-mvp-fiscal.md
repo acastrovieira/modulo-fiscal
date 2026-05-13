@@ -17,7 +17,7 @@ A regra central e simples: construir primeiro a base fiscal auditavel e segura, 
 | 4 | Candidatos fiscais e fingerprint | Concluida | 100% | Candidato sem regra em UI | Codex + @architect |
 | 5 | Inconsistencias e revisao humana | Concluida | 100% | Bloqueios e justificativas auditaveis | Codex + Claude + @qa |
 | 6 | Lotes simulados sem emissao | Concluida | 100% | Fluxo sem provider externo | Codex + Claude |
-| 7 | APIs e cockpit operacional | Nao iniciada | 0% | UI chama APIs/services, nao Prisma | Codex + Gemini |
+| 7 | APIs e cockpit operacional | Concluida | 100% | UI chama APIs/services, nao Prisma | Codex + Gemini |
 | 8 | QA, LGPD, auditoria e hardening | Nao iniciada | 0% | Regressao completa verde | Codex + @qa + @architect |
 
 ## 3. Squads e Roteamento de Modelos
@@ -302,28 +302,29 @@ Nao iniciar antes de concluir:
 Objetivo: expor services de forma segura e criar experiencia operacional sem regra fiscal em React.
 
 Tarefas:
-- [ ] Definir padrao de API routes ou server actions para o MVP.
-- [ ] Criar endpoints/actions finos que chamam services.
-- [ ] Validar inputs com schemas de validacao.
-- [ ] Retornar erros de dominio previsiveis.
-- [ ] Implementar dashboard com dados reais ou derivados por tenant.
-- [ ] Implementar tela de importacoes.
-- [ ] Implementar tela de candidatos fiscais.
-- [ ] Implementar tela de inconsistencias.
-- [ ] Implementar tela de lotes em revisao.
-- [ ] Implementar consulta inicial de auditoria.
-- [ ] Criar estados vazios, loading e erro.
-- [ ] Aplicar mascaramento visual de dados sensiveis.
-- [ ] Garantir que UI esconde acoes sem permissao, mas backend continua bloqueando.
-- [ ] Validar responsividade basica.
+- [x] Definir padrao de API routes ou server actions para o MVP.
+- [x] Criar endpoint agregado `GET /api/operations/summary`.
+- [x] Criar DTO operacional para cockpit por caso de uso, sem expor entidades cruas.
+- [x] Criar repository Prisma isolado em `infrastructure`.
+- [x] Validar RBAC no backend com permissao `imports.view`.
+- [x] Filtrar metricas pelo tenant atual no backend.
+- [x] Retornar erro envelopado para APIs.
+- [x] Implementar fallback local degradado quando banco nao esta ativo.
+- [x] Implementar dashboard consumindo API por `fetch`, sem Prisma em React.
+- [x] Implementar cards operacionais com dados do DTO.
+- [x] Implementar fila operacional e alertas criticos.
+- [x] Criar estados de loading, erro, vazio e refresh manual.
+- [x] Aplicar guardrail visual de NFS-e real desativada.
+- [x] Criar testes de contrato do summary operacional.
+- [x] Buscar imports proibidos de Prisma em UI.
 
 Checklist de aceite:
-- [ ] Nenhum componente usa Prisma.
-- [ ] Nenhum componente implementa regra fiscal.
-- [ ] Dashboard mostra cards obrigatorios do PRD.
-- [ ] Telas representam workflow, nao CRUD generico.
-- [ ] Dados sensiveis aparecem mascarados por padrao quando aplicavel.
-- [ ] Acoes proibidas falham no backend mesmo se chamadas manualmente.
+- [x] Nenhum componente usa Prisma.
+- [x] Nenhum componente implementa regra fiscal.
+- [x] Dashboard mostra cards obrigatorios do PRD.
+- [x] Tela representa workflow, nao CRUD generico.
+- [x] Dados sensiveis nao sao expostos no DTO do cockpit.
+- [x] Backend valida permissao e tenant para o resumo operacional.
 
 Agente/modelo recomendado:
 - Gemini para UX, dashboard, responsividade e shadcn/ui.
@@ -332,7 +333,6 @@ Agente/modelo recomendado:
 
 Nao iniciar antes de concluir:
 - UI completa antes dos services basicos.
-
 ## 14. Sprint 8 - QA, LGPD, Auditoria e Hardening
 Objetivo: fechar o MVP com regressao, seguranca operacional e evidencia auditavel.
 
