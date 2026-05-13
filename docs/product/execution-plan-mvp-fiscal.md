@@ -11,7 +11,7 @@ A regra central e simples: construir primeiro a base fiscal auditavel e segura, 
 | Ordem | Sprint | Status | Progresso | Gate principal | Squad recomendado |
 | --- | --- | --- | --- | --- | --- |
 | 0 | Planejamento e governanca | Concluida | 100% | PM/PO/architect revisados | Codex + @pm/@po + @architect |
-| 1 | Schema operacional e migrations | Nao iniciada | 0% | Prisma validate/generate OK | Codex + @architect |
+| 1 | Schema operacional e migrations | Concluida | 100% | Prisma validate/generate OK | Codex + @architect |
 | 2 | Fundacao RBAC, tenant e auditoria | Nao iniciada | 0% | Comandos criticos protegidos | Codex + Claude |
 | 3 | Documentos e importacoes | Nao iniciada | 0% | Importacao auditada por tenant | Codex |
 | 4 | Candidatos fiscais e fingerprint | Nao iniciada | 0% | Candidato sem regra em UI | Codex + Claude |

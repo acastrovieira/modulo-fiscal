@@ -19,29 +19,29 @@ Permitir que o VetFiscal OS tenha modelos operacionais seguros para importacoes,
 - [x] Nenhuma decisao de produto pendente para o schema operacional.
 
 ## Tarefas
-- [ ] Modelar enums operacionais de importacao, linha, candidato, inconsistencia, lote e item de lote.
-- [ ] Modelar `ImportBatch` com `tenantId`, documento de origem, status, contadores, idempotency key e timestamps.
-- [ ] Modelar `ImportRow` com `tenantId`, import batch, payload bruto, payload normalizado, erro e status.
-- [ ] Modelar `FiscalCandidate` com origem, dados minimos, centavos, fingerprint versionado e status.
-- [ ] Modelar `FiscalInconsistency` com tipo, severidade, status, mensagem, detalhes e resolucao futura.
-- [ ] Modelar `FiscalBatch` com status de aprovacao futura, responsaveis, timestamps e total em centavos.
-- [ ] Modelar `FiscalBatchItem` com lote, candidato, tenant, status e valor em centavos.
-- [ ] Definir indices por `tenantId`, status, origem e datas operacionais.
-- [ ] Definir constraints para reduzir risco de relacionamento entre tenants.
-- [ ] Rodar `npx prisma validate`.
-- [ ] Rodar `npx prisma generate`.
-- [ ] Criar migration SQL pequena e isolada.
-- [ ] Confirmar ausencia de provider NFS-e, prefeitura, certificado, protocolo fiscal ou numero de nota.
+- [x] Modelar enums operacionais de importacao, linha, candidato, inconsistencia, lote e item de lote.
+- [x] Modelar `ImportBatch` com `tenantId`, documento de origem, status, contadores, idempotency key e timestamps.
+- [x] Modelar `ImportRow` com `tenantId`, import batch, payload bruto, payload normalizado, erro e status.
+- [x] Modelar `FiscalCandidate` com origem, dados minimos, centavos, fingerprint versionado e status.
+- [x] Modelar `FiscalInconsistency` com tipo, severidade, status, mensagem, detalhes e resolucao futura.
+- [x] Modelar `FiscalBatch` com status de aprovacao futura, responsaveis, timestamps e total em centavos.
+- [x] Modelar `FiscalBatchItem` com lote, candidato, tenant, status e valor em centavos.
+- [x] Definir indices por `tenantId`, status, origem e datas operacionais.
+- [x] Definir constraints para reduzir risco de relacionamento entre tenants.
+- [x] Rodar `npx prisma validate`.
+- [x] Rodar `npx prisma generate`.
+- [x] Criar migration SQL pequena e isolada.
+- [x] Confirmar ausencia de provider NFS-e, prefeitura, certificado, protocolo fiscal ou numero de nota.
 
 ## Criterios de Aceite
-- [ ] Prisma valida sem erro.
-- [ ] Prisma Client gera sem erro.
-- [ ] Todos os modelos operacionais criticos possuem `tenantId`.
-- [ ] Status deixam claro que nao ha emissao real.
-- [ ] Valores monetarios usam centavos com `BigInt`.
-- [ ] Timestamps usam `Timestamptz` quando representam instantes.
-- [ ] Schema nao cria provider NFS-e nem campos de emissao real.
-- [ ] Migration e isolada e revisavel.
+- [x] Prisma valida sem erro.
+- [x] Prisma Client gera sem erro.
+- [x] Todos os modelos operacionais criticos possuem `tenantId`.
+- [x] Status deixam claro que nao ha emissao real.
+- [x] Valores monetarios usam centavos com `BigInt`.
+- [x] Timestamps usam `Timestamptz` quando representam instantes.
+- [x] Schema nao cria provider NFS-e nem campos de emissao real.
+- [x] Migration e isolada e revisavel.
 
 ## Agentes Recomendados
 - Codex: executar alteracoes no Prisma, migration e validacoes.

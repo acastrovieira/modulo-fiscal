@@ -35,31 +35,111 @@ enum TenantRole {
   AUDITOR
 }
 
+enum ImportBatchStatus {
+  PENDING_VALIDATION
+  VALIDATING
+  VALIDATED
+  HAS_ERRORS
+  READY_FOR_REVIEW
+  ARCHIVED
+}
+
+enum ImportRowStatus {
+  RECEIVED
+  NORMALIZED
+  REJECTED
+  CANDIDATE_CREATED
+}
+
+enum FiscalCandidateStatus {
+  DRAFT
+  NEEDS_REVIEW
+  BLOCKED
+  READY_FOR_BATCH
+  IN_BATCH
+  SIMULATED
+  APPROVED_FOR_FUTURE_ISSUANCE
+}
+
+enum FiscalInconsistencyStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  WAIVED
+}
+
+enum FiscalInconsistencySeverity {
+  BLOCKING
+  REVIEWABLE
+}
+
+enum FiscalInconsistencyType {
+  MISSING_AMOUNT
+  INVALID_AMOUNT
+  MISSING_COMPETENCE_DATE
+  POSSIBLE_DUPLICATE
+  TENANT_MISMATCH
+  MISSING_SOURCE_DOCUMENT
+  MISSING_CHECKSUM
+  MISSING_CUSTOMER_DATA
+  INCOMPLETE_DESCRIPTION
+  QUESTIONABLE_SERVICE_CLASSIFICATION
+  SOURCE_REVIEW_DIVERGENCE
+  SENSITIVE_DATA_REVIEW
+}
+
+enum FiscalBatchStatus {
+  DRAFT
+  IN_REVIEW
+  SIMULATED
+  APPROVED_FOR_FUTURE_ISSUANCE
+  CANCELLED
+}
+
+enum FiscalBatchItemStatus {
+  INCLUDED
+  REMOVED
+}
+
 model Tenant {
-  id          String             @id @default(uuid()) @db.Uuid
-  name        String
-  legalName   String?
-  cnpj        String?            @unique
-  status      TenantStatus       @default(ACTIVE)
-  createdAt   DateTime           @default(now()) @db.Timestamptz(6)
-  updatedAt   DateTime           @updatedAt @db.Timestamptz(6)
-  memberships TenantMembership[]
-  auditEvents AuditEvent[]
-  documents   DocumentFile[]
+  id                    String                  @id @default(uuid()) @db.Uuid
+  name                  String
+  legalName             String?
+  cnpj                  String?                 @unique
+  status                TenantStatus            @default(ACTIVE)
+  createdAt             DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime                @updatedAt @db.Timestamptz(6)
+  memberships           TenantMembership[]
+  auditEvents           AuditEvent[]
+  documents             DocumentFile[]
+  importBatches         ImportBatch[]
+  importRows            ImportRow[]
+  fiscalCandidates      FiscalCandidate[]
+  fiscalInconsistencies FiscalInconsistency[]
+  fiscalBatches         FiscalBatch[]
+  fiscalBatchItems      FiscalBatchItem[]
 
   @@map("tenants")
 }
 
 model Profile {
-  id          String             @id @db.Uuid
-  email       String             @unique
-  name        String?
-  status      UserStatus         @default(ACTIVE)
-  createdAt   DateTime           @default(now()) @db.Timestamptz(6)
-  updatedAt   DateTime           @updatedAt @db.Timestamptz(6)
-  memberships TenantMembership[]
-  auditEvents AuditEvent[]       @relation("AuditActor")
-  documents   DocumentFile[]     @relation("DocumentCreator")
+  id                       String                @id @db.Uuid
+  email                    String                @unique
+  name                     String?
+  status                   UserStatus            @default(ACTIVE)
+  createdAt                DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime              @updatedAt @db.Timestamptz(6)
+  memberships              TenantMembership[]
+  auditEvents              AuditEvent[]          @relation("AuditActor")
+  documents                DocumentFile[]        @relation("DocumentCreator")
+  createdImportBatches     ImportBatch[]         @relation("ImportBatchCreator")
+  reviewedCandidates       FiscalCandidate[]     @relation("FiscalCandidateReviewer")
+  resolvedInconsistencies  FiscalInconsistency[] @relation("FiscalInconsistencyResolver")
+  createdFiscalBatches     FiscalBatch[]         @relation("FiscalBatchCreator")
+  submittedFiscalBatches   FiscalBatch[]         @relation("FiscalBatchSubmitter")
+  simulatedFiscalBatches   FiscalBatch[]         @relation("FiscalBatchSimulator")
+  approvedFiscalBatches    FiscalBatch[]         @relation("FiscalBatchApprover")
+  cancelledFiscalBatches   FiscalBatch[]         @relation("FiscalBatchCanceller")
 
   @@map("profiles")
 }
@@ -103,20 +183,192 @@ model AuditEvent {
 }
 
 model DocumentFile {
-  id             String   @id @default(uuid()) @db.Uuid
-  tenantId       String   @db.Uuid
-  fileName       String
-  fileType       String
-  mimeType       String
-  storagePath    String
-  checksumSha256 String
-  sizeBytes      BigInt
-  createdBy      String?  @db.Uuid
-  createdAt      DateTime @default(now()) @db.Timestamptz(6)
-  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  creator        Profile? @relation("DocumentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  id               String            @id @default(uuid()) @db.Uuid
+  tenantId         String            @db.Uuid
+  fileName         String
+  fileType         String
+  mimeType         String
+  storagePath      String
+  checksumSha256   String
+  sizeBytes        BigInt
+  createdBy        String?           @db.Uuid
+  createdAt        DateTime          @default(now()) @db.Timestamptz(6)
+  tenant           Tenant            @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  creator          Profile?          @relation("DocumentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  importBatches    ImportBatch[]
+  fiscalCandidates FiscalCandidate[]
 
+  @@unique([id, tenantId])
   @@index([tenantId, createdAt])
   @@index([checksumSha256])
   @@map("document_files")
+}
+
+model ImportBatch {
+  id              String                  @id @default(uuid()) @db.Uuid
+  tenantId        String                  @db.Uuid
+  documentFileId  String                  @db.Uuid
+  createdBy       String?                 @db.Uuid
+  status          ImportBatchStatus       @default(PENDING_VALIDATION)
+  sourceType      String                  @default("structured_file")
+  sourceName      String?
+  idempotencyKey  String?
+  totalRows       Int                     @default(0)
+  validRows       Int                     @default(0)
+  invalidRows     Int                     @default(0)
+  createdAt       DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime                @updatedAt @db.Timestamptz(6)
+  validatedAt     DateTime?               @db.Timestamptz(6)
+  archivedAt      DateTime?               @db.Timestamptz(6)
+  tenant          Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  documentFile    DocumentFile            @relation(fields: [documentFileId, tenantId], references: [id, tenantId], onDelete: Restrict)
+  creator         Profile?                @relation("ImportBatchCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  rows            ImportRow[]
+  candidates      FiscalCandidate[]
+  inconsistencies FiscalInconsistency[]
+
+  @@unique([id, tenantId])
+  @@unique([tenantId, idempotencyKey])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, documentFileId])
+  @@map("import_batches")
+}
+
+model ImportRow {
+  id                String                @id @default(uuid()) @db.Uuid
+  tenantId          String                @db.Uuid
+  importBatchId     String                @db.Uuid
+  rowNumber         Int
+  sourceRowId       String?
+  status            ImportRowStatus       @default(RECEIVED)
+  rawPayload        Json
+  normalizedPayload Json?
+  errorPayload      Json?
+  createdAt         DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime              @updatedAt @db.Timestamptz(6)
+  tenant            Tenant                @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  importBatch       ImportBatch           @relation(fields: [importBatchId, tenantId], references: [id, tenantId], onDelete: Cascade)
+  candidates        FiscalCandidate[]
+  inconsistencies   FiscalInconsistency[]
+
+  @@unique([id, tenantId])
+  @@unique([importBatchId, rowNumber])
+  @@index([tenantId, importBatchId, status])
+  @@index([tenantId, status])
+  @@map("import_rows")
+}
+
+model FiscalCandidate {
+  id                       String                  @id @default(uuid()) @db.Uuid
+  tenantId                 String                  @db.Uuid
+  importBatchId            String                  @db.Uuid
+  importRowId              String?                 @db.Uuid
+  documentFileId           String?                 @db.Uuid
+  customerName             String?
+  customerDocumentMasked   String?
+  serviceDate              DateTime?               @db.Date
+  competenceDate           DateTime?               @db.Date
+  serviceDescription       String?
+  grossAmountCents         BigInt?
+  status                   FiscalCandidateStatus   @default(DRAFT)
+  fiscalFingerprintVersion String                  @default("v1")
+  fiscalFingerprint        String
+  reviewedBy               String?                 @db.Uuid
+  reviewedAt               DateTime?               @db.Timestamptz(6)
+  createdAt                DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime                @updatedAt @db.Timestamptz(6)
+  tenant                   Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  importBatch              ImportBatch             @relation(fields: [importBatchId, tenantId], references: [id, tenantId], onDelete: Restrict)
+  importRow                ImportRow?              @relation(fields: [importRowId, tenantId], references: [id, tenantId], onDelete: Restrict)
+  documentFile             DocumentFile?           @relation(fields: [documentFileId, tenantId], references: [id, tenantId], onDelete: Restrict)
+  reviewer                 Profile?                @relation("FiscalCandidateReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  inconsistencies          FiscalInconsistency[]
+  batchItems               FiscalBatchItem[]
+
+  @@unique([id, tenantId])
+  @@unique([tenantId, fiscalFingerprintVersion, fiscalFingerprint])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, importBatchId])
+  @@index([tenantId, importRowId])
+  @@map("fiscal_candidates")
+}
+
+model FiscalInconsistency {
+  id             String                       @id @default(uuid()) @db.Uuid
+  tenantId       String                       @db.Uuid
+  candidateId    String?                      @db.Uuid
+  importBatchId  String?                      @db.Uuid
+  importRowId    String?                      @db.Uuid
+  type           FiscalInconsistencyType
+  severity       FiscalInconsistencySeverity
+  status         FiscalInconsistencyStatus    @default(OPEN)
+  message        String
+  details        Json?
+  resolutionNote String?
+  resolvedBy     String?                      @db.Uuid
+  resolvedAt     DateTime?                    @db.Timestamptz(6)
+  createdAt      DateTime                     @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime                     @updatedAt @db.Timestamptz(6)
+  tenant         Tenant                       @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  candidate      FiscalCandidate?             @relation(fields: [candidateId, tenantId], references: [id, tenantId], onDelete: Cascade)
+  importBatch    ImportBatch?                 @relation(fields: [importBatchId, tenantId], references: [id, tenantId], onDelete: Cascade)
+  importRow      ImportRow?                   @relation(fields: [importRowId, tenantId], references: [id, tenantId], onDelete: Cascade)
+  resolver       Profile?                     @relation("FiscalInconsistencyResolver", fields: [resolvedBy], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, status, severity, createdAt])
+  @@index([tenantId, candidateId, status])
+  @@index([tenantId, importBatchId])
+  @@index([tenantId, importRowId])
+  @@map("fiscal_inconsistencies")
+}
+
+model FiscalBatch {
+  id                    String             @id @default(uuid()) @db.Uuid
+  tenantId              String             @db.Uuid
+  status                FiscalBatchStatus  @default(DRAFT)
+  batchNumber           String?
+  createdBy             String?            @db.Uuid
+  submittedBy           String?            @db.Uuid
+  submittedAt           DateTime?          @db.Timestamptz(6)
+  simulatedBy           String?            @db.Uuid
+  simulatedAt           DateTime?          @db.Timestamptz(6)
+  approvedBy            String?            @db.Uuid
+  approvedAt            DateTime?          @db.Timestamptz(6)
+  cancelledBy           String?            @db.Uuid
+  cancelledAt           DateTime?          @db.Timestamptz(6)
+  cancelReason          String?
+  totalGrossAmountCents BigInt             @default(0)
+  createdAt             DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime           @updatedAt @db.Timestamptz(6)
+  tenant                Tenant             @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  creator               Profile?           @relation("FiscalBatchCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  submitter             Profile?           @relation("FiscalBatchSubmitter", fields: [submittedBy], references: [id], onDelete: SetNull)
+  simulator             Profile?           @relation("FiscalBatchSimulator", fields: [simulatedBy], references: [id], onDelete: SetNull)
+  approver              Profile?           @relation("FiscalBatchApprover", fields: [approvedBy], references: [id], onDelete: SetNull)
+  canceller             Profile?           @relation("FiscalBatchCanceller", fields: [cancelledBy], references: [id], onDelete: SetNull)
+  items                 FiscalBatchItem[]
+
+  @@unique([id, tenantId])
+  @@unique([tenantId, batchNumber])
+  @@index([tenantId, status, createdAt])
+  @@map("fiscal_batches")
+}
+
+model FiscalBatchItem {
+  id               String                @id @default(uuid()) @db.Uuid
+  tenantId         String                @db.Uuid
+  batchId          String                @db.Uuid
+  candidateId      String                @db.Uuid
+  status           FiscalBatchItemStatus @default(INCLUDED)
+  grossAmountCents BigInt
+  createdAt        DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime              @updatedAt @db.Timestamptz(6)
+  tenant           Tenant                @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  batch            FiscalBatch           @relation(fields: [batchId, tenantId], references: [id, tenantId], onDelete: Cascade)
+  candidate        FiscalCandidate       @relation(fields: [candidateId, tenantId], references: [id, tenantId], onDelete: Restrict)
+
+  @@unique([batchId, candidateId])
+  @@index([tenantId, batchId])
+  @@index([tenantId, candidateId])
+  @@map("fiscal_batch_items")
 }
