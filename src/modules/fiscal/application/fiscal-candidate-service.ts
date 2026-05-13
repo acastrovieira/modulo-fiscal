@@ -75,6 +75,7 @@ export type FiscalCandidateRepository = {
   createFiscalCandidate(input: CreateFiscalCandidateInput): Promise<FiscalCandidateRecord>;
   markImportRowCandidateCreated(id: string, tenantId: string): Promise<void>;
   findCandidateById(id: string): Promise<FiscalCandidateRecord | null>;
+  countOpenBlockingInconsistenciesByCandidateId(candidateId: string, tenantId: string): Promise<number>;
   updateFiscalCandidate(input: {
     id: string;
     tenantId: string;
@@ -270,6 +271,14 @@ export function createFiscalCandidateService(dependencies: { repository: FiscalC
 
       if (!canMarkCandidateReadyForBatch(candidate.status)) {
         throw new InvalidStateError(`Cannot mark fiscal candidate as ready from ${candidate.status}.`);
+      }
+
+      const openBlockingInconsistencies = await repository.countOpenBlockingInconsistenciesByCandidateId(
+        candidate.id,
+        input.context.tenantId
+      );
+      if (openBlockingInconsistencies > 0) {
+        throw new InvalidStateError("Fiscal candidate has open blocking inconsistencies.");
       }
 
       const updated = await repository.updateFiscalCandidate({

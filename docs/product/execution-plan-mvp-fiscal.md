@@ -1,4 +1,4 @@
-# Plano de Orquestracao e Execucao - MVP Fiscal Supervisionado
+﻿# Plano de Orquestracao e Execucao - MVP Fiscal Supervisionado
 
 Atualizado em: 2026-05-13
 
@@ -15,7 +15,7 @@ A regra central e simples: construir primeiro a base fiscal auditavel e segura, 
 | 2 | Fundacao RBAC, tenant e auditoria | Concluida | 100% | Comandos criticos protegidos | Codex + @qa |
 | 3 | Documentos e importacoes | Concluida | 100% | Importacao auditada por tenant | Codex + @qa |
 | 4 | Candidatos fiscais e fingerprint | Concluida | 100% | Candidato sem regra em UI | Codex + @architect |
-| 5 | Inconsistencias e revisao humana | Nao iniciada | 0% | Bloqueios e justificativas auditaveis | Codex + Claude + @qa |
+| 5 | Inconsistencias e revisao humana | Concluida | 100% | Bloqueios e justificativas auditaveis | Codex + Claude + @qa |
 | 6 | Lotes simulados sem emissao | Nao iniciada | 0% | Fluxo sem provider externo | Codex + Claude |
 | 7 | APIs e cockpit operacional | Nao iniciada | 0% | UI chama APIs/services, nao Prisma | Codex + Gemini |
 | 8 | QA, LGPD, auditoria e hardening | Nao iniciada | 0% | Regressao completa verde | Codex + @qa + @architect |
@@ -233,28 +233,28 @@ Nao iniciar antes de concluir:
 Objetivo: abrir, resolver e dispensar inconsistencias com justificativa e auditoria.
 
 Tarefas:
-- [ ] Implementar modelo de dominio de `FiscalInconsistency`.
-- [ ] Definir tipos iniciais: valor ausente, valor invalido, data ausente, tenant inconsistente, duplicidade provavel, dado sensivel pendente.
-- [ ] Separar severidade bloqueante e revisavel.
-- [ ] Implementar `openInconsistency`.
-- [ ] Implementar `resolveInconsistency`.
-- [ ] Implementar `waiveInconsistency`.
-- [ ] Exigir justificativa para resolucao ou dispensa.
-- [ ] Validar permissao `inconsistencies.resolve`.
-- [ ] Impedir resolucao de inconsistencia de outro tenant.
-- [ ] Atualizar estado do candidato quando bloqueios forem resolvidos.
-- [ ] Registrar auditoria `inconsistency.opened`.
-- [ ] Registrar auditoria `inconsistency.resolved`.
-- [ ] Registrar auditoria `inconsistency.waived`.
-- [ ] Criar testes de bloqueantes e revisaveis.
-- [ ] Criar testes de resolucao sem permissao.
+- [x] Implementar modelo de dominio de `FiscalInconsistency`.
+- [x] Definir tipos iniciais: valor ausente, valor invalido, data ausente, tenant inconsistente, duplicidade provavel, dado sensivel pendente.
+- [x] Separar severidade bloqueante e revisavel.
+- [x] Implementar `openInconsistency`.
+- [x] Implementar `resolveInconsistency`.
+- [x] Implementar `waiveInconsistency`.
+- [x] Exigir justificativa para resolucao ou dispensa.
+- [x] Validar permissao `inconsistencies.resolve`.
+- [x] Impedir resolucao de inconsistencia de outro tenant.
+- [x] Atualizar estado do candidato quando bloqueios forem resolvidos.
+- [x] Registrar auditoria `inconsistency.opened`.
+- [x] Registrar auditoria `inconsistency.resolved`.
+- [x] Registrar auditoria `inconsistency.waived`.
+- [x] Criar testes de bloqueantes e revisaveis.
+- [x] Criar testes de resolucao sem permissao.
 
 Checklist de aceite:
-- [ ] Inconsistencia bloqueante impede lote.
-- [ ] Inconsistencia revisavel exige justificativa.
-- [ ] Resolucao registra before/after payload quando aplicavel.
-- [ ] Tenant A nao resolve inconsistencia do tenant B.
-- [ ] Dashboard pode consumir contagem de abertas sem virar fonte de verdade.
+- [x] Inconsistencia bloqueante impede lote.
+- [x] Inconsistencia revisavel exige justificativa.
+- [x] Resolucao registra before/after payload quando aplicavel.
+- [x] Tenant A nao resolve inconsistencia do tenant B.
+- [x] Dashboard pode consumir contagem de abertas sem virar fonte de verdade.
 
 Agente/modelo recomendado:
 - Claude para taxonomia fiscal.
@@ -264,7 +264,6 @@ Agente/modelo recomendado:
 Nao iniciar antes de concluir:
 - Aprovacao de lote.
 - Simulacao de lote.
-
 ## 12. Sprint 6 - Lotes Simulados sem Emissao
 Objetivo: fechar o ciclo operacional com lote supervisionado, simulacao interna e aprovacao futura, sem provider externo.
 

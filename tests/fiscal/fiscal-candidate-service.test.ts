@@ -84,6 +84,7 @@ function makeRepository(overrides: Partial<FiscalCandidateRepository> = {}) {
     ),
     markImportRowCandidateCreated: vi.fn().mockResolvedValue(undefined),
     findCandidateById: vi.fn().mockResolvedValue(makeCandidate()),
+    countOpenBlockingInconsistenciesByCandidateId: vi.fn().mockResolvedValue(0),
     updateFiscalCandidate: vi.fn().mockImplementation(async (input) =>
       makeCandidate({
         id: input.id,
@@ -301,6 +302,15 @@ describe("markCandidateReadyForBatch", () => {
     await expect(
       service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "missing" })
     ).rejects.toThrow(NotFoundError);
+  });
+
+  it("blocks candidates with open blocking inconsistencies", async () => {
+    const repository = makeRepository({ countOpenBlockingInconsistenciesByCandidateId: vi.fn().mockResolvedValue(1) });
+    const service = createFiscalCandidateService({ repository, audit: makeAudit() });
+
+    await expect(
+      service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "candidate-1" })
+    ).rejects.toThrow(InvalidStateError);
   });
 
   it("blocks candidates that are not in review", async () => {
