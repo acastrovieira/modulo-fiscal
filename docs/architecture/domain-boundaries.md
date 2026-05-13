@@ -1,90 +1,90 @@
-# Fronteiras de Domínio
+# Fronteiras de Dominio
 
 ## Objetivo
-Definir responsabilidades dos módulos do VetFiscal OS para preservar uma arquitetura modular, SaaS-ready e segura para evolução fiscal, financeira e operacional.
+Definir responsabilidades dos modulos do VetFiscal OS para preservar uma arquitetura modular, SaaS-ready e segura para evolucao fiscal, financeira e operacional.
 
-## Direção de Dependências
-Cada módulo deve seguir DDD leve:
-- `presentation`: componentes, páginas ou adaptadores de interface.
-- `application`: casos de uso, comandos, queries e orquestração.
-- `domain`: entidades, value objects, políticas e regras do domínio.
-- `infrastructure`: Prisma, storage, provedores externos e adapters técnicos.
+## Direcao de Dependencias
+Cada modulo deve seguir DDD leve:
+- `presentation`: componentes, paginas ou adaptadores de interface.
+- `application`: casos de uso, comandos, queries e orquestracao.
+- `domain`: entidades, value objects, politicas e regras do dominio.
+- `infrastructure`: Prisma, storage, provedores externos e adapters tecnicos.
 
-A interface não acessa Prisma diretamente. Componentes chamam APIs, server actions ou services de aplicação. Permissões, tenant e auditoria são verificados no backend.
+A interface nao acessa Prisma diretamente. Componentes chamam APIs, server actions ou services de aplicacao. Permissoes, tenant e auditoria sao verificados no backend.
 
-## Módulos
+## Modulos
 ### identity
-Responsável por identidade de usuário, perfil local, sessão e ponte com Supabase Auth.
+Responsavel por identidade de usuario, perfil local, sessao e ponte com Supabase Auth.
 
-Não deve possuir regras fiscais, dados financeiros ou decisões de tenant além do necessário para autenticação.
+Nao deve possuir regras fiscais, dados financeiros ou decisoes de tenant alem do necessario para autenticacao.
 
 ### tenant
-Responsável por tenant, membership, papéis, tenant ativo e isolamento multiempresa.
+Responsavel por tenant, membership, papeis, tenant ativo e isolamento multiempresa.
 
-Não deve executar workflows fiscais. Deve fornecer contexto e garantias de escopo.
+Nao deve executar workflows fiscais. Deve fornecer contexto e garantias de escopo.
 
 ### audit
-Responsável por registrar eventos auditáveis, correlacionar ações e permitir consulta controlada.
+Responsavel por registrar eventos auditaveis, correlacionar acoes e permitir consulta controlada.
 
-Não deve ser usado como banco operacional primário. Payloads de auditoria complementam fatos, mas não substituem tabelas de domínio.
+Nao deve ser usado como banco operacional primario. Payloads de auditoria complementam fatos, mas nao substituem tabelas de dominio.
 
 ### documents
-Responsável por metadados de arquivos, checksums, storage path e controle de download.
+Responsavel por metadados de arquivos, checksums, storage path e controle de download.
 
-Não deve interpretar regra fiscal do conteúdo. Parsing pertence a imports ou fiscal, conforme o caso.
+Nao deve interpretar regra fiscal do conteudo. Parsing pertence a imports ou fiscal, conforme o caso.
 
 ### imports
-Responsável por receber fontes estruturadas, validar formato, normalizar registros e preparar dados para candidatos fiscais.
+Responsavel por receber fontes estruturadas, validar formato, normalizar registros e preparar dados para candidatos fiscais.
 
-Não deve emitir NFS-e nem tomar decisão fiscal final.
+Nao deve emitir NFS-e nem tomar decisao fiscal final.
 
 ### fiscal
-Responsável por candidatos fiscais, inconsistências, fingerprints, lotes supervisionados e políticas fiscais internas.
+Responsavel por candidatos fiscais, inconsistencias, fingerprints, lotes supervisionados e politicas fiscais internas.
 
-Não deve chamar provedor municipal diretamente. Integrações externas passam por contracts/adapters em integrations.
+Nao deve chamar provedor municipal diretamente. Integracoes externas passam por contracts/adapters em integrations.
 
 ### workflow
-Responsável por estados, transições, guards, histórico de fluxo e coordenação de processos longos.
+Responsavel por estados, transicoes, guards, historico de fluxo e coordenacao de processos longos.
 
-Não deve conter regra fiscal específica que pertence ao módulo fiscal.
+Nao deve conter regra fiscal especifica que pertence ao modulo fiscal.
 
 ### integrations
-Responsável por adapters externos futuros, incluindo provedores NFS-e, storage externo, mensageria e APIs terceiras.
+Responsavel por adapters externos futuros, incluindo provedores NFS-e, storage externo, mensageria e APIs terceiras.
 
-Não deve vazar detalhes de provider para módulos de domínio. O contrato interno governa a dependência.
+Nao deve vazar detalhes de provider para modulos de dominio. O contrato interno governa a dependencia.
 
 ### operational
-Responsável por visão operacional agregada, dashboard, filas de trabalho e indicadores de execução.
+Responsavel por visao operacional agregada, dashboard, filas de trabalho e indicadores de execucao.
 
-Não deve ser fonte de verdade de regras fiscais. Ele compõe leituras de outros módulos.
+Nao deve ser fonte de verdade de regras fiscais. Ele compoe leituras de outros modulos.
 
 ### observability
-Responsável por logs estruturados, traces futuros, métricas, Sentry futuro e diagnóstico técnico.
+Responsavel por logs estruturados, traces futuros, metricas, Sentry futuro e diagnostico tecnico.
 
-Não deve armazenar dados sensíveis sem mascaramento e não substitui auditoria de negócio.
+Nao deve armazenar dados sensiveis sem mascaramento e nao substitui auditoria de negocio.
 
 ## Regras Transversais
-- Tabelas críticas devem carregar `tenantId`.
-- Ações críticas validam `currentUser`, `currentTenant` e `assertPermission`.
-- Ações críticas registram `audit.record`.
-- Dados sensíveis devem ser mascaráveis em UI, logs e eventos técnicos.
-- Valores monetários futuros devem ser armazenados em centavos.
-- Datas devem ser persistidas de forma consistente e comparável.
+- Tabelas criticas devem carregar `tenantId`.
+- Acoes criticas validam `currentUser`, `currentTenant` e `assertPermission`.
+- Acoes criticas registram `audit.record`.
+- Dados sensiveis devem ser mascaraveis em UI, logs e eventos tecnicos.
+- Valores monetarios futuros devem ser armazenados em centavos.
+- Datas devem ser persistidas de forma consistente e comparavel.
 - `correlationId` acompanha comandos, auditoria e logs.
-- Fiscal logic não deve residir em React.
+- Fiscal logic nao deve residir em React.
 
-## Persistência
-Prisma é o acesso primário ao PostgreSQL. Repositórios e gateways devem ficar em `infrastructure`, enquanto casos de uso ficam em `application`.
+## Persistencia
+Prisma e o acesso primario ao PostgreSQL. Repositorios e gateways devem ficar em `infrastructure`, enquanto casos de uso ficam em `application`.
 
-JSON pode ser usado em auditoria e metadados, mas fatos operacionais importantes devem ganhar modelo próprio quando virarem parte do workflow.
+JSON pode ser usado em auditoria e metadados, mas fatos operacionais importantes devem ganhar modelo proprio quando virarem parte do workflow.
 
-## Integrações Futuras
-Adapters de NFS-e devem ser introduzidos atrás de contratos internos, respeitando:
-- idempotência;
-- simulação/homologação antes de produção;
-- segregação por tenant;
+## Integracoes Futuras
+Adapters de NFS-e devem ser introduzidos atras de contratos internos, respeitando:
+- idempotencia;
+- simulacao/homologacao antes de producao;
+- segregacao por tenant;
 - rastreabilidade de payloads;
-- aprovação humana antes de efeitos fiscais reais.
+- aprovacao humana antes de efeitos fiscais reais.
 
-## Implicação Para o PRD
-O PRD deve organizar requisitos por módulo e jornada operacional. Cada requisito precisa indicar ator, permissão, estado inicial, estado final, auditoria esperada e dados sensíveis envolvidos.
+## Implicacao Para o PRD
+O PRD deve organizar requisitos por modulo e jornada operacional. Cada requisito precisa indicar ator, permissao, estado inicial, estado final, auditoria esperada e dados sensiveis envolvidos.

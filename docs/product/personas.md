@@ -1,120 +1,120 @@
-# Personas e Papéis Operacionais
+# Personas e Papeis Operacionais
 
 ## Objetivo
-Este documento define as personas iniciais do VetFiscal OS e sua relação com os papéis de RBAC. A intenção é evitar telas genéricas e orientar o PRD por workflows reais de clínicas veterinárias.
+Este documento define as personas iniciais do VetFiscal OS e sua relacao com os papeis de RBAC. A intencao e evitar telas genericas e orientar o PRD por workflows reais de clinicas veterinarias.
 
-## Dono da Clínica
+## Dono da Clinica
 **Papel sugerido:** OWNER
 
-Responsável final pela operação da clínica, conformidade fiscal, delegação de acessos e acompanhamento de indicadores.
+Responsavel final pela operacao da clinica, conformidade fiscal, delegacao de acessos e acompanhamento de indicadores.
 
 Necessidades principais:
-- Ver pendências fiscais sem entrar em detalhes técnicos.
-- Saber se há risco operacional ou fiscal relevante.
-- Delegar acessos com segurança.
-- Consultar auditoria quando houver divergência.
+- Ver pendencias fiscais sem entrar em detalhes tecnicos.
+- Saber se ha risco operacional ou fiscal relevante.
+- Delegar acessos com seguranca.
+- Consultar auditoria quando houver divergencia.
 
-Não deve:
-- Executar ações fiscais técnicas por acidente.
-- Receber telas de configuração avançada como experiência padrão.
+Nao deve:
+- Executar acoes fiscais tecnicas por acidente.
+- Receber telas de configuracao avancada como experiencia padrao.
 
-## Administrador da Clínica
+## Administrador da Clinica
 **Papel sugerido:** ADMIN
 
-Pessoa responsável por usuários, configuração operacional e apoio ao time fiscal ou financeiro.
+Pessoa responsavel por usuarios, configuracao operacional e apoio ao time fiscal ou financeiro.
 
 Necessidades principais:
 - Gerenciar membros do tenant.
-- Acompanhar status de importações e documentos.
-- Ajustar dados administrativos da clínica.
-- Apoiar resolução de pendências operacionais.
+- Acompanhar status de importacoes e documentos.
+- Ajustar dados administrativos da clinica.
+- Apoiar resolucao de pendencias operacionais.
 
-Não deve:
-- Executar emissão futura sem permissão fiscal específica.
+Nao deve:
+- Executar emissao futura sem permissao fiscal especifica.
 - Alterar regras fiscais versionadas sem trilha de auditoria.
 
 ## Gestor Fiscal
 **Papel sugerido:** FISCAL_MANAGER
 
-Responsável por revisar, aprovar e supervisionar o processo fiscal antes de qualquer emissão futura.
+Responsavel por revisar, aprovar e supervisionar o processo fiscal antes de qualquer emissao futura.
 
 Necessidades principais:
-- Ver candidatos fiscais, inconsistências e lotes.
+- Ver candidatos fiscais, inconsistencias e lotes.
 - Aprovar lotes para etapa supervisionada.
-- Justificar decisões e resoluções.
-- Consultar trilha de auditoria por correlação.
+- Justificar decisoes e resolucoes.
+- Consultar trilha de auditoria por correlacao.
 
-Não deve:
-- Depender de lógica fiscal embutida em interface.
-- Aprovar lote sem evidência, estado consistente e permissões validadas no backend.
+Nao deve:
+- Depender de logica fiscal embutida em interface.
+- Aprovar lote sem evidencia, estado consistente e permissoes validadas no backend.
 
 ## Operador Fiscal
 **Papel sugerido:** FISCAL_OPERATOR
 
-Pessoa que prepara importações, revisa candidatos e resolve pendências sob supervisão.
+Pessoa que prepara importacoes, revisa candidatos e resolve pendencias sob supervisao.
 
 Necessidades principais:
-- Criar importações.
+- Criar importacoes.
 - Visualizar candidatos fiscais.
-- Marcar inconsistências para revisão.
-- Preparar lotes para aprovação do gestor.
+- Marcar inconsistencias para revisao.
+- Preparar lotes para aprovacao do gestor.
 
-Não deve:
-- Aprovar lote final sem permissão.
-- Executar emissão futura.
-- Alterar configurações fiscais estruturais.
+Nao deve:
+- Aprovar lote final sem permissao.
+- Executar emissao futura.
+- Alterar configuracoes fiscais estruturais.
 
 ## Operador Financeiro
 **Papel sugerido:** FINANCIAL_OPERATOR
 
-Pessoa que futuramente acompanhará recebimentos, conciliações, fluxo de caixa e indicadores financeiros.
+Pessoa que futuramente acompanhara recebimentos, conciliacoes, fluxo de caixa e indicadores financeiros.
 
 Necessidades principais:
 - Visualizar impactos financeiros relacionados a documentos e receitas.
-- Apoiar conferência de valores futuros em centavos.
-- Consultar pendências que afetam faturamento.
+- Apoiar conferencia de valores futuros em centavos.
+- Consultar pendencias que afetam faturamento.
 
-Não deve:
-- Executar decisões fiscais sem papel fiscal.
-- Acessar dados pessoais além do necessário.
+Nao deve:
+- Executar decisoes fiscais sem papel fiscal.
+- Acessar dados pessoais alem do necessario.
 
 ## Contador Externo
 **Papel sugerido:** ACCOUNTANT
 
-Profissional externo que apoia conformidade fiscal, parametrização e conferência de evidências.
+Profissional externo que apoia conformidade fiscal, parametrizacao e conferencia de evidencias.
 
 Necessidades principais:
-- Consultar candidatos, inconsistências e auditoria quando autorizado.
-- Validar critérios fiscais fora do sistema quando necessário.
-- Registrar recomendações ou observações auditáveis em fluxos futuros.
+- Consultar candidatos, inconsistencias e auditoria quando autorizado.
+- Validar criterios fiscais fora do sistema quando necessario.
+- Registrar recomendacoes ou observacoes auditaveis em fluxos futuros.
 
-Não deve:
-- Gerenciar usuários do tenant por padrão.
-- Executar ações operacionais sem autorização explícita.
+Nao deve:
+- Gerenciar usuarios do tenant por padrao.
+- Executar acoes operacionais sem autorizacao explicita.
 
 ## Auditor
 **Papel sugerido:** AUDITOR
 
-Pessoa que precisa consultar evidências sem alterar o estado operacional.
+Pessoa que precisa consultar evidencias sem alterar o estado operacional.
 
 Necessidades principais:
 - Ver eventos de auditoria.
 - Baixar documentos quando permitido.
-- Rastrear ações por tenant, ator, entidade e `correlationId`.
+- Rastrear acoes por tenant, ator, entidade e `correlationId`.
 
-Não deve:
-- Criar importações.
-- Resolver inconsistências.
+Nao deve:
+- Criar importacoes.
+- Resolver inconsistencias.
 - Aprovar ou executar lotes.
 
-## Matriz Inicial de Intenção de Acesso
-- OWNER: gestão completa do tenant, usuários, auditoria e supervisão executiva.
-- ADMIN: gestão operacional e usuários, sem poder fiscal irrestrito por padrão.
-- FISCAL_MANAGER: revisão, simulação e aprovação de lotes fiscais.
-- FISCAL_OPERATOR: importação, visualização e preparação fiscal.
-- FINANCIAL_OPERATOR: visão financeira futura e apoio operacional.
-- ACCOUNTANT: consulta e revisão técnica autorizada.
-- AUDITOR: leitura auditável e acesso restrito a evidências.
+## Matriz Inicial de Intencao de Acesso
+- OWNER: gestao completa do tenant, usuarios, auditoria e supervisao executiva.
+- ADMIN: gestao operacional e usuarios, sem poder fiscal irrestrito por padrao.
+- FISCAL_MANAGER: revisao, simulacao e aprovacao de lotes fiscais.
+- FISCAL_OPERATOR: importacao, visualizacao e preparacao fiscal.
+- FINANCIAL_OPERATOR: visao financeira futura e apoio operacional.
+- ACCOUNTANT: consulta e revisao tecnica autorizada.
+- AUDITOR: leitura auditavel e acesso restrito a evidencias.
 
 ## Responsabilidade Humana
-O VetFiscal OS deve deixar claro quem preparou, quem revisou, quem aprovou e qual evidência sustentou cada transição crítica. A automação apoia o trabalho, mas não substitui a responsabilidade fiscal humana no MVP.
+O VetFiscal OS deve deixar claro quem preparou, quem revisou, quem aprovou e qual evidencia sustentou cada transicao critica. A automacao apoia o trabalho, mas nao substitui a responsabilidade fiscal humana no MVP.

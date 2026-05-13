@@ -10,7 +10,7 @@ A regra central e simples: construir primeiro a base fiscal auditavel e segura, 
 ## 2. Dashboard de Evolucao
 | Ordem | Sprint | Status | Progresso | Gate principal | Squad recomendado |
 | --- | --- | --- | --- | --- | --- |
-| 0 | Planejamento e governanca | Concluida parcial | 70% | PRD e plano criados | Codex + @pm/@po |
+| 0 | Planejamento e governanca | Concluida | 100% | PM/PO/architect revisados | Codex + @pm/@po + @architect |
 | 1 | Schema operacional e migrations | Nao iniciada | 0% | Prisma validate/generate OK | Codex + @architect |
 | 2 | Fundacao RBAC, tenant e auditoria | Nao iniciada | 0% | Comandos criticos protegidos | Codex + Claude |
 | 3 | Documentos e importacoes | Nao iniciada | 0% | Importacao auditada por tenant | Codex |
@@ -66,7 +66,7 @@ Antes de encerrar qualquer sprint:
 - [ ] Nenhuma tela virou CRUD generico sem workflow.
 
 ## 6. Sprint 0 - Planejamento e Governanca
-Status inicial: concluida parcial.
+Status inicial: concluida.
 
 Objetivo: consolidar artefatos que guiam a execucao sem ambiguidade.
 
@@ -80,13 +80,16 @@ Checklist da sprint:
 - [x] Criar inputs do PRD.
 - [x] Criar PRD do MVP Fiscal Supervisionado.
 - [x] Criar plano de orquestracao e execucao.
-- [ ] Revisar plano com `@pm` ou `@po` antes da Sprint 1.
-- [ ] Revisar riscos de schema com `@architect` antes da Sprint 1.
+- [x] Criar stories minimas de readiness e Sprint 1.
+- [x] Padronizar status de lote como APPROVED_FOR_FUTURE_ISSUANCE.
+- [x] Revisar encoding dos docs criticos de produto e arquitetura.
+- [x] Revisar plano com `@pm` e `@po` antes da Sprint 1.
+- [x] Revisar riscos de schema com `@architect` antes da Sprint 1.
 
 Criterios de aceite:
 - [x] PRD existe em `docs/product/prd-mvp-fiscal-supervisionado.md`.
 - [x] Plano de execucao existe em `docs/product/execution-plan-mvp-fiscal.md`.
-- [ ] Backlog inicial pode ser convertido em stories em `docs/stories/`.
+- [x] Backlog inicial convertido em stories minimas em `docs/stories/`.
 
 Agente/modelo recomendado:
 - Codex para criar artefatos e commit.

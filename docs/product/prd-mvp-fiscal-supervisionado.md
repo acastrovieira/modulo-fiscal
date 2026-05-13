@@ -127,7 +127,7 @@ Regra de engenharia: valores monetarios devem ser armazenados em centavos.
 - DRAFT: lote em preparacao.
 - IN_REVIEW: lote em revisao por gestor fiscal.
 - SIMULATED: lote passou por simulacao interna futura.
-- APPROVED: lote aprovado para etapa futura.
+- APPROVED_FOR_FUTURE_ISSUANCE: lote aprovado para etapa futura, sem emissao real.
 - CANCELLED: lote cancelado com motivo auditavel.
 
 ## 9. Inconsistencias
@@ -257,7 +257,7 @@ Eventos obrigatorios:
 - `batch.created`
 - `batch.submitted_for_review`
 - `batch.simulated`
-- `batch.approved`
+- `batch.approved_for_future_issuance`
 - `batch.cancelled`
 
 Payload minimo:

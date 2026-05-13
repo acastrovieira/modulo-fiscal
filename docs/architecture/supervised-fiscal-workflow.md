@@ -1,53 +1,53 @@
 # Workflow Fiscal Supervisionado
 
 ## Objetivo
-Definir o fluxo operacional inicial para importações, candidatos fiscais, inconsistências e lotes supervisionados. Este documento orienta o PRD e futuras implementações sem introduzir emissão real de NFS-e nesta fase.
+Definir o fluxo operacional inicial para importacoes, candidatos fiscais, inconsistencias e lotes supervisionados. Este documento orienta o PRD e futuras implementacoes sem introduzir emissao real de NFS-e nesta fase.
 
-## Princípios
-- Toda transição crítica acontece no backend.
-- Componentes React exibem estado e disparam comandos, mas não executam lógica fiscal.
-- Cada comando crítico valida tenant, permissão e estado atual.
-- Cada transição relevante gera evento de auditoria.
-- Operações repetíveis devem usar idempotência.
-- Revisão humana é parte obrigatória do fluxo fiscal.
+## Principios
+- Toda transicao critica acontece no backend.
+- Componentes React exibem estado e disparam comandos, mas nao executam logica fiscal.
+- Cada comando critico valida tenant, permissao e estado atual.
+- Cada transicao relevante gera evento de auditoria.
+- Operacoes repetiveis devem usar idempotencia.
+- Revisao humana e parte obrigatoria do fluxo fiscal.
 
 ## Estados Conceituais
 ### ImportBatch
-- DRAFT: lote de importação iniciado, ainda sem processamento.
-- PENDING_VALIDATION: arquivo recebido e aguardando validação.
-- VALIDATING: validação em andamento.
-- VALIDATED: importação validada sem bloqueios críticos.
-- HAS_ERRORS: importação contém erros bloqueantes.
+- DRAFT: lote de importacao iniciado, ainda sem processamento.
+- PENDING_VALIDATION: arquivo recebido e aguardando validacao.
+- VALIDATING: validacao em andamento.
+- VALIDATED: importacao validada sem bloqueios criticos.
+- HAS_ERRORS: importacao contem erros bloqueantes.
 - READY_FOR_REVIEW: dados importados podem ser revisados por operador fiscal.
-- ARCHIVED: importação preservada para consulta, sem novas ações.
+- ARCHIVED: importacao preservada para consulta, sem novas acoes.
 
 ### ImportRow
 - RECEIVED: linha recebida do arquivo ou fonte estruturada.
 - NORMALIZED: linha convertida para formato interno.
-- REJECTED: linha rejeitada por erro estrutural ou regra mínima.
+- REJECTED: linha rejeitada por erro estrutural ou regra minima.
 - CANDIDATE_CREATED: linha originou um candidato fiscal.
 
 ### FiscalCandidate
 - DRAFT: candidato criado, ainda incompleto.
-- NEEDS_REVIEW: candidato precisa de conferência humana.
-- BLOCKED: candidato bloqueado por inconsistência.
+- NEEDS_REVIEW: candidato precisa de conferencia humana.
+- BLOCKED: candidato bloqueado por inconsistencia.
 - READY_FOR_BATCH: candidato revisado e apto para lote supervisionado.
 - IN_BATCH: candidato associado a um lote.
-- SIMULATED: candidato passou por simulação interna futura.
-- APPROVED_FOR_FUTURE_ISSUANCE: candidato aprovado para etapa futura, sem emissão real nesta fase.
+- SIMULATED: candidato passou por simulacao interna futura.
+- APPROVED_FOR_FUTURE_ISSUANCE: candidato aprovado para etapa futura, sem emissao real nesta fase.
 
 ### FiscalInconsistency
-- OPEN: inconsistência criada e pendente.
-- IN_REVIEW: inconsistência em análise humana.
-- RESOLVED: inconsistência resolvida com evidência.
-- WAIVED: inconsistência dispensada com justificativa auditável.
+- OPEN: inconsistencia criada e pendente.
+- IN_REVIEW: inconsistencia em analise humana.
+- RESOLVED: inconsistencia resolvida com evidencia.
+- WAIVED: inconsistencia dispensada com justificativa auditavel.
 
 ### FiscalBatch
-- DRAFT: lote em preparação.
-- IN_REVIEW: lote em revisão por gestor fiscal.
-- SIMULATED: lote passou por simulação interna futura.
-- APPROVED: lote aprovado para etapa futura supervisionada.
-- CANCELLED: lote cancelado com motivo auditável.
+- DRAFT: lote em preparacao.
+- IN_REVIEW: lote em revisao por gestor fiscal.
+- SIMULATED: lote passou por simulacao interna futura.
+- APPROVED_FOR_FUTURE_ISSUANCE: lote aprovado para etapa futura supervisionada, sem emissao real.
+- CANCELLED: lote cancelado com motivo auditavel.
 
 ## Eventos Internos Iniciais
 - imports.created
@@ -63,21 +63,21 @@ Definir o fluxo operacional inicial para importações, candidatos fiscais, inco
 - batch.created
 - batch.submitted_for_review
 - batch.simulated
-- batch.approved
+- batch.approved_for_future_issuance
 - batch.cancelled
 
-## Permissões Por Transição
-- Criar importação: `imports.create`
-- Ver importações: `imports.view`
+## Permissoes Por Transicao
+- Criar importacao: `imports.create`
+- Ver importacoes: `imports.view`
 - Ver candidatos: `candidates.view`
-- Resolver inconsistência: `inconsistencies.resolve`
+- Resolver inconsistencia: `inconsistencies.resolve`
 - Simular lote futuro: `batches.simulate`
 - Aprovar lote: `batches.approve`
 - Consultar auditoria: `audit.view`
 - Baixar documentos: `documents.download`
 
 ## Auditoria
-Cada transição crítica deve registrar:
+Cada transicao critica deve registrar:
 - tenantId
 - actorId
 - eventType
@@ -89,20 +89,20 @@ Cada transição crítica deve registrar:
 - correlationId
 - createdAt
 
-A auditoria deve permitir reconstruir a decisão operacional sem depender de logs técnicos voláteis.
+A auditoria deve permitir reconstruir a decisao operacional sem depender de logs tecnicos volateis.
 
-## Idempotência
-Comandos que criam ou mudam estados relevantes devem aceitar uma chave de idempotência futura. A chave deve considerar tenant, ator, comando e entidade-alvo quando aplicável.
+## Idempotencia
+Comandos que criam ou mudam estados relevantes devem aceitar uma chave de idempotencia futura. A chave deve considerar tenant, ator, comando e entidade-alvo quando aplicavel.
 
 ## Fingerprint Fiscal
-O fingerprint fiscal deve ser versionado e calculado fora da interface. Ele será usado futuramente para detectar duplicidade, mudanças relevantes de dados e reprocessamentos seguros.
+O fingerprint fiscal deve ser versionado e calculado fora da interface. Ele sera usado futuramente para detectar duplicidade, mudancas relevantes de dados e reprocessamentos seguros.
 
 ## Limites Desta Fase
-- Não existe provider adapter ativo.
-- Não existe envio para prefeitura.
-- Não existe certificado digital.
-- Não existe scraping.
-- Não existe motor fiscal municipal completo.
+- Nao existe provider adapter ativo.
+- Nao existe envio para prefeitura.
+- Nao existe certificado digital.
+- Nao existe scraping.
+- Nao existe motor fiscal municipal completo.
 
-## Implicação Para o PRD
-O PRD deve descrever jornadas por transição de estado, não por CRUD. Cada tela precisa responder qual trabalho operacional está sendo feito, qual risco está sendo reduzido e qual evidência fica registrada.
+## Implicacao Para o PRD
+O PRD deve descrever jornadas por transicao de estado, nao por CRUD. Cada tela precisa responder qual trabalho operacional esta sendo feito, qual risco esta sendo reduzido e qual evidencia fica registrada.
