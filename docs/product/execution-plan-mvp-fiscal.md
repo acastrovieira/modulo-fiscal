@@ -16,7 +16,7 @@ A regra central e simples: construir primeiro a base fiscal auditavel e segura, 
 | 3 | Documentos e importacoes | Concluida | 100% | Importacao auditada por tenant | Codex + @qa |
 | 4 | Candidatos fiscais e fingerprint | Concluida | 100% | Candidato sem regra em UI | Codex + @architect |
 | 5 | Inconsistencias e revisao humana | Concluida | 100% | Bloqueios e justificativas auditaveis | Codex + Claude + @qa |
-| 6 | Lotes simulados sem emissao | Nao iniciada | 0% | Fluxo sem provider externo | Codex + Claude |
+| 6 | Lotes simulados sem emissao | Concluida | 100% | Fluxo sem provider externo | Codex + Claude |
 | 7 | APIs e cockpit operacional | Nao iniciada | 0% | UI chama APIs/services, nao Prisma | Codex + Gemini |
 | 8 | QA, LGPD, auditoria e hardening | Nao iniciada | 0% | Regressao completa verde | Codex + @qa + @architect |
 
@@ -268,27 +268,27 @@ Nao iniciar antes de concluir:
 Objetivo: fechar o ciclo operacional com lote supervisionado, simulacao interna e aprovacao futura, sem provider externo.
 
 Tarefas:
-- [ ] Implementar modelo de dominio de `FiscalBatch`.
-- [ ] Implementar itens de lote vinculados a candidatos.
-- [ ] Implementar `createFiscalBatch`.
-- [ ] Implementar `submitBatchForReview`.
-- [ ] Implementar `simulateBatchInternally`.
-- [ ] Implementar `approveBatchForFutureIssuance`.
-- [ ] Implementar `cancelBatch`.
-- [ ] Validar que apenas candidatos `READY_FOR_BATCH` entram no lote.
-- [ ] Impedir mistura de tenants em lote.
-- [ ] Separar permissao `batches.simulate` de `batches.approve`.
-- [ ] Registrar auditoria para criacao, envio, simulacao, aprovacao e cancelamento.
-- [ ] Criar testes para candidato bloqueado em lote.
-- [ ] Criar testes para aprovacao sem permissao.
-- [ ] Criar teste de regressao garantindo ausencia de provider NFS-e.
+- [x] Implementar modelo de dominio de `FiscalBatch`.
+- [x] Implementar itens de lote vinculados a candidatos.
+- [x] Implementar `createFiscalBatch`.
+- [x] Implementar `submitBatchForReview`.
+- [x] Implementar `simulateBatchInternally`.
+- [x] Implementar `approveBatchForFutureIssuance`.
+- [x] Implementar `cancelBatch`.
+- [x] Validar que apenas candidatos `READY_FOR_BATCH` entram no lote.
+- [x] Impedir mistura de tenants em lote.
+- [x] Separar permissao `batches.simulate` de `batches.approve`.
+- [x] Registrar auditoria para criacao, envio, simulacao, aprovacao e cancelamento.
+- [x] Criar testes para candidato bloqueado em lote.
+- [x] Criar testes para aprovacao sem permissao.
+- [x] Criar teste de regressao garantindo ausencia de provider NFS-e.
 
 Checklist de aceite:
-- [ ] Nenhum lote chama prefeitura ou provider externo.
-- [ ] Aprovacao significa somente etapa futura supervisionada.
-- [ ] Lote nao mistura tenants.
-- [ ] Lote nao aceita candidato bloqueado.
-- [ ] Auditoria completa existe para o ciclo do lote.
+- [x] Nenhum lote chama prefeitura ou provider externo.
+- [x] Aprovacao significa somente etapa futura supervisionada.
+- [x] Lote nao mistura tenants.
+- [x] Lote nao aceita candidato bloqueado.
+- [x] Auditoria completa existe para o ciclo do lote.
 
 Agente/modelo recomendado:
 - Codex para implementation e testes.
@@ -298,7 +298,6 @@ Agente/modelo recomendado:
 Nao iniciar antes de concluir:
 - Tela final de lote.
 - Regressao ponta a ponta.
-
 ## 13. Sprint 7 - APIs e Cockpit Operacional
 Objetivo: expor services de forma segura e criar experiencia operacional sem regra fiscal em React.
 
