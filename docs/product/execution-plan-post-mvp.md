@@ -1,4 +1,4 @@
-# Plano de Orquestracao e Execucao - Pos-MVP VetFiscal OS
+﻿# Plano de Orquestracao e Execucao - Pos-MVP VetFiscal OS
 
 Atualizado em: 2026-05-13
 
@@ -222,22 +222,22 @@ Agentes/modelos:
 Objetivo: tornar auditoria e documentos utilizaveis com permissoes e minimizacao de dados.
 
 Tarefas:
-- [ ] Criar API `GET /api/audit-events` protegida por `audit.view`.
-- [ ] Criar filtros por entidade, evento, data e correlationId.
-- [ ] Criar tela de trilha de auditoria.
-- [ ] Criar API de metadata de documentos protegida por tenant.
-- [ ] Preparar fluxo futuro de download protegido por `documents.download`.
-- [ ] Registrar evento conceitual de visualizacao/download quando aplicavel.
-- [ ] Criar helper de sanitizacao/mascaramento para logs e DTOs.
-- [ ] Documentar politica inicial LGPD de minimizacao e retencao.
-- [ ] Criar testes de acesso negado para audit/documents.
+- [x] Criar API `GET /api/audit-events` protegida por `audit.view`.
+- [x] Criar filtros por entidade, evento, data e correlationId.
+- [x] Criar tela de trilha de auditoria.
+- [x] Criar API de metadata de documentos protegida por tenant.
+- [x] Preparar fluxo futuro de download protegido por `documents.download`.
+- [x] Registrar evento conceitual de visualizacao/download quando aplicavel.
+- [x] Criar helper de sanitizacao/mascaramento para logs e DTOs.
+- [x] Documentar politica inicial LGPD de minimizacao e retencao.
+- [x] Criar testes de acesso negado para audit/documents.
 
 Checklist de aceite:
-- [ ] Apenas roles com `audit.view` acessam eventos.
-- [ ] Apenas roles com `documents.download` acessam documento/download.
-- [ ] Auditoria nao exp�e payload sensivel completo por padrao.
-- [ ] DTOs usam allowlist.
-- [ ] Logs/erros publicos seguem envelope seguro.
+- [x] Apenas roles com `audit.view` acessam eventos.
+- [x] Apenas roles com `documents.download` acessam documento/download.
+- [x] Auditoria nao expõe payload sensivel completo por padrao.
+- [x] DTOs usam allowlist.
+- [x] Logs/erros publicos seguem envelope seguro.
 
 Agentes/modelos:
 - Codex para APIs/telas/testes.
@@ -302,3 +302,4 @@ Agentes/modelos:
 - [ ] LGPD basica documentada e testada.
 - [ ] Runbooks e checklist beta existem.
 - [ ] Nenhuma emissao real, scraping ou provider externo foi introduzido.
+

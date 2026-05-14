@@ -1,12 +1,12 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertCircle, ArrowUpRight, CheckCircle2, ClipboardList, FileInput, Layers3, RefreshCw, Search, ShieldCheck } from "lucide-react";
+import { AlertCircle, Archive, ArrowUpRight, CheckCircle2, ClipboardList, FileInput, Layers3, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/status/status-badge";
 
-type ResourceKind = "imports" | "candidates" | "inconsistencies" | "batches";
+type ResourceKind = "imports" | "candidates" | "inconsistencies" | "batches" | "audit" | "documents";
 type ApiEnvelope = { data: Array<Record<string, unknown>>; requestId: string };
 type ApiErrorEnvelope = { error: { code: string; message: string; requestId: string } };
 
@@ -18,6 +18,7 @@ function asDate(value: unknown): string { if (!value) return "-"; return new Int
 function asMoney(value: unknown): string { if (!value) return "-"; const cents = Number(value); if (!Number.isFinite(cents)) return String(value); return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100); }
 function toneForStatus(value: unknown): "neutral" | "attention" | "critical" | "success" { const status = String(value ?? ""); if (["BLOCKED", "HAS_ERRORS", "OPEN", "CANCELLED"].includes(status)) return "critical"; if (["NEEDS_REVIEW", "READY_FOR_REVIEW", "IN_REVIEW", "SIMULATED", "DRAFT"].includes(status)) return "attention"; if (["READY_FOR_BATCH", "APPROVED_FOR_FUTURE_ISSUANCE", "RESOLVED", "WAIVED", "VALIDATED"].includes(status)) return "success"; return "neutral"; }
 function statusCell(row: Record<string, unknown>) { return <StatusBadge tone={toneForStatus(row.status)}>{asText(row.status)}</StatusBadge>; }
+function summaryGroup(row: Record<string, unknown>): string { return asText(row.status ?? row.eventType ?? row.fileType ?? "registros"); }
 function isApiError(value: unknown): value is ApiErrorEnvelope { return typeof value === "object" && value !== null && "error" in value; }
 
 const configs: Record<ResourceKind, Config> = {
@@ -92,6 +93,42 @@ const configs: Record<ResourceKind, Config> = {
       { key: "approvedAt", label: "Aprovado", render: (row) => asDate(row.approvedAt) }
     ],
     guardrails: ["NFS-e real desativada", "Provider externo nao chamado", "Aprovacao e apenas futura"]
+  },
+  audit: {
+    title: "Trilha de auditoria",
+    eyebrow: "Rastreabilidade operacional",
+    helper: "Consulte eventos do tenant ativo com payloads sensiveis sempre resumidos e redigidos.",
+    endpoint: "/api/audit-events",
+    icon: ShieldCheck,
+    primaryAction: "Filtrar eventos",
+    empty: "Nenhum evento de auditoria encontrado.",
+    columns: [
+      { key: "eventType", label: "Evento" },
+      { key: "entityType", label: "Entidade" },
+      { key: "entityId", label: "ID entidade" },
+      { key: "actorId", label: "Ator" },
+      { key: "correlationId", label: "Correlacao" },
+      { key: "createdAt", label: "Criado", render: (row) => asDate(row.createdAt) }
+    ],
+    guardrails: ["audit.view no backend", "Payloads sensiveis resumidos", "CorrelationId rastreavel"]
+  },
+  documents: {
+    title: "Documentos fiscais",
+    eyebrow: "Metadados seguros",
+    helper: "Acompanhe arquivos do tenant sem expor storage interno, path real ou download de producao.",
+    endpoint: "/api/documents",
+    icon: Archive,
+    primaryAction: "Preparar download",
+    empty: "Nenhum documento encontrado.",
+    columns: [
+      { key: "fileName", label: "Arquivo" },
+      { key: "fileType", label: "Tipo" },
+      { key: "mimeType", label: "MIME" },
+      { key: "checksumSha256Preview", label: "Checksum" },
+      { key: "sizeBytes", label: "Bytes" },
+      { key: "createdAt", label: "Criado", render: (row) => asDate(row.createdAt) }
+    ],
+    guardrails: ["documents.download no backend", "storagePath nao exposto", "Download real ainda desativado"]
   }
 };
 
@@ -118,7 +155,7 @@ export function OperationalWorkflowPage({ kind }: Readonly<{ kind: ResourceKind 
   }, [config.endpoint]);
 
   useEffect(() => { void load(); }, [load]);
-  const statusSummary = useMemo(() => rows.reduce<Record<string, number>>((acc, row) => { const key = asText(row.status); acc[key] = (acc[key] ?? 0) + 1; return acc; }, {}), [rows]);
+  const statusSummary = useMemo(() => rows.reduce<Record<string, number>>((acc, row) => { const key = summaryGroup(row); acc[key] = (acc[key] ?? 0) + 1; return acc; }, {}), [rows]);
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-5">

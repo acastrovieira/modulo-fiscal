@@ -1,4 +1,4 @@
-export const roles = [
+﻿export const roles = [
   "OWNER",
   "ADMIN",
   "FISCAL_MANAGER",
@@ -55,5 +55,7 @@ export const rolePermissions: Record<Role, readonly Permission[]> = {
 };
 
 export function hasPermission(role: Role, permission: Permission): boolean {
-  return rolePermissions[role].includes(permission);
+  return (rolePermissions[role] ?? []).includes(permission);
 }
+
+

@@ -1,4 +1,4 @@
-import { Activity, Archive, Building2, ClipboardCheck, FileInput, Gauge, Layers3, Landmark, ShieldCheck, TriangleAlert } from "lucide-react";
+﻿import { Activity, Archive, Building2, ClipboardCheck, FileInput, Gauge, Layers3, Landmark, ShieldCheck, TriangleAlert } from "lucide-react";
 
 const navigation = [
   { label: "Dashboard", href: "/dashboard", icon: Gauge },
@@ -6,9 +6,9 @@ const navigation = [
   { label: "Candidatos", href: "/dashboard/candidates", icon: ClipboardCheck },
   { label: "Inconsistencias", href: "/dashboard/inconsistencies", icon: TriangleAlert },
   { label: "Lotes", href: "/dashboard/batches", icon: Layers3 },
-  { label: "Documentos", href: "#", icon: Archive },
+  { label: "Documentos", href: "/dashboard/documents", icon: Archive },
   { label: "Tenant", href: "#", icon: Building2 },
-  { label: "Auditoria", href: "#", icon: ShieldCheck },
+  { label: "Auditoria", href: "/dashboard/audit", icon: ShieldCheck },
   { label: "Operacional", href: "#", icon: Activity },
   { label: "Financeiro", href: "#", icon: Landmark }
 ];
