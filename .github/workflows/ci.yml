@@ -1,0 +1,86 @@
+name: VetFiscal CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - codex/**
+  push:
+    branches:
+      - main
+      - master
+      - codex/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vetfiscal-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vetfiscal_ci?schema=public
+  DIRECT_URL: postgresql://postgres:postgres@localhost:5432/vetfiscal_ci?schema=public
+  NEXT_PUBLIC_APP_ENV: Local
+  NEXT_PUBLIC_APP_URL: http://localhost:3000
+  NEXT_PUBLIC_SUPABASE_URL: ""
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ""
+  SUPABASE_SERVICE_ROLE_KEY: ""
+
+jobs:
+  quality-gates:
+    name: Quality gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Validate Prisma schema
+        run: npx prisma validate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Write CI summary
+        if: always()
+        run: |
+          {
+            echo "## VetFiscal OS CI"
+            echo ""
+            echo "Quality gates executed for commit \`${{ github.sha }}\`."
+            echo ""
+            echo "- npm ci"
+            echo "- npx prisma generate"
+            echo "- npx prisma validate"
+            echo "- npm run lint"
+            echo "- npm run typecheck"
+            echo "- npm test"
+            echo "- npm run build"
+            echo ""
+            echo "No real secrets, external fiscal providers, scraping, migrations or database reset commands are required by this workflow."
+          } >> "$GITHUB_STEP_SUMMARY"

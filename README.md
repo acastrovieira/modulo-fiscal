@@ -1,4 +1,6 @@
-﻿# VetFiscal OS
+# VetFiscal OS
+
+[![VetFiscal CI](https://github.com/acastrovieira/modulo-fiscal/actions/workflows/ci.yml/badge.svg)](https://github.com/acastrovieira/modulo-fiscal/actions/workflows/ci.yml)
 
 VetFiscal OS e uma plataforma operacional fiscal e financeira modular para clinicas veterinarias. O estado atual entrega a fundacao do **MVP Fiscal Supervisionado**: importacoes estruturadas, candidatos fiscais, inconsistencias, lotes simulados, cockpit operacional, RBAC, tenant isolation, auditoria e regressao de hardening.
 
@@ -136,6 +138,23 @@ O seed Prisma cria um tenant demo completo e ficticio:
 
 Os dados demo nao usam CPF/CNPJ real, e-mails externos, certificado digital, provider NFS-e, scraping ou fila fiscal real.
 
+## CI E Politica De PR
+
+O workflow `VetFiscal CI` roda em `push` e `pull_request` para `main`, `master` e branches `codex/**`.
+
+Gates bloqueantes:
+
+```bash
+npm ci
+npx prisma generate
+npx prisma validate
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+O CI usa apenas variaveis ficticias/locais para validar Prisma e build. Ele nao executa migrations, seed, reset de banco, provider fiscal externo, scraping ou emissao real de NFS-e.
 ## Comandos De Qualidade
 
 ```bash

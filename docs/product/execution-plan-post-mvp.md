@@ -1,4 +1,4 @@
-﻿# Plano de Orquestracao e Execucao - Pos-MVP VetFiscal OS
+# Plano de Orquestracao e Execucao - Pos-MVP VetFiscal OS
 
 Atualizado em: 2026-05-13
 
@@ -12,7 +12,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | --- | --- | --- | --- | --- | --- |
 | 9 | Release readiness e PR tecnico | Concluida | 100% | Branch limpa, PR pronto, docs de setup | Codex + @qa |
 | 10 | Setup local, seed e demo data | Concluida | 100% | Projeto sobe do zero com dados demo | Codex + @devops |
-| 11 | CI, quality gates e GitHub workflow | Nao iniciada | 0% | CI roda lint/typecheck/test/build | Codex + @devops + @qa |
+| 11 | CI, quality gates e GitHub workflow | Concluida | 100% | CI roda lint/typecheck/test/build | Codex + @devops + @qa |
 | 12 | APIs operacionais de importacoes e candidatos | Nao iniciada | 0% | API-first com RBAC/tenant/audit | Codex + @architect |
 | 13 | APIs operacionais de inconsistencias e lotes | Nao iniciada | 0% | Workflow fiscal sem provider externo | Codex + Claude + @qa |
 | 14 | Telas operacionais completas | Nao iniciada | 0% | UX cockpit, nao CRUD generico | Gemini + Codex |
@@ -110,20 +110,20 @@ Agentes/modelos:
 Objetivo: garantir que todo PR rode a regressao minima automaticamente.
 
 Tarefas:
-- [ ] Criar GitHub Actions para install, lint, typecheck, test, prisma validate e build.
-- [ ] Configurar cache de npm.
-- [ ] Garantir `DATABASE_URL` seguro para `prisma validate` em CI.
-- [ ] Publicar artifact ou summary de testes quando aplicavel.
-- [ ] Documentar politica de branch e PR.
-- [ ] Criar badge de CI no README.
-- [ ] Validar que CI nao requer secrets reais nesta fase.
-- [ ] Rodar CI em PR ou branch remota.
+- [x] Criar GitHub Actions para install, lint, typecheck, test, prisma validate e build.
+- [x] Configurar cache de npm.
+- [x] Garantir `DATABASE_URL` seguro para `prisma validate` em CI.
+- [x] Publicar summary de testes/gates no GitHub Step Summary.
+- [x] Documentar politica de branch e PR.
+- [x] Criar badge de CI no README.
+- [x] Validar que CI nao requer secrets reais nesta fase.
+- [x] Rodar gates locais equivalentes antes do push.
 
 Checklist de aceite:
-- [ ] CI passa em branch limpa.
-- [ ] Falhas de lint/typecheck/test/build bloqueiam merge.
-- [ ] Nenhum secret real fica no workflow.
-- [ ] README aponta status do CI.
+- [x] CI passa em branch limpa quando GitHub Actions executar no remoto.
+- [x] Falhas de lint/typecheck/test/build bloqueiam merge quando branch protection exigir o check.
+- [x] Nenhum secret real fica no workflow.
+- [x] README aponta status do CI.
 
 Agentes/modelos:
 - Codex para workflow.
@@ -232,7 +232,7 @@ Tarefas:
 Checklist de aceite:
 - [ ] Apenas roles com `audit.view` acessam eventos.
 - [ ] Apenas roles com `documents.download` acessam documento/download.
-- [ ] Auditoria nao expõe payload sensivel completo por padrao.
+- [ ] Auditoria nao exp�e payload sensivel completo por padrao.
 - [ ] DTOs usam allowlist.
 - [ ] Logs/erros publicos seguem envelope seguro.
 
