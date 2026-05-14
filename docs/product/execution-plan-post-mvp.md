@@ -14,7 +14,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 10 | Setup local, seed e demo data | Concluida | 100% | Projeto sobe do zero com dados demo | Codex + @devops |
 | 11 | CI, quality gates e GitHub workflow | Concluida | 100% | CI roda lint/typecheck/test/build | Codex + @devops + @qa |
 | 12 | APIs operacionais de importacoes e candidatos | Concluida | 100% | API-first com RBAC/tenant/audit | Codex + @architect |
-| 13 | APIs operacionais de inconsistencias e lotes | Nao iniciada | 0% | Workflow fiscal sem provider externo | Codex + Claude + @qa |
+| 13 | APIs operacionais de inconsistencias e lotes | Concluida | 100% | Workflow fiscal sem provider externo | Codex + Claude + @qa |
 | 14 | Telas operacionais completas | Nao iniciada | 0% | UX cockpit, nao CRUD generico | Gemini + Codex |
 | 15 | Auditoria, documentos e LGPD operacional | Nao iniciada | 0% | audit.view/documents.download protegidos | Codex + @qa + seguranca/LGPD |
 | 16 | Observabilidade, runbooks e beta readiness | Nao iniciada | 0% | Checklist beta aprovado | Codex + @devops + @architect |
@@ -163,26 +163,28 @@ Agentes/modelos:
 Objetivo: expor o workflow de revisao humana e lotes simulados por APIs seguras.
 
 Tarefas:
-- [ ] Definir DTOs `InconsistencyListItemDTO`, `InconsistencyDetailDTO`, `BatchOperationDTO`.
-- [ ] Criar `GET /api/inconsistencies`.
-- [ ] Criar `POST /api/inconsistencies` para abertura supervisionada.
-- [ ] Criar `POST /api/inconsistencies/[id]/resolve`.
-- [ ] Criar `POST /api/inconsistencies/[id]/waive`.
-- [ ] Criar `GET /api/batches`.
-- [ ] Criar `POST /api/batches`.
-- [ ] Criar `POST /api/batches/[id]/submit`.
-- [ ] Criar `POST /api/batches/[id]/simulate`.
-- [ ] Criar `POST /api/batches/[id]/approve-future`.
-- [ ] Criar `POST /api/batches/[id]/cancel`.
-- [ ] Garantir metadata `externalProviderCalled: false` e `nfseIssued: false`.
-- [ ] Criar testes negativos para operador aprovando lote.
+- [x] Definir DTOs `InconsistencyListItemDTO`, `InconsistencyDetailDTO`, `BatchOperationDTO`.
+- [x] Criar `GET /api/inconsistencies`.
+- [x] Criar `POST /api/inconsistencies` para abertura supervisionada.
+- [x] Criar `GET /api/inconsistencies/[id]`.
+- [x] Criar `POST /api/inconsistencies/[id]/resolve`.
+- [x] Criar `POST /api/inconsistencies/[id]/waive`.
+- [x] Criar `GET /api/batches`.
+- [x] Criar `POST /api/batches`.
+- [x] Criar `GET /api/batches/[id]`.
+- [x] Criar `POST /api/batches/[id]/submit-review`.
+- [x] Criar `POST /api/batches/[id]/simulate`.
+- [x] Criar `POST /api/batches/[id]/approve-future-issuance`.
+- [x] Criar `POST /api/batches/[id]/cancel`.
+- [x] Garantir metadata `externalProviderCalled: false` e `nfseIssued: false`.
+- [x] Criar testes negativos para operador aprovando lote.
 
 Checklist de aceite:
-- [ ] Inconsistencia bloqueante impede lote via API.
-- [ ] Operador nao aprova lote futuro.
-- [ ] Tenant A nao altera inconsistencia/lote do Tenant B.
-- [ ] Nenhuma API chama provider externo.
-- [ ] Auditoria registra before/after em transicoes criticas.
+- [x] Inconsistencia bloqueante impede lote via service/API command path.
+- [x] Operador nao aprova lote futuro.
+- [x] Tenant A nao altera inconsistencia/lote do Tenant B.
+- [x] Nenhuma API chama provider externo.
+- [x] Auditoria registra before/after em transicoes criticas.
 
 Agentes/modelos:
 - Codex para APIs e testes.

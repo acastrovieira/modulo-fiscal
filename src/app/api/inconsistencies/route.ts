@@ -1,0 +1,12 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { createFiscalInconsistencyService } from "@/modules/fiscal/application/fiscal-inconsistency-service";
+import { listInconsistencies, toInconsistencyDTO } from "@/modules/fiscal/application/fiscal-inconsistency-queries";
+import { createPrismaFiscalInconsistencyRepository } from "@/modules/fiscal/infrastructure/prisma-fiscal-inconsistency-repository";
+import { openInconsistencyRequestSchema, parseInconsistencySeverity, parseInconsistencyStatus } from "@/modules/fiscal/presentation/fiscal-inconsistency-schemas";
+import { audit } from "@/modules/audit/application/audit-service";
+import { createCommandContext } from "@/shared/application/command-context";
+import { apiErrorResponse } from "@/shared/http/api-error-response";
+import { createCorrelationId } from "@/shared/logging/correlation-id";
+export const dynamic = "force-dynamic";
+export async function GET(request: NextRequest) { const requestId = createCorrelationId(); try { const context = await createCommandContext({ correlationId: requestId }); const data = await listInconsistencies({ context, repository: createPrismaFiscalInconsistencyRepository(), status: parseInconsistencyStatus(request.nextUrl.searchParams.get("status")), severity: parseInconsistencySeverity(request.nextUrl.searchParams.get("severity")) }); return NextResponse.json({ data, requestId }); } catch (error) { return apiErrorResponse(error, requestId); } }
+export async function POST(request: Request) { const requestId = createCorrelationId(); try { const context = await createCommandContext({ correlationId: requestId }); const body = openInconsistencyRequestSchema.parse(await request.json()); const repository = createPrismaFiscalInconsistencyRepository(); const service = createFiscalInconsistencyService({ repository, audit }); const row = await service.openInconsistency({ context, candidateId: body.candidateId, importBatchId: body.importBatchId, importRowId: body.importRowId, type: body.type, severity: body.severity, message: body.message, details: body.details }); const data = toInconsistencyDTO({ ...row, createdAt: new Date(), updatedAt: new Date() }); return NextResponse.json({ data, requestId }, { status: 201 }); } catch (error) { return apiErrorResponse(error, requestId); } }
