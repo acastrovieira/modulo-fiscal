@@ -67,19 +67,39 @@ Exemplo local:
 
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/vetfiscal_os?schema=public"
+DIRECT_URL="postgresql://postgres:postgres@localhost:5432/vetfiscal_os?schema=public"
 NEXT_PUBLIC_APP_ENV="Local"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 NEXT_PUBLIC_SUPABASE_URL=""
 NEXT_PUBLIC_SUPABASE_ANON_KEY=""
-SUPABASE_SERVICE_ROLE_KEY=""`nDIRECT_URL="postgresql://postgres:postgres@localhost:5432/vetfiscal_os?schema=public"`nNEXT_PUBLIC_APP_URL="http://localhost:3000"
+SUPABASE_SERVICE_ROLE_KEY=""
 ```
 
-4. Gere o Prisma Client quando necessario:`n`n```bash`nnpx prisma generate`n``` `n`n5. Valide o schema Prisma:
+4. Gere o Prisma Client quando necessario:
+
+```bash
+npx prisma generate
+```
+
+5. Valide o schema Prisma:
 
 ```bash
 npx prisma validate
 ```
 
-6. Se for usar banco local com migrations, aplique as migrations quando existirem:`n`n```bash`nnpx prisma migrate dev`n``` `n`n7. Rode o projeto:
+6. Aplique migrations no banco local:
+
+```bash
+npx prisma migrate dev
+```
+
+7. Popule dados demo seguros:
+
+```bash
+npm run db:seed
+```
+
+8. Rode o projeto:
 
 ```bash
 npm run dev
@@ -91,6 +111,31 @@ Acesse:
 http://localhost:3000/dashboard
 ```
 
+## Reset Local Manual
+
+Para recriar completamente o banco local/demo, use apenas quando tiver certeza de que `DATABASE_URL` aponta para um banco local descartavel:
+
+```bash
+npx prisma migrate reset
+```
+
+Esse comando e destrutivo e apaga os dados do banco configurado. Nao existe script `db:reset` neste projeto para reduzir risco operacional.
+
+## Dados Demo
+
+O seed Prisma cria um tenant demo completo e ficticio:
+
+- tenant `Clinica VetFiscal Demo`;
+- usuarios `@vetfiscal.local`;
+- documento estruturado demo;
+- importacao `READY_FOR_REVIEW`;
+- candidatos em revisao, pronto para lote, bloqueado, simulado e aprovado para emissao futura;
+- inconsistencias bloqueante e revisavel;
+- lotes simulado e aprovado para emissao futura;
+- eventos de auditoria com `correlationId`.
+
+Os dados demo nao usam CPF/CNPJ real, e-mails externos, certificado digital, provider NFS-e, scraping ou fila fiscal real.
+
 ## Comandos De Qualidade
 
 ```bash
@@ -101,7 +146,7 @@ npm run build
 npx prisma validate
 ```
 
-A regressao atual possui 100 testes cobrindo permissao, tenant isolation, auditoria, importacoes, candidatos, inconsistencias, lotes simulados, cockpit e hardening MVP.
+A regressao atual possui testes cobrindo permissao, tenant isolation, auditoria, importacoes, candidatos, inconsistencias, lotes simulados, cockpit, hardening MVP e seguranca dos dados demo.
 
 ## Estrutura Principal
 
@@ -110,9 +155,9 @@ src/app                  # Rotas Next.js e API routes
 src/components           # UI compartilhada e layout
 src/modules              # Modulos DDD leve por dominio
 src/shared               # Auth, database, security, logging, erros, validacao
-prisma                   # Schema Prisma
+prisma                   # Schema Prisma e seed demo
 docs                     # ADRs, arquitetura, produto, stories e planos
-tests                    # Unit, integration e hardening tests
+tests                    # Unit, integration, seed smoke e hardening tests
 ```
 
 ## Fronteiras De Engenharia

@@ -11,7 +11,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | Ordem | Sprint | Status | Progresso | Gate principal | Squad recomendado |
 | --- | --- | --- | --- | --- | --- |
 | 9 | Release readiness e PR tecnico | Concluida | 100% | Branch limpa, PR pronto, docs de setup | Codex + @qa |
-| 10 | Setup local, seed e demo data | Nao iniciada | 0% | Projeto sobe do zero com dados demo | Codex + @devops |
+| 10 | Setup local, seed e demo data | Concluida | 100% | Projeto sobe do zero com dados demo | Codex + @devops |
 | 11 | CI, quality gates e GitHub workflow | Nao iniciada | 0% | CI roda lint/typecheck/test/build | Codex + @devops + @qa |
 | 12 | APIs operacionais de importacoes e candidatos | Nao iniciada | 0% | API-first com RBAC/tenant/audit | Codex + @architect |
 | 13 | APIs operacionais de inconsistencias e lotes | Nao iniciada | 0% | Workflow fiscal sem provider externo | Codex + Claude + @qa |
@@ -86,27 +86,26 @@ Agentes/modelos:
 Objetivo: permitir que qualquer agente/dev rode o projeto localmente com dados demo seguros.
 
 Tarefas:
-- [ ] Criar `.env.example` completo e seguro.
-- [ ] Criar seed Prisma com tenant demo, usuarios, documentos, importacoes, candidatos, inconsistencias e lotes simulados.
-- [ ] Garantir que seed nao contenha CPF/CNPJ real.
-- [ ] Criar script `db:seed`.
-- [ ] Criar script `db:reset` ou documentar reset local seguro.
-- [ ] Atualizar README com setup do banco.
-- [ ] Garantir dashboard com dados demo quando DB estiver populado.
-- [ ] Criar teste ou smoke script para seed.
-- [ ] Confirmar que seed respeita tenant/RBAC/auditoria conceitual.
+- [x] Criar `.env.example` completo e seguro.
+- [x] Criar seed Prisma com tenant demo, usuarios, documentos, importacoes, candidatos, inconsistencias e lotes simulados.
+- [x] Garantir que seed nao contenha CPF/CNPJ real.
+- [x] Criar script `db:seed`.
+- [x] Documentar reset local seguro sem criar script destrutivo.
+- [x] Atualizar README com setup do banco.
+- [x] Garantir dados demo para o cockpit quando DB estiver populado.
+- [x] Criar smoke test para seed demo.
+- [x] Confirmar que seed respeita tenant/RBAC/auditoria conceitual.
 
 Checklist de aceite:
-- [ ] Dev consegue clonar, instalar, configurar env, migrar/validar e popular demo.
-- [ ] Dados demo aparecem no cockpit.
-- [ ] Dados demo nao usam informacao pessoal real.
-- [ ] `npm test` segue verde depois do seed script.
+- [x] Dev consegue clonar, instalar, configurar env, migrar/validar e popular demo.
+- [x] Dados demo aparecem no cockpit quando seed e DB local estiverem disponiveis.
+- [x] Dados demo nao usam informacao pessoal real.
+- [x] `npm test` segue verde depois do seed script.
 
 Agentes/modelos:
 - Codex para Prisma/seed/scripts.
 - @devops para setup reproduzivel.
 - @qa para smoke de dados demo.
-
 ## 8. Sprint 11 - CI, Quality Gates e GitHub Workflow
 Objetivo: garantir que todo PR rode a regressao minima automaticamente.
 
