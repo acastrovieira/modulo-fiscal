@@ -21,6 +21,7 @@ concurrency:
 
 env:
   CI: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vetfiscal_ci?schema=public
   DIRECT_URL: postgresql://postgres:postgres@localhost:5432/vetfiscal_ci?schema=public
   NEXT_PUBLIC_APP_ENV: Local
