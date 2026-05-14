@@ -1,4 +1,4 @@
-import { ShieldCheck } from "lucide-react";
+﻿import { ShieldCheck } from "lucide-react";
 
 export default function LoginPage() {
   return (
@@ -14,8 +14,8 @@ export default function LoginPage() {
           </div>
         </div>
         <p className="text-sm leading-6 text-muted-foreground">
-          Supabase Auth será conectado na próxima etapa. Esta tela existe para reservar o fluxo de autenticação sem
-          acoplar regras fiscais à interface.
+          A sessao server-side com Supabase Auth ja esta preparada. Login, logout e troca de tenant entram na proxima etapa,
+          sem acoplar regras fiscais a interface.
         </p>
       </section>
     </main>
