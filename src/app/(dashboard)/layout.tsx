@@ -1,6 +1,8 @@
-import { AppHeader } from "@/components/layout/app-header";
+﻿import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { currentTenant } from "@/shared/auth/current-tenant";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const tenant = await currentTenant();
