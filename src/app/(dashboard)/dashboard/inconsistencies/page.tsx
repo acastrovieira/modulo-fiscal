@@ -1,0 +1,2 @@
+import { OperationalWorkflowPage } from "@/modules/operational/presentation/operational-workflow-page";
+export default function InconsistenciesPage() { return <OperationalWorkflowPage kind="inconsistencies" />; }

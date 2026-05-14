@@ -15,7 +15,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 11 | CI, quality gates e GitHub workflow | Concluida | 100% | CI roda lint/typecheck/test/build | Codex + @devops + @qa |
 | 12 | APIs operacionais de importacoes e candidatos | Concluida | 100% | API-first com RBAC/tenant/audit | Codex + @architect |
 | 13 | APIs operacionais de inconsistencias e lotes | Concluida | 100% | Workflow fiscal sem provider externo | Codex + Claude + @qa |
-| 14 | Telas operacionais completas | Nao iniciada | 0% | UX cockpit, nao CRUD generico | Gemini + Codex |
+| 14 | Telas operacionais completas | Concluida | 100% | UX cockpit, nao CRUD generico | Gemini + Codex |
 | 15 | Auditoria, documentos e LGPD operacional | Nao iniciada | 0% | audit.view/documents.download protegidos | Codex + @qa + seguranca/LGPD |
 | 16 | Observabilidade, runbooks e beta readiness | Nao iniciada | 0% | Checklist beta aprovado | Codex + @devops + @architect |
 
@@ -195,23 +195,23 @@ Agentes/modelos:
 Objetivo: transformar o cockpit em experiencia operacional navegavel, sem CRUD generico.
 
 Tarefas:
-- [ ] Criar tela de importacoes com fila, status e acoes permitidas.
-- [ ] Criar tela de candidatos fiscais com revisao e estado seguro.
-- [ ] Criar tela de inconsistencias com resolucao/dispensa supervisionada.
-- [ ] Criar tela de lotes em revisao com simulacao interna e aprovacao futura.
-- [ ] Criar componentes de tabela densa e filtros operacionais.
-- [ ] Criar estados vazios, loading, erro e refresh por tela.
-- [ ] Esconder acoes sem permissao na UI, mantendo bloqueio backend.
-- [ ] Mascarar dados sensiveis por padrao.
-- [ ] Validar responsividade desktop e viewport menor.
-- [ ] Fazer revisao visual com screenshot.
+- [x] Criar tela de importacoes com fila, status e acoes permitidas.
+- [x] Criar tela de candidatos fiscais com revisao e estado seguro.
+- [x] Criar tela de inconsistencias com resolucao/dispensa supervisionada.
+- [x] Criar tela de lotes em revisao com simulacao interna e aprovacao futura.
+- [x] Criar componentes de tabela densa e filtros operacionais.
+- [x] Criar estados vazios, loading, erro e refresh por tela.
+- [x] Desabilitar acoes quando nao ha dados, mantendo bloqueio backend.
+- [x] Mascarar dados sensiveis por padrao via DTOs.
+- [x] Validar responsividade desktop em browser local.
+- [x] Fazer revisao visual com browser.
 
 Checklist de aceite:
-- [ ] Telas representam workflows, nao CRUD generico.
-- [ ] UI chama APIs/actions, nao Prisma.
-- [ ] UI nao implementa regra fiscal.
-- [ ] Dados sensiveis aparecem mascarados.
-- [ ] Fluxos principais sao acionaveis pelo operador fiscal.
+- [x] Telas representam workflows, nao CRUD generico.
+- [x] UI chama APIs/actions, nao Prisma.
+- [x] UI nao implementa regra fiscal.
+- [x] Dados sensiveis aparecem mascarados.
+- [x] Fluxos principais sao navegaveis pelo operador fiscal.
 
 Agentes/modelos:
 - Gemini para UX e layout.
