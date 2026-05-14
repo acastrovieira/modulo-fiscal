@@ -22,7 +22,7 @@ export function AppHeader({ tenant }: Readonly<{ tenant: CurrentTenant }>) {
         <Button variant="ghost" size="icon" aria-label="Pesquisar">
           <Search className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" aria-label="Notificações">
+        <Button variant="ghost" size="icon" aria-label="Notificacoes">
           <Bell className="h-4 w-4" />
         </Button>
         <div className="hidden items-center gap-2 rounded-md border px-3 py-2 text-xs font-medium text-muted-foreground sm:flex">

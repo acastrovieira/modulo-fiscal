@@ -1,14 +1,16 @@
-import { Activity, Archive, Building2, ClipboardCheck, FileInput, Gauge, Landmark, ShieldCheck } from "lucide-react";
+﻿import { Activity, Archive, Building2, ClipboardCheck, FileInput, Gauge, Layers3, Landmark, ShieldCheck, TriangleAlert } from "lucide-react";
 
 const navigation = [
-  { label: "Dashboard", icon: Gauge },
-  { label: "Importações", icon: FileInput },
-  { label: "Fiscal", icon: ClipboardCheck },
-  { label: "Documentos", icon: Archive },
-  { label: "Tenant", icon: Building2 },
-  { label: "Auditoria", icon: ShieldCheck },
-  { label: "Operacional", icon: Activity },
-  { label: "Financeiro", icon: Landmark }
+  { label: "Dashboard", href: "/dashboard", icon: Gauge },
+  { label: "Importacoes", href: "/dashboard/imports", icon: FileInput },
+  { label: "Candidatos", href: "/dashboard/candidates", icon: ClipboardCheck },
+  { label: "Inconsistencias", href: "/dashboard/inconsistencies", icon: TriangleAlert },
+  { label: "Lotes", href: "/dashboard/batches", icon: Layers3 },
+  { label: "Documentos", href: "/dashboard/documents", icon: Archive },
+  { label: "Tenant", href: "#", icon: Building2 },
+  { label: "Auditoria", href: "/dashboard/audit", icon: ShieldCheck },
+  { label: "Operacional", href: "#", icon: Activity },
+  { label: "Financeiro", href: "#", icon: Landmark }
 ];
 
 export function AppSidebar() {
@@ -26,7 +28,7 @@ export function AppSidebar() {
       <nav className="flex-1 space-y-1 px-3 py-4">
         {navigation.map((item) => (
           <a
-            href={item.label === "Dashboard" ? "/dashboard" : "#"}
+            href={item.href}
             key={item.label}
             className="flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
           >
@@ -36,7 +38,7 @@ export function AppSidebar() {
         ))}
       </nav>
       <div className="border-t px-6 py-4 text-xs leading-5 text-muted-foreground">
-        Emissão supervisionada, audit-first e idempotency-first desde a fundação.
+        Emissao supervisionada, audit-first e idempotency-first desde a fundacao.
       </div>
     </aside>
   );

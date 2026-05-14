@@ -1,0 +1,27 @@
+import type { FiscalBatchQueryRepository, FiscalBatchListRecord } from "@/modules/fiscal/application/fiscal-batch-queries";
+import type { CreateFiscalBatchRepositoryInput, FiscalBatchItemRecord, FiscalBatchRecord, FiscalBatchRepository } from "@/modules/fiscal/application/fiscal-batch-service";
+import type { FiscalCandidateRecord } from "@/modules/fiscal/application/fiscal-candidate-service";
+import type { FiscalBatchStatus } from "@/modules/fiscal/domain/fiscal-batch";
+import { prisma } from "@/shared/database/prisma";
+
+type Candidate = NonNullable<Awaited<ReturnType<typeof prisma.fiscalCandidate.findFirst>>>;
+type Batch = NonNullable<Awaited<ReturnType<typeof prisma.fiscalBatch.findFirst>>>;
+type BatchItem = NonNullable<Awaited<ReturnType<typeof prisma.fiscalBatchItem.findFirst>>>;
+type BatchWithItems = Batch & { items?: BatchItem[]; _count?: { items: number } };
+function candidateRecord(c: Candidate): FiscalCandidateRecord { return { id: c.id, tenantId: c.tenantId, importBatchId: c.importBatchId, importRowId: c.importRowId, documentFileId: c.documentFileId, customerName: c.customerName, customerDocumentMasked: c.customerDocumentMasked, serviceDate: c.serviceDate, competenceDate: c.competenceDate, serviceDescription: c.serviceDescription, grossAmountCents: c.grossAmountCents, status: c.status, fiscalFingerprintVersion: c.fiscalFingerprintVersion, fiscalFingerprint: c.fiscalFingerprint, reviewedBy: c.reviewedBy, reviewedAt: c.reviewedAt }; }
+function itemRecord(i: BatchItem): FiscalBatchItemRecord { return { id: i.id, tenantId: i.tenantId, batchId: i.batchId, candidateId: i.candidateId, status: i.status, grossAmountCents: i.grossAmountCents }; }
+function batchRecord(b: BatchWithItems): FiscalBatchRecord { return { id: b.id, tenantId: b.tenantId, status: b.status, batchNumber: b.batchNumber, createdBy: b.createdBy, submittedBy: b.submittedBy, submittedAt: b.submittedAt, simulatedBy: b.simulatedBy, simulatedAt: b.simulatedAt, approvedBy: b.approvedBy, approvedAt: b.approvedAt, cancelledBy: b.cancelledBy, cancelledAt: b.cancelledAt, cancelReason: b.cancelReason, totalGrossAmountCents: b.totalGrossAmountCents, items: b.items?.map(itemRecord) }; }
+function batchListRecord(b: BatchWithItems): FiscalBatchListRecord { return { ...batchRecord(b), createdAt: b.createdAt, updatedAt: b.updatedAt, itemsCount: b._count?.items ?? b.items?.length ?? 0 }; }
+export function createPrismaFiscalBatchRepository(): FiscalBatchRepository & FiscalBatchQueryRepository {
+  return {
+    async findCandidateById(id: string) { const c = await prisma.fiscalCandidate.findUnique({ where: { id } }); return c ? candidateRecord(c) : null; },
+    async countOpenBlockingInconsistenciesByCandidateId(candidateId, tenantId) { return prisma.fiscalInconsistency.count({ where: { candidateId, tenantId, severity: "BLOCKING", status: { in: ["OPEN", "IN_REVIEW"] } } }); },
+    async createFiscalBatch(input: CreateFiscalBatchRepositoryInput) { const b = await prisma.fiscalBatch.create({ data: { tenantId: input.tenantId, batchNumber: input.batchNumber ?? null, createdBy: input.createdBy, status: input.status, totalGrossAmountCents: input.totalGrossAmountCents, items: { create: input.items } }, include: { items: true, _count: { select: { items: true } } } }); return batchRecord(b); },
+    async findBatchById(id: string) { const b = await prisma.fiscalBatch.findUnique({ where: { id }, include: { items: true } }); return b ? batchRecord(b) : null; },
+    async findIncludedBatchItems(batchId, tenantId) { const items = await prisma.fiscalBatchItem.findMany({ where: { batchId, tenantId, status: "INCLUDED" } }); return items.map(itemRecord); },
+    async updateBatchStatus(input: { id: string; tenantId: string; status: FiscalBatchStatus; submittedBy?: string; submittedAt?: Date; simulatedBy?: string; simulatedAt?: Date; approvedBy?: string; approvedAt?: Date; cancelledBy?: string; cancelledAt?: Date; cancelReason?: string }) { const b = await prisma.fiscalBatch.update({ where: { id_tenantId: { id: input.id, tenantId: input.tenantId } }, data: { status: input.status, submittedBy: input.submittedBy, submittedAt: input.submittedAt, simulatedBy: input.simulatedBy, simulatedAt: input.simulatedAt, approvedBy: input.approvedBy, approvedAt: input.approvedAt, cancelledBy: input.cancelledBy, cancelledAt: input.cancelledAt, cancelReason: input.cancelReason }, include: { items: true } }); return batchRecord(b); },
+    async updateCandidateStatus(candidateId, tenantId, status) { const c = await prisma.fiscalCandidate.update({ where: { id_tenantId: { id: candidateId, tenantId } }, data: { status } }); return candidateRecord(c); },
+    async listBatches(input) { const rows = await prisma.fiscalBatch.findMany({ where: { tenantId: input.tenantId, status: input.status }, include: { _count: { select: { items: true } } }, orderBy: { createdAt: "desc" }, take: 50 }); return rows.map(batchListRecord); },
+    async findBatchDetail(input) { const b = await prisma.fiscalBatch.findUnique({ where: { id_tenantId: { id: input.id, tenantId: input.tenantId } }, include: { items: true, _count: { select: { items: true } } } }); return b ? batchListRecord(b) : null; }
+  };
+}

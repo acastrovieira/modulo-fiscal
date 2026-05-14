@@ -1,6 +1,18 @@
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 
+const databaseImportRestriction = [
+  "error",
+  {
+    patterns: [
+      {
+        group: ["@/shared/database/*"],
+        message: "Access database through module application services or repositories, not UI components."
+      }
+    ]
+  }
+];
+
 export default [
   {
     ignores: [
@@ -42,18 +54,13 @@ export default [
     },
     rules: {
       "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-      "@typescript-eslint/consistent-type-imports": "error",
-      "no-restricted-imports": [
-        "error",
-        {
-          "patterns": [
-            {
-              "group": ["@/shared/database/*"],
-              "message": "Access database through module application services or repositories, not UI components."
-            }
-          ]
-        }
-      ]
+      "@typescript-eslint/consistent-type-imports": "error"
+    }
+  },
+  {
+    files: ["src/app/**/*.{ts,tsx}", "src/components/**/*.{ts,tsx}", "src/modules/*/presentation/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": databaseImportRestriction
     }
   }
 ];
