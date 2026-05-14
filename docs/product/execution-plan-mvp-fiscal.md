@@ -18,7 +18,7 @@ A regra central e simples: construir primeiro a base fiscal auditavel e segura, 
 | 5 | Inconsistencias e revisao humana | Concluida | 100% | Bloqueios e justificativas auditaveis | Codex + Claude + @qa |
 | 6 | Lotes simulados sem emissao | Concluida | 100% | Fluxo sem provider externo | Codex + Claude |
 | 7 | APIs e cockpit operacional | Concluida | 100% | UI chama APIs/services, nao Prisma | Codex + Gemini |
-| 8 | QA, LGPD, auditoria e hardening | Nao iniciada | 0% | Regressao completa verde | Codex + @qa + @architect |
+| 8 | QA, LGPD, auditoria e hardening | Concluida | 100% | Regressao completa verde | Codex + @qa + @architect |
 
 ## 3. Squads e Roteamento de Modelos
 | Squad | Quando chamar | Modelo/agente sugerido | Responsabilidade |
@@ -337,34 +337,33 @@ Nao iniciar antes de concluir:
 Objetivo: fechar o MVP com regressao, seguranca operacional e evidencia auditavel.
 
 Tarefas:
-- [ ] Criar fixtures com dois tenants e usuarios por role.
-- [ ] Criar regressao do fluxo: importacao -> candidato -> inconsistencia -> lote -> simulacao interna.
-- [ ] Criar testes negativos de RBAC para comandos criticos.
-- [ ] Criar testes negativos de tenant isolation.
-- [ ] Criar testes de auditoria por evento obrigatorio.
-- [ ] Criar testes de mascaramento LGPD.
-- [ ] Validar que `audit.view` controla acesso a eventos.
-- [ ] Validar que `documents.download` controla acesso a documentos.
-- [ ] Confirmar que logs tecnicos nao vazam dado sensivel completo.
-- [ ] Confirmar que nao existe emissao real de NFS-e.
-- [ ] Confirmar que nao existe scraping.
-- [ ] Rodar build local.
-- [ ] Rodar lint, typecheck e tests.
-- [ ] Preparar checklist manual de aceite do MVP.
+- [x] Criar fixtures com dois tenants e usuarios por role.
+- [x] Criar regressao do fluxo: importacao -> candidato -> inconsistencia -> lote -> simulacao interna.
+- [x] Criar testes negativos de RBAC para comandos criticos.
+- [x] Criar testes negativos de tenant isolation.
+- [x] Criar testes de auditoria por evento obrigatorio.
+- [x] Criar testes de mascaramento LGPD.
+- [x] Validar que `audit.view` controla acesso a eventos.
+- [x] Validar que `documents.download` controla acesso a documentos.
+- [x] Confirmar que logs tecnicos nao vazam dado sensivel completo.
+- [x] Confirmar que nao existe emissao real de NFS-e.
+- [x] Confirmar que nao existe scraping.
+- [x] Rodar build local.
+- [x] Rodar lint, typecheck e tests.
+- [x] Preparar checklist manual de aceite do MVP.
 
 Checklist de aceite:
-- [ ] Fluxo feliz passa de ponta a ponta sem efeito externo.
-- [ ] Bloqueios fiscais impedem lote.
-- [ ] Auditoria permite rastrear tenant, ator, entidade e correlation id.
-- [ ] LGPD basica esta coberta por mascaramento e acesso.
-- [ ] Build, lint, typecheck e tests verdes.
+- [x] Fluxo feliz passa de ponta a ponta sem efeito externo.
+- [x] Bloqueios fiscais impedem lote.
+- [x] Auditoria permite rastrear tenant, ator, entidade e correlation id.
+- [x] LGPD basica esta coberta por mascaramento e acesso.
+- [x] Build, lint, typecheck e tests verdes.
 
 Agente/modelo recomendado:
 - AIOX `@qa` para estrategia e cenarios.
 - Codex para automatizar testes e corrigir falhas.
 - AIOX `@architect` para revisao final de riscos.
 - Gemini para revisao final visual.
-
 ## 15. Riscos e Mitigacoes
 | Risco | Severidade | Mitigacao |
 | --- | --- | --- |
@@ -387,12 +386,12 @@ Agente/modelo recomendado:
 7. Repetir para cada sprint sem pular dependencias.
 
 ## 17. Definition of Done do MVP
-- [ ] Todos os gates globais verdes.
-- [ ] Todas as sprints marcadas como concluidas no dashboard.
-- [ ] Fluxo supervisionado funciona sem emissao real.
-- [ ] RBAC validado no backend.
-- [ ] Tenant isolation validado por testes.
-- [ ] Auditoria registra eventos criticos.
-- [ ] Dados sensiveis sao mascaraveis.
-- [ ] UI operacional esta densa, clara e sem cara de landing page.
-- [ ] Nenhuma integracao municipal, scraping ou provider NFS-e real foi implementado.
+- [x] Todos os gates globais verdes.
+- [x] Todas as sprints marcadas como concluidas no dashboard.
+- [x] Fluxo supervisionado funciona sem emissao real.
+- [x] RBAC validado no backend.
+- [x] Tenant isolation validado por testes.
+- [x] Auditoria registra eventos criticos.
+- [x] Dados sensiveis sao mascaraveis.
+- [x] UI operacional esta densa, clara e sem cara de landing page.
+- [x] Nenhuma integracao municipal, scraping ou provider NFS-e real foi implementado.
