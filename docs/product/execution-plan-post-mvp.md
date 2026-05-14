@@ -13,7 +13,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 9 | Release readiness e PR tecnico | Concluida | 100% | Branch limpa, PR pronto, docs de setup | Codex + @qa |
 | 10 | Setup local, seed e demo data | Concluida | 100% | Projeto sobe do zero com dados demo | Codex + @devops |
 | 11 | CI, quality gates e GitHub workflow | Concluida | 100% | CI roda lint/typecheck/test/build | Codex + @devops + @qa |
-| 12 | APIs operacionais de importacoes e candidatos | Nao iniciada | 0% | API-first com RBAC/tenant/audit | Codex + @architect |
+| 12 | APIs operacionais de importacoes e candidatos | Concluida | 100% | API-first com RBAC/tenant/audit | Codex + @architect |
 | 13 | APIs operacionais de inconsistencias e lotes | Nao iniciada | 0% | Workflow fiscal sem provider externo | Codex + Claude + @qa |
 | 14 | Telas operacionais completas | Nao iniciada | 0% | UX cockpit, nao CRUD generico | Gemini + Codex |
 | 15 | Auditoria, documentos e LGPD operacional | Nao iniciada | 0% | audit.view/documents.download protegidos | Codex + @qa + seguranca/LGPD |
@@ -134,24 +134,25 @@ Agentes/modelos:
 Objetivo: expor fluxos de importacao e candidatos por APIs seguras, finas e testaveis.
 
 Tarefas:
-- [ ] Definir DTOs `ImportListItemDTO`, `ImportDetailDTO`, `CandidateReviewDTO`.
-- [ ] Criar `GET /api/imports` com filtros seguros.
-- [ ] Criar `GET /api/imports/[id]` com tenant isolation.
-- [ ] Criar `POST /api/imports` ou action fina para criar importacao a partir de documento existente.
-- [ ] Criar `POST /api/imports/[id]/validate` para validacao estrutural.
-- [ ] Criar `GET /api/candidates`.
-- [ ] Criar `GET /api/candidates/[id]`.
-- [ ] Criar `POST /api/candidates/[id]/ready-for-batch`.
-- [ ] Validar inputs com zod no backend.
-- [ ] Padronizar erros com envelope existente.
-- [ ] Criar testes de API/service para RBAC e tenant.
+- [x] Definir DTOs `ImportListItemDTO`, `ImportDetailDTO`, `CandidateReviewDTO`.
+- [x] Criar `GET /api/imports` com filtros seguros.
+- [x] Criar `GET /api/imports/[id]` com tenant isolation.
+- [x] Criar `POST /api/imports` para criar importacao a partir de documento existente.
+- [x] Criar `POST /api/imports/[id]/validate` para validacao estrutural.
+- [x] Criar `POST /api/imports/[id]/candidates` para geracao supervisionada de candidatos.
+- [x] Criar `GET /api/candidates`.
+- [x] Criar `GET /api/candidates/[id]`.
+- [x] Criar `POST /api/candidates/[id]/ready-for-batch`.
+- [x] Validar inputs com zod no backend.
+- [x] Padronizar erros com envelope existente.
+- [x] Criar testes de API/service para RBAC e tenant.
 
 Checklist de aceite:
-- [ ] APIs nao retornam entidade Prisma crua.
-- [ ] APIs nao aceitam `tenantId` do client como escopo confiavel.
-- [ ] Backend bloqueia roles sem permissao.
-- [ ] Nenhum componente React acessa Prisma.
-- [ ] Nenhuma regra fiscal entra em React.
+- [x] APIs nao retornam entidade Prisma crua.
+- [x] APIs nao aceitam `tenantId` do client como escopo confiavel.
+- [x] Backend bloqueia roles sem permissao.
+- [x] Nenhum componente React acessa Prisma.
+- [x] Nenhuma regra fiscal entra em React.
 
 Agentes/modelos:
 - Codex para implementacao e testes.
