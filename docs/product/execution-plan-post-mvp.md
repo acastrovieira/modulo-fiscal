@@ -1,6 +1,6 @@
-﻿# Plano de Orquestracao e Execucao - Pos-MVP VetFiscal OS
+# Plano de Orquestracao e Execucao - Pos-MVP VetFiscal OS
 
-Atualizado em: 2026-05-13
+Atualizado em: 2026-05-14
 
 ## 1. Objetivo
 Este plano continua o VetFiscal OS depois da fundacao MVP fiscal supervisionada concluida nas Sprints 0 a 8.
@@ -16,8 +16,8 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 12 | APIs operacionais de importacoes e candidatos | Concluida | 100% | API-first com RBAC/tenant/audit | Codex + @architect |
 | 13 | APIs operacionais de inconsistencias e lotes | Concluida | 100% | Workflow fiscal sem provider externo | Codex + Claude + @qa |
 | 14 | Telas operacionais completas | Concluida | 100% | UX cockpit, nao CRUD generico | Gemini + Codex |
-| 15 | Auditoria, documentos e LGPD operacional | Nao iniciada | 0% | audit.view/documents.download protegidos | Codex + @qa + seguranca/LGPD |
-| 16 | Observabilidade, runbooks e beta readiness | Nao iniciada | 0% | Checklist beta aprovado | Codex + @devops + @architect |
+| 15 | Auditoria, documentos e LGPD operacional | Concluida | 100% | audit.view/documents.download protegidos | Codex + @qa + seguranca/LGPD |
+| 16 | Observabilidade, runbooks e beta readiness | Concluida | 100% | Checklist beta aprovado | Codex + @devops + @architect |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -248,23 +248,23 @@ Agentes/modelos:
 Objetivo: preparar o produto para uso beta controlado e manutencao operacional.
 
 Tarefas:
-- [ ] Definir eventos e logs operacionais permitidos.
-- [ ] Preparar integracao futura com Sentry sem ativar secrets reais.
-- [ ] Criar healthcheck mais informativo sem vazar internals.
-- [ ] Criar runbook de falha de importacao.
-- [ ] Criar runbook de lote travado.
-- [ ] Criar runbook de incidente de tenant isolation.
-- [ ] Criar checklist de release beta.
-- [ ] Criar matriz de riscos residuais.
-- [ ] Revisar performance basica do cockpit e APIs.
-- [ ] Rodar regressao completa final.
+- [x] Definir eventos e logs operacionais permitidos.
+- [x] Preparar integracao futura com Sentry sem ativar secrets reais.
+- [x] Criar healthcheck mais informativo sem vazar internals.
+- [x] Criar runbook de falha de importacao.
+- [x] Criar runbook de lote travado.
+- [x] Criar runbook de incidente de tenant isolation.
+- [x] Criar checklist de release beta.
+- [x] Criar matriz de riscos residuais.
+- [x] Revisar performance basica do cockpit e APIs.
+- [x] Rodar regressao completa final.
 
 Checklist de aceite:
-- [ ] Existe runbook para incidentes operacionais principais.
-- [ ] Existe checklist beta aprovado.
-- [ ] Observabilidade nao vaza dado sensivel.
-- [ ] Gates globais verdes.
-- [ ] Riscos residuais estao documentados.
+- [x] Existe runbook para incidentes operacionais principais.
+- [x] Existe checklist beta aprovado.
+- [x] Observabilidade nao vaza dado sensivel.
+- [x] Gates globais verdes.
+- [x] Riscos residuais estao documentados.
 
 Agentes/modelos:
 - Codex para docs/scripts/checks.
@@ -300,6 +300,5 @@ Agentes/modelos:
 - [ ] Telas operacionais usam workflow e nao CRUD generico.
 - [ ] Auditoria e documentos possuem acesso protegido.
 - [ ] LGPD basica documentada e testada.
-- [ ] Runbooks e checklist beta existem.
+- [x] Runbooks e checklist beta existem.
 - [ ] Nenhuma emissao real, scraping ou provider externo foi introduzido.
-
