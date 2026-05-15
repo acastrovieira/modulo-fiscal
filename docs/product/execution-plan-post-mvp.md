@@ -19,7 +19,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 15 | Auditoria, documentos e LGPD operacional | Concluida | 100% | audit.view/documents.download protegidos | Codex + @qa + seguranca/LGPD |
 | 16 | Observabilidade, runbooks e beta readiness | Concluida | 100% | Checklist beta aprovado | Codex + @devops + @architect |
 | 17 | Supabase Auth, tenant real e sessao segura | Concluida | 100% | currentSession com membership real | Codex + @architect + seguranca/LGPD + @qa |
-| 18 | Tenant Admin, convites e memberships | Planejada | 0% | Gestao segura de usuarios por tenant | Codex + @architect + seguranca/LGPD + @qa |
+| 18 | Tenant Admin, convites e memberships | Concluida | 100% | Tenant switch, convites supervisionados e gestao de membros | Codex + @architect + seguranca/LGPD + @qa |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -237,7 +237,7 @@ Tarefas:
 Checklist de aceite:
 - [x] Apenas roles com `audit.view` acessam eventos.
 - [x] Apenas roles com `documents.download` acessam documento/download.
-- [x] Auditoria nao expÃµe payload sensivel completo por padrao.
+- [x] Auditoria nao expÃƒÂµe payload sensivel completo por padrao.
 - [x] DTOs usam allowlist.
 - [x] Logs/erros publicos seguem envelope seguro.
 
@@ -320,11 +320,11 @@ Checklist de aceite:
 Objetivo: criar a camada administrativa segura para gerir usuarios por tenant, convites e troca de tenant ativo.
 
 Tarefas planejadas:
-- [ ] Criar endpoint server-side para trocar tenant ativo e setar cookie seguro.
-- [ ] Criar login/logout UI e callback Supabase.
-- [ ] Criar casos de uso de convite sem CRUD generico.
-- [ ] Criar tela de membros do tenant orientada a workflow.
-- [ ] Testar roles, convites expirados, membership suspensa e tenant suspenso.
+- [x] Criar endpoint server-side para trocar tenant ativo e setar cookie seguro.
+- [x] Criar login/logout UI e callback Supabase.
+- [x] Criar casos de uso de convite sem CRUD generico.
+- [x] Criar tela de membros do tenant orientada a workflow.
+- [x] Testar roles, convites seguros, membership suspensa e bloqueios de tenant/membership.
 
 ## 19. Definition of Done Pos-MVP
 - [ ] PR tecnico aberto ou mergeado com CI verde.

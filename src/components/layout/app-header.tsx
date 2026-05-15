@@ -2,6 +2,7 @@ import { Bell, Search, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getAppEnvironment } from "@/config/app-env";
+import { LogoutButton } from "@/components/layout/logout-button";
 import type { CurrentTenant } from "@/shared/auth/current-tenant";
 
 export function AppHeader({ tenant }: Readonly<{ tenant: CurrentTenant }>) {
@@ -25,6 +26,7 @@ export function AppHeader({ tenant }: Readonly<{ tenant: CurrentTenant }>) {
         <Button variant="ghost" size="icon" aria-label="Notificacoes">
           <Bell className="h-4 w-4" />
         </Button>
+        <LogoutButton />
         <div className="hidden items-center gap-2 rounded-md border px-3 py-2 text-xs font-medium text-muted-foreground sm:flex">
           <ShieldCheck className="h-4 w-4 text-primary" />
           {tenant.role}
