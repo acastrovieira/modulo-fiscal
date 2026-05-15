@@ -23,7 +23,9 @@ export default function LoginPage() {
       return;
     }
 
-    window.location.href = "/dashboard";
+    const statusResponse = await fetch("/api/onboarding/status");
+    const statusPayload = await statusResponse.json();
+    window.location.href = statusResponse.ok ? statusPayload.data.nextPath : "/dashboard";
   }
 
   return (

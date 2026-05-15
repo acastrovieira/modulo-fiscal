@@ -21,6 +21,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 17 | Supabase Auth, tenant real e sessao segura | Concluida | 100% | currentSession com membership real | Codex + @architect + seguranca/LGPD + @qa |
 | 18 | Tenant Admin, convites e memberships | Concluida | 100% | Tenant switch, convites supervisionados e gestao de membros | Codex + @architect + seguranca/LGPD + @qa |
 | 19 | Invite lifecycle e aceite seguro | Concluida | 100% | Accept/revoke/resend com token hash e auditoria | Codex + @architect + seguranca/LGPD + @qa |
+| 20 | Onboarding e tenant bootstrap | Concluida | 100% | Primeiro tenant/OWNER com idempotencia | Codex + @architect + seguranca/LGPD + @qa |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -339,7 +340,29 @@ Tarefas concluidas:
 - [x] Marcar convite expirado de forma lazy no aceite.
 - [x] Ajustar indice para permitir historico e manter apenas um convite PENDING por tenant/e-mail.
 - [x] Testar token hash, e-mail divergente, membership suspensa, expiracao, revogacao e reenvio.
-## 20. Definition of Done Pos-MVP
+
+## 20. Sprint 20 - Onboarding e Tenant Bootstrap
+Objetivo: permitir que um usuario autenticado sem tenant crie o primeiro tenant operacional e uma membership OWNER de forma segura, auditavel e idempotente.
+
+Tarefas concluidas:
+- [x] Criar endpoint `GET /api/onboarding/status` fora da dependencia de tenant ativo.
+- [x] Criar endpoint `POST /api/onboarding/tenant` para bootstrap transacional.
+- [x] Criar tabela `tenant_bootstrap_requests` com idempotencia por usuario e chave.
+- [x] Criar primeiro `Tenant`, `Profile` e `TenantMembership OWNER` em transacao.
+- [x] Setar cookie de tenant ativo depois do bootstrap.
+- [x] Redirecionar login para `/onboarding` quando nao houver membership ativa.
+- [x] Registrar auditoria com CNPJ mascarado.
+- [x] Bloquear usuario desativado, usuario ja membro e CNPJ duplicado sem enumeracao.
+- [x] Criar tela operacional de onboarding sem CRUD generico.
+- [x] Testar idempotencia, auditoria mascarada, bloqueios e status de onboarding.
+
+Checklist de aceite:
+- [x] Usuario autenticado sem tenant nao cai em erro cru de sessao.
+- [x] Bootstrap cria tenant e OWNER uma unica vez por idempotency key.
+- [x] Nenhum dado sensivel completo e exposto em auditoria publica.
+- [x] Nenhuma service role, emissao fiscal, provider externo ou seed real entra no fluxo.
+
+## 21. Definition of Done Pos-MVP
 - [ ] PR tecnico aberto ou mergeado com CI verde.
 - [ ] Setup local reproduzivel documentado.
 - [ ] Seed demo seguro disponivel.
