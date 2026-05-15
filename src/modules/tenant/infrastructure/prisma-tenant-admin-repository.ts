@@ -6,6 +6,10 @@ const memberInclude = {
   user: { select: { id: true, email: true, name: true, status: true } }
 } satisfies Prisma.TenantMembershipInclude;
 
+const inviteInclude = {
+  tenant: { select: { id: true, status: true } }
+} satisfies Prisma.TenantInviteInclude;
+
 export function createPrismaTenantAdminRepository(): TenantAdminRepository {
   return {
     async listTenantOptions(userId) {
@@ -50,6 +54,33 @@ export function createPrismaTenantAdminRepository(): TenantAdminRepository {
       });
     },
 
+    async listInvites(tenantId) {
+      return prisma.tenantInvite.findMany({
+        where: { tenantId },
+        include: inviteInclude,
+        orderBy: [{ createdAt: "desc" }]
+      });
+    },
+
+    async findInviteById(input) {
+      return prisma.tenantInvite.findFirst({
+        where: { id: input.inviteId, tenantId: input.tenantId },
+        include: inviteInclude
+      });
+    },
+
+    async findInviteByTokenHash(tokenHash) {
+      return prisma.tenantInvite.findUnique({ where: { tokenHash }, include: inviteInclude });
+    },
+
+    async findInviteByEmail(input) {
+      return prisma.tenantInvite.findFirst({
+        where: { tenantId: input.tenantId, email: input.email, status: input.status },
+        include: inviteInclude,
+        orderBy: { createdAt: "desc" }
+      });
+    },
+
     async createInvite(input) {
       return prisma.tenantInvite.create({
         data: {
@@ -59,7 +90,64 @@ export function createPrismaTenantAdminRepository(): TenantAdminRepository {
           tokenHash: input.tokenHash,
           invitedBy: input.invitedBy,
           expiresAt: input.expiresAt
-        }
+        },
+        include: inviteInclude
+      });
+    },
+
+    async updateInviteToken(input) {
+      return prisma.tenantInvite.update({
+        where: { id: input.inviteId, tenantId: input.tenantId },
+        data: { tokenHash: input.tokenHash, expiresAt: input.expiresAt, status: "PENDING", acceptedBy: null, acceptedAt: null, revokedAt: null },
+        include: inviteInclude
+      });
+    },
+
+    async revokeInvite(input) {
+      return prisma.tenantInvite.update({
+        where: { id: input.inviteId, tenantId: input.tenantId },
+        data: { status: "REVOKED", revokedAt: input.revokedAt },
+        include: inviteInclude
+      });
+    },
+
+    async expireInvite(input) {
+      return prisma.tenantInvite.update({
+        where: { id: input.inviteId, tenantId: input.tenantId },
+        data: { status: "EXPIRED" },
+        include: inviteInclude
+      });
+    },
+
+    async findMembershipByUserTenant(input) {
+      return prisma.tenantMembership.findUnique({
+        where: { tenantId_userId: { tenantId: input.tenantId, userId: input.userId } },
+        include: memberInclude
+      });
+    },
+
+    async acceptInvite(input) {
+      return prisma.$transaction(async (tx) => {
+        await tx.profile.upsert({
+          where: { id: input.user.id },
+          update: { email: input.user.email, name: input.user.name, status: "ACTIVE" },
+          create: { id: input.user.id, email: input.user.email, name: input.user.name, status: "ACTIVE" }
+        });
+
+        const member = await tx.tenantMembership.upsert({
+          where: { tenantId_userId: { tenantId: input.invite.tenantId, userId: input.user.id } },
+          update: { role: input.invite.role, status: "ACTIVE" },
+          create: { tenantId: input.invite.tenantId, userId: input.user.id, role: input.invite.role, status: "ACTIVE" },
+          include: memberInclude
+        });
+
+        const invite = await tx.tenantInvite.update({
+          where: { id: input.invite.id, tenantId: input.invite.tenantId },
+          data: { status: "ACCEPTED", acceptedBy: input.user.id, acceptedAt: input.acceptedAt },
+          include: inviteInclude
+        });
+
+        return { invite, member };
       });
     }
   };

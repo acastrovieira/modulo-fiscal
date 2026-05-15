@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { createTenantSessionService } from "@/modules/tenant/application/tenant-session-service";
 import type { TenantAdminRepository } from "@/modules/tenant/application/tenant-admin-types";
 import { ForbiddenError } from "@/shared/errors/application-error";
@@ -26,6 +26,15 @@ function makeRepository(overrides: Partial<TenantAdminRepository> = {}): TenantA
     async countActiveOwners() { return 1; },
     async suspendMember() { throw new Error("not used"); },
     async createInvite() { throw new Error("not used"); },
+    async listInvites() { return []; },
+    async findInviteById() { return null; },
+    async findInviteByTokenHash() { return null; },
+    async findInviteByEmail() { return null; },
+    async updateInviteToken() { throw new Error("not used"); },
+    async revokeInvite() { throw new Error("not used"); },
+    async expireInvite() { throw new Error("not used"); },
+    async findMembershipByUserTenant() { return null; },
+    async acceptInvite() { throw new Error("not used"); },
     ...overrides
   };
 }

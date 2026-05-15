@@ -189,7 +189,7 @@ model TenantInvite {
   inviter    Profile?           @relation("TenantInviteInviter", fields: [invitedBy], references: [id], onDelete: SetNull)
   accepter   Profile?           @relation("TenantInviteAccepter", fields: [acceptedBy], references: [id], onDelete: SetNull)
 
-  @@unique([tenantId, email, status])
+  @@index([tenantId, email])
   @@index([tenantId, status, expiresAt])
   @@index([email])
   @@map("tenant_invites")

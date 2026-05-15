@@ -9,6 +9,20 @@ import { createCorrelationId } from "@/shared/logging/correlation-id";
 
 export const dynamic = "force-dynamic";
 
+export async function GET() {
+  const requestId = createCorrelationId();
+
+  try {
+    const context = await createCommandContext({ correlationId: requestId });
+    const service = createTenantMemberService({ repository: createPrismaTenantAdminRepository(), audit });
+    const data = await service.listInvites({ context });
+
+    return NextResponse.json({ data, requestId });
+  } catch (error) {
+    return apiErrorResponse(error, requestId);
+  }
+}
+
 export async function POST(request: NextRequest) {
   const requestId = createCorrelationId();
 

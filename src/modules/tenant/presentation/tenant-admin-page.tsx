@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Building2, LockKeyhole, Send, ShieldCheck, UserMinus, Users } from "lucide-react";
+import { Building2, LockKeyhole, RefreshCw, Send, ShieldCheck, UserMinus, Users, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,15 @@ type TenantMember = {
   createdAt: string;
   updatedAt: string;
 };
+type TenantInvite = {
+  id: string;
+  emailMasked: string;
+  role: Role;
+  status: "PENDING" | "ACCEPTED" | "EXPIRED" | "REVOKED";
+  expiresAt: string;
+  createdAt: string;
+  deliveryStatus: "NOT_CONFIGURED";
+};
 
 const inviteRoles: Role[] = ["ADMIN", "FISCAL_MANAGER", "FISCAL_OPERATOR", "FINANCIAL_OPERATOR", "ACCOUNTANT", "AUDITOR"];
 
@@ -33,18 +42,21 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
 export function TenantAdminPage() {
   const [tenants, setTenants] = useState<TenantOption[]>([]);
   const [members, setMembers] = useState<TenantMember[]>([]);
+  const [invites, setInvites] = useState<TenantInvite[]>([]);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("FISCAL_OPERATOR");
   const [status, setStatus] = useState<string>("Carregando dados do tenant...");
   const activeTenant = useMemo(() => tenants.find((tenant) => tenant.isActive), [tenants]);
 
   async function load() {
-    const [tenantData, memberData] = await Promise.all([
+    const [tenantData, memberData, inviteData] = await Promise.all([
       fetchJson<{ tenants: TenantOption[] }>("/api/tenants"),
-      fetchJson<{ members: TenantMember[] }>("/api/tenant/members")
+      fetchJson<{ members: TenantMember[] }>("/api/tenant/members"),
+      fetchJson<{ invites: TenantInvite[] }>("/api/tenant/invites")
     ]);
     setTenants(tenantData.tenants);
     setMembers(memberData.members);
+    setInvites(inviteData.invites);
     setStatus("Pronto");
   }
 
@@ -63,7 +75,20 @@ export function TenantAdminPage() {
     await fetchJson("/api/tenant/invites", { method: "POST", body: JSON.stringify({ email, role }) });
     setEmail("");
     await load();
-    setStatus("Convite registrado. Envio por e-mail fica fora desta sprint.");
+    setStatus("Convite registrado. Envio por e-mail segue fora do core nesta sprint.");
+  }
+
+  async function resendInvite(inviteId: string) {
+    setStatus("Regerando convite...");
+    await fetchJson(`/api/tenant/invites/${inviteId}/resend`, { method: "POST", body: JSON.stringify({}) });
+    await load();
+    setStatus("Convite regenerado com novo token hasheado.");
+  }
+
+  async function revokeInvite(inviteId: string) {
+    setStatus("Revogando convite...");
+    await fetchJson(`/api/tenant/invites/${inviteId}/revoke`, { method: "POST", body: JSON.stringify({}) });
+    await load();
   }
 
   async function suspendMember(membershipId: string) {
@@ -119,10 +144,56 @@ export function TenantAdminPage() {
               </select>
               <Button type="submit"><Send className="mr-2 h-4 w-4" /> Registrar</Button>
             </form>
-            <p className="mt-3 text-xs text-muted-foreground">Convite fica registrado com token hasheado e sem envio real de e-mail nesta sprint.</p>
+            <p className="mt-3 text-xs text-muted-foreground">Convite usa token hasheado, expira e pode ser revogado ou regenerado. Nenhum e-mail real e enviado nesta sprint.</p>
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base"><Send className="h-4 w-4" /> Convites do tenant</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-hidden rounded-md border">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-muted text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3 font-medium">E-mail</th>
+                  <th className="px-4 py-3 font-medium">Role</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium">Expira em</th>
+                  <th className="px-4 py-3 font-medium text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {invites.map((invite) => (
+                  <tr key={invite.id}>
+                    <td className="px-4 py-3 font-medium">{invite.emailMasked}</td>
+                    <td className="px-4 py-3"><Badge variant="outline">{invite.role}</Badge></td>
+                    <td className="px-4 py-3"><Badge variant={invite.status === "PENDING" ? "default" : "secondary"}>{invite.status}</Badge></td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(invite.expiresAt).toLocaleDateString("pt-BR")}</td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" disabled={invite.status === "ACCEPTED" || invite.status === "REVOKED"} onClick={() => resendInvite(invite.id).catch((error: Error) => setStatus(error.message))}>
+                          <RefreshCw className="mr-2 h-4 w-4" /> Reenviar
+                        </Button>
+                        <Button variant="outline" disabled={invite.status !== "PENDING"} onClick={() => revokeInvite(invite.id).catch((error: Error) => setStatus(error.message))}>
+                          <XCircle className="mr-2 h-4 w-4" /> Revogar
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {invites.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground"><LockKeyhole className="mx-auto mb-2 h-5 w-5" /> Nenhum convite registrado para o tenant ativo.</td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -168,4 +239,3 @@ export function TenantAdminPage() {
     </div>
   );
 }
-

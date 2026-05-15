@@ -17,6 +17,8 @@ export const permissions = [
   "tenant.members.view",
   "tenant.members.invite",
   "tenant.members.suspend",
+  "tenant.invites.resend",
+  "tenant.invites.revoke",
   "fiscal_config.manage",
   "imports.create",
   "imports.view",
