@@ -51,6 +51,9 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
+      - name: Secret guardrails
+        run: npm run security:secrets
+
       - name: Validate Prisma schema
         run: npx prisma validate
 
@@ -76,6 +79,7 @@ jobs:
             echo ""
             echo "- npm ci"
             echo "- npx prisma generate"
+            echo "- npm run security:secrets"
             echo "- npx prisma validate"
             echo "- npm run lint"
             echo "- npm run typecheck"

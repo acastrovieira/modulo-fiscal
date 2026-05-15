@@ -1,5 +1,5 @@
 ﻿import { describe, expect, it } from "vitest";
-import { createActiveTenantCookieOptions, parseRequestedTenantId } from "@/shared/auth/active-tenant";
+import { createActiveTenantCookieOptions, createExpiredActiveTenantCookieOptions, parseRequestedTenantId } from "@/shared/auth/active-tenant";
 
 describe("active tenant cookie", () => {
   it("accepts only uuid tenant ids", () => {
@@ -12,5 +12,12 @@ describe("active tenant cookie", () => {
 
     expect(options).toMatchObject({ httpOnly: true, sameSite: "lax", path: "/" });
     expect(options.maxAge).toBeGreaterThan(0);
+  });
+
+  it("clears active tenant with the same hardened cookie scope", () => {
+    const options = createExpiredActiveTenantCookieOptions();
+
+    expect(options).toMatchObject({ httpOnly: true, sameSite: "lax", path: "/", maxAge: 0 });
+    expect(options.secure).toBe(process.env.NODE_ENV === "production");
   });
 });

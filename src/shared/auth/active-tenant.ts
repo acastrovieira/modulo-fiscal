@@ -28,6 +28,13 @@ export function createActiveTenantCookieOptions(): ActiveTenantCookieOptions {
   };
 }
 
+export function createExpiredActiveTenantCookieOptions(): ActiveTenantCookieOptions {
+  return {
+    ...createActiveTenantCookieOptions(),
+    maxAge: 0
+  };
+}
+
 export async function getRequestedTenantId(): Promise<string | undefined> {
   const cookieStore = await cookies();
   return parseRequestedTenantId(cookieStore.get(activeTenantCookieName)?.value);

@@ -22,6 +22,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 18 | Tenant Admin, convites e memberships | Concluida | 100% | Tenant switch, convites supervisionados e gestao de membros | Codex + @architect + seguranca/LGPD + @qa |
 | 19 | Invite lifecycle e aceite seguro | Concluida | 100% | Accept/revoke/resend com token hash e auditoria | Codex + @architect + seguranca/LGPD + @qa |
 | 20 | Onboarding e tenant bootstrap | Concluida | 100% | Primeiro tenant/OWNER com idempotencia | Codex + @architect + seguranca/LGPD + @qa |
+| 21 | Security, tenant e LGPD hardening | Concluida | 100% | Secret scanner, cookie clear seguro e inventario LGPD | Codex + seguranca/LGPD + @qa |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -362,7 +363,25 @@ Checklist de aceite:
 - [x] Nenhum dado sensivel completo e exposto em auditoria publica.
 - [x] Nenhuma service role, emissao fiscal, provider externo ou seed real entra no fluxo.
 
-## 21. Definition of Done Pos-MVP
+## 21. Sprint 21 - Security, Tenant e LGPD Hardening
+Objetivo: reduzir risco operacional apos onboarding, reforcando guardrails de secrets, sessao/cookies, tenant isolation e inventario LGPD antes de ampliar o dominio fiscal.
+
+Tarefas concluidas:
+- [x] Criar scanner local `npm run security:secrets` sem dependencia nova.
+- [x] Adicionar scanner aos Quality Gates do GitHub.
+- [x] Expandir `.gitignore` para chaves privadas, service accounts, credentials e arquivos de comando com secrets.
+- [x] Limpar cookie de tenant ativo no logout com as mesmas flags endurecidas do cookie original.
+- [x] Criar testes para scanner, CI, `.gitignore` e cookie clear.
+- [x] Criar inventario LGPD inicial por categoria de dado, finalidade, exposicao e retencao.
+- [x] Documentar que arquivos locais com segredo fora do repositorio exigem rotacao no provedor.
+
+Checklist de aceite:
+- [x] `security:secrets` falha se encontrar chave privada, service account ou service role preenchida.
+- [x] CI executa o scanner antes dos demais gates.
+- [x] Logout remove tenant ativo sem reduzir flags de seguranca.
+- [x] Nenhuma emissao real, scraping, provider externo, certificado ou service role foi introduzida.
+
+## 22. Definition of Done Pos-MVP
 - [ ] PR tecnico aberto ou mergeado com CI verde.
 - [ ] Setup local reproduzivel documentado.
 - [ ] Seed demo seguro disponivel.
