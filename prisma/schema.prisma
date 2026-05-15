@@ -126,6 +126,7 @@ model Tenant {
   fiscalInconsistencies FiscalInconsistency[]
   fiscalBatches         FiscalBatch[]
   fiscalBatchItems      FiscalBatchItem[]
+  bootstrapRequests     TenantBootstrapRequest[]
 
   @@map("tenants")
 }
@@ -150,6 +151,7 @@ model Profile {
   simulatedFiscalBatches   FiscalBatch[]         @relation("FiscalBatchSimulator")
   approvedFiscalBatches    FiscalBatch[]         @relation("FiscalBatchApprover")
   cancelledFiscalBatches   FiscalBatch[]         @relation("FiscalBatchCanceller")
+  tenantBootstrapRequests  TenantBootstrapRequest[]
 
   @@map("profiles")
 }
@@ -171,6 +173,19 @@ model TenantMembership {
   @@map("tenant_memberships")
 }
 
+model TenantBootstrapRequest {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @db.Uuid
+  tenantId       String   @db.Uuid
+  idempotencyKey String
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+  user           Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, idempotencyKey])
+  @@index([tenantId])
+  @@map("tenant_bootstrap_requests")
+}
 model TenantInvite {
   id         String             @id @default(uuid()) @db.Uuid
   tenantId   String             @db.Uuid
