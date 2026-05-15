@@ -25,6 +25,13 @@ enum MembershipStatus {
   SUSPENDED
 }
 
+enum TenantInviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
 enum TenantRole {
   OWNER
   ADMIN
@@ -110,6 +117,7 @@ model Tenant {
   createdAt             DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt             DateTime                @updatedAt @db.Timestamptz(6)
   memberships           TenantMembership[]
+  invites               TenantInvite[]
   auditEvents           AuditEvent[]
   documents             DocumentFile[]
   importBatches         ImportBatch[]
@@ -130,6 +138,8 @@ model Profile {
   createdAt                DateTime              @default(now()) @db.Timestamptz(6)
   updatedAt                DateTime              @updatedAt @db.Timestamptz(6)
   memberships              TenantMembership[]
+  sentTenantInvites        TenantInvite[]        @relation("TenantInviteInviter")
+  acceptedTenantInvites    TenantInvite[]        @relation("TenantInviteAccepter")
   auditEvents              AuditEvent[]          @relation("AuditActor")
   documents                DocumentFile[]        @relation("DocumentCreator")
   createdImportBatches     ImportBatch[]         @relation("ImportBatchCreator")
@@ -161,6 +171,29 @@ model TenantMembership {
   @@map("tenant_memberships")
 }
 
+model TenantInvite {
+  id         String             @id @default(uuid()) @db.Uuid
+  tenantId   String             @db.Uuid
+  email      String
+  role       TenantRole
+  status     TenantInviteStatus @default(PENDING)
+  tokenHash  String             @unique
+  invitedBy  String?            @db.Uuid
+  acceptedBy String?            @db.Uuid
+  expiresAt  DateTime           @db.Timestamptz(6)
+  acceptedAt DateTime?          @db.Timestamptz(6)
+  revokedAt  DateTime?          @db.Timestamptz(6)
+  createdAt  DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime           @updatedAt @db.Timestamptz(6)
+  tenant     Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  inviter    Profile?           @relation("TenantInviteInviter", fields: [invitedBy], references: [id], onDelete: SetNull)
+  accepter   Profile?           @relation("TenantInviteAccepter", fields: [acceptedBy], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, email])
+  @@index([tenantId, status, expiresAt])
+  @@index([email])
+  @@map("tenant_invites")
+}
 model AuditEvent {
   id            String   @id @default(uuid()) @db.Uuid
   tenantId      String   @db.Uuid

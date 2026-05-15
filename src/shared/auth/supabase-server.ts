@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+﻿import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import type { AuthProviderUser } from "@/shared/auth/session-types";
 import { UnauthorizedError } from "@/shared/errors/application-error";
@@ -7,14 +7,15 @@ export function isSupabaseAuthConfigured(): boolean {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }
 
-export async function getSupabaseAuthUser(): Promise<AuthProviderUser | null> {
+export async function createSupabaseServerClient() {
   if (!isSupabaseAuthConfigured()) {
     throw new UnauthorizedError("Supabase Auth is not configured.");
   }
 
   const cookieStore = await cookies();
   type CookieToSet = { name: string; value: string; options?: Parameters<typeof cookieStore.set>[2] };
-  const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+
+  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -28,7 +29,10 @@ export async function getSupabaseAuthUser(): Promise<AuthProviderUser | null> {
       }
     }
   });
+}
 
+export async function getSupabaseAuthUser(): Promise<AuthProviderUser | null> {
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) {
     return null;
