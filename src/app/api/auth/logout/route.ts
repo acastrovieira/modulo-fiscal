@@ -1,5 +1,5 @@
 ﻿import { NextResponse } from "next/server";
-import { activeTenantCookieName } from "@/shared/auth/active-tenant";
+import { activeTenantCookieName, createExpiredActiveTenantCookieOptions } from "@/shared/auth/active-tenant";
 import { createSupabaseServerClient } from "@/shared/auth/supabase-server";
 import { apiErrorResponse } from "@/shared/http/api-error-response";
 import { createCorrelationId } from "@/shared/logging/correlation-id";
@@ -14,7 +14,7 @@ export async function POST() {
     await supabase.auth.signOut();
 
     const response = NextResponse.json({ data: { status: "SIGNED_OUT" }, requestId });
-    response.cookies.set(activeTenantCookieName, "", { path: "/", maxAge: 0 });
+    response.cookies.set(activeTenantCookieName, "", createExpiredActiveTenantCookieOptions());
 
     return response;
   } catch (error) {

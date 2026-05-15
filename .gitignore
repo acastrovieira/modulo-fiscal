@@ -15,6 +15,13 @@ tsconfig.tsbuildinfo
 .env.*.local
 *.key
 *.pem
+*.p8
+*.p12
+*.pfx
+*service-account*.json
+*service_account*.json
+*credentials*.json
+*supabase*secrets*set*.txt
 .DS_Store
 Thumbs.db
 .idea/
