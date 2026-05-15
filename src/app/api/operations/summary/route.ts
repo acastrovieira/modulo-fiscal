@@ -1,12 +1,11 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getAppEnvironment } from "@/config/app-env";
 import {
   getOperationalDashboardSummary,
   type OperationalDashboardRepository
 } from "@/modules/operational/application/dashboard-metrics";
 import { createPrismaOperationalDashboardRepository } from "@/modules/operational/infrastructure/prisma-dashboard-repository";
-import { currentTenant } from "@/shared/auth/current-tenant";
-import { currentUser } from "@/shared/auth/current-user";
+import { currentSession } from "@/shared/auth/current-session";
 import { apiErrorResponse } from "@/shared/http/api-error-response";
 import { createCorrelationId } from "@/shared/logging/correlation-id";
 
@@ -40,7 +39,7 @@ export async function GET() {
   const requestId = createCorrelationId();
 
   try {
-    const [user, tenant] = await Promise.all([currentUser(), currentTenant()]);
+    const { user, tenant } = await currentSession();
     const context = {
       tenantId: tenant.id,
       actorId: user.id,

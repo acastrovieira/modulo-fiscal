@@ -1,6 +1,5 @@
-import type { AuditEventInput } from "@/modules/audit/domain/audit-event";
-import { currentTenant } from "@/shared/auth/current-tenant";
-import { currentUser } from "@/shared/auth/current-user";
+﻿import type { AuditEventInput } from "@/modules/audit/domain/audit-event";
+import { currentSession } from "@/shared/auth/current-session";
 import { createCorrelationId } from "@/shared/logging/correlation-id";
 import { assertPermission } from "@/shared/security/assert-permission";
 import { permissionForCommand, type CommandName } from "@/shared/security/command-permissions";
@@ -18,8 +17,7 @@ export type CommandContextOptions = {
 };
 
 export async function createCommandContext(options: CommandContextOptions = {}): Promise<CommandContext> {
-  const user = await currentUser();
-  const tenant = await currentTenant();
+  const { user, tenant } = await currentSession();
 
   return {
     tenantId: tenant.id,
