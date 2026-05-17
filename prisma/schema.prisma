@@ -108,6 +108,30 @@ enum FiscalBatchItemStatus {
   REMOVED
 }
 
+enum FiscalSimulationProfileStatus {
+  DRAFT
+  CONFIGURED
+  BLOCKED
+}
+
+enum FiscalServiceTakerStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum FiscalServiceTakerDocumentType {
+  CPF
+  CNPJ
+  UNKNOWN
+}
+
+enum SimulatedFiscalDocumentStatus {
+  DRAFT
+  VALIDATED
+  SIMULATED_ISSUED
+  VOIDED
+}
+
 model Tenant {
   id                    String                  @id @default(uuid()) @db.Uuid
   name                  String
@@ -127,6 +151,11 @@ model Tenant {
   fiscalBatches         FiscalBatch[]
   fiscalBatchItems      FiscalBatchItem[]
   bootstrapRequests     TenantBootstrapRequest[]
+  fiscalSimulationProfile FiscalSimulationProfile?
+  fiscalServiceTakers   FiscalServiceTaker[]
+  simulatedFiscalDocuments SimulatedFiscalDocument[]
+  simulatedFiscalDocumentItems SimulatedFiscalDocumentItem[]
+  fiscalSimulationIdempotencyRecords FiscalSimulationIdempotencyRecord[]
 
   @@map("tenants")
 }
@@ -419,4 +448,100 @@ model FiscalBatchItem {
   @@index([tenantId, batchId])
   @@index([tenantId, candidateId])
   @@map("fiscal_batch_items")
+}
+
+model FiscalSimulationProfile {
+  id                 String                        @id @default(uuid()) @db.Uuid
+  tenantId           String                        @unique @db.Uuid
+  status             FiscalSimulationProfileStatus @default(DRAFT)
+  municipalityCode   String
+  taxRegime          String
+  serviceDefaultCode String
+  simulationMode     Boolean                       @default(true)
+  createdAt          DateTime                      @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime                      @updatedAt @db.Timestamptz(6)
+  tenant             Tenant                        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+
+  @@map("fiscal_simulation_profiles")
+}
+
+model FiscalServiceTaker {
+  id             String                         @id @default(uuid()) @db.Uuid
+  tenantId       String                         @db.Uuid
+  name           String
+  documentMasked String
+  documentHash   String
+  documentType   FiscalServiceTakerDocumentType @default(UNKNOWN)
+  emailMasked    String?
+  status         FiscalServiceTakerStatus       @default(ACTIVE)
+  createdAt      DateTime                       @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime                       @updatedAt @db.Timestamptz(6)
+  tenant         Tenant                         @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  documents      SimulatedFiscalDocument[]
+
+  @@unique([id, tenantId])
+  @@unique([tenantId, documentHash])
+  @@index([tenantId, status, createdAt])
+  @@map("fiscal_service_takers")
+}
+
+model SimulatedFiscalDocument {
+  id                   String                        @id @default(uuid()) @db.Uuid
+  tenantId             String                        @db.Uuid
+  serviceTakerId       String                        @db.Uuid
+  status               SimulatedFiscalDocumentStatus @default(DRAFT)
+  simulationId         String                        @unique
+  description          String
+  totalAmountCents     BigInt                        @default(0)
+  fiscalValue          Boolean                       @default(false)
+  externalTransmission Boolean                       @default(false)
+  createdBy            String?                       @db.Uuid
+  validatedBy          String?                       @db.Uuid
+  validatedAt          DateTime?                     @db.Timestamptz(6)
+  simulatedBy          String?                       @db.Uuid
+  simulatedAt          DateTime?                     @db.Timestamptz(6)
+  voidedBy             String?                       @db.Uuid
+  voidedAt             DateTime?                     @db.Timestamptz(6)
+  createdAt            DateTime                      @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime                      @updatedAt @db.Timestamptz(6)
+  tenant               Tenant                        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  serviceTaker         FiscalServiceTaker            @relation(fields: [serviceTakerId, tenantId], references: [id, tenantId], onDelete: Restrict)
+  items                SimulatedFiscalDocumentItem[]
+  idempotencyRecords   FiscalSimulationIdempotencyRecord[]
+
+  @@unique([id, tenantId])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, serviceTakerId])
+  @@map("simulated_fiscal_documents")
+}
+
+model SimulatedFiscalDocumentItem {
+  id                  String                  @id @default(uuid()) @db.Uuid
+  tenantId            String                  @db.Uuid
+  simulatedDocumentId String                  @db.Uuid
+  description         String
+  serviceCode         String
+  amountCents         BigInt
+  createdAt           DateTime                @default(now()) @db.Timestamptz(6)
+  tenant              Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  simulatedDocument   SimulatedFiscalDocument @relation(fields: [simulatedDocumentId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@index([tenantId, simulatedDocumentId])
+  @@map("simulated_fiscal_document_items")
+}
+
+model FiscalSimulationIdempotencyRecord {
+  id                  String                   @id @default(uuid()) @db.Uuid
+  tenantId            String                   @db.Uuid
+  idempotencyKey      String
+  operation           String
+  requestHash         String
+  simulatedDocumentId String                   @db.Uuid
+  createdAt           DateTime                 @default(now()) @db.Timestamptz(6)
+  tenant              Tenant                   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  simulatedDocument   SimulatedFiscalDocument  @relation(fields: [simulatedDocumentId, tenantId], references: [id, tenantId], onDelete: Restrict)
+
+  @@unique([tenantId, operation, idempotencyKey])
+  @@index([tenantId, createdAt])
+  @@map("fiscal_simulation_idempotency_records")
 }

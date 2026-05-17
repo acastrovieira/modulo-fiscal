@@ -28,7 +28,13 @@ export const permissions = [
   "batches.approve",
   "issuance.execute",
   "audit.view",
-  "documents.download"
+  "documents.download",
+  "fiscal_simulation.profile.manage",
+  "fiscal_simulation.takers.manage",
+  "fiscal_simulation.documents.create",
+  "fiscal_simulation.documents.validate",
+  "fiscal_simulation.documents.simulate",
+  "fiscal_simulation.documents.view"
 ] as const;
 
 export type Permission = (typeof permissions)[number];
@@ -39,6 +45,12 @@ export const rolePermissions: Record<Role, readonly Permission[]> = {
   FISCAL_MANAGER: [
     "tenant.switch",
     "fiscal_config.manage",
+    "fiscal_simulation.profile.manage",
+    "fiscal_simulation.takers.manage",
+    "fiscal_simulation.documents.create",
+    "fiscal_simulation.documents.validate",
+    "fiscal_simulation.documents.simulate",
+    "fiscal_simulation.documents.view",
     "imports.create",
     "imports.view",
     "candidates.view",
@@ -50,6 +62,10 @@ export const rolePermissions: Record<Role, readonly Permission[]> = {
   ],
   FISCAL_OPERATOR: [
     "tenant.switch",
+    "fiscal_simulation.takers.manage",
+    "fiscal_simulation.documents.create",
+    "fiscal_simulation.documents.validate",
+    "fiscal_simulation.documents.view",
     "imports.create",
     "imports.view",
     "candidates.view",
@@ -58,8 +74,8 @@ export const rolePermissions: Record<Role, readonly Permission[]> = {
     "documents.download"
   ],
   FINANCIAL_OPERATOR: ["tenant.switch", "imports.view", "documents.download"],
-  ACCOUNTANT: ["tenant.switch", "imports.view", "candidates.view", "audit.view", "documents.download"],
-  AUDITOR: ["tenant.switch", "audit.view", "documents.download"]
+  ACCOUNTANT: ["tenant.switch", "fiscal_simulation.documents.view", "imports.view", "candidates.view", "audit.view", "documents.download"],
+  AUDITOR: ["tenant.switch", "fiscal_simulation.documents.view", "audit.view", "documents.download"]
 };
 
 export function hasPermission(role: Role, permission: Permission): boolean {
