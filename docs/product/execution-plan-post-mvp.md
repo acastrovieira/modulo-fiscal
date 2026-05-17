@@ -24,6 +24,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 20 | Onboarding e tenant bootstrap | Concluida | 100% | Primeiro tenant/OWNER com idempotencia | Codex + @architect + seguranca/LGPD + @qa |
 | 21 | Security, tenant e LGPD hardening | Concluida | 100% | Secret scanner, cookie clear seguro e inventario LGPD | Codex + seguranca/LGPD + @qa |
 | 22 | Simulador fiscal governado v1 | Concluida | 100% | Perfil, tomadores e documentos simulados sem provider | Codex + @architect + fiscal/LGPD + @qa |
+| 23 | Hardening de contratos do simulador | Concluida | 100% | DTO allowlist, auditoria padronizada e linguagem segura | Codex + @architect + @qa |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -412,3 +413,20 @@ Checklist de aceite:
 - [x] Dados do tomador nao sao gravados em auditoria como documento bruto.
 - [x] Documento simulado sempre carrega disclaimer e flags de simulacao.
 - [x] Mutacoes criticas passam por service de aplicacao, nao por React.
+
+## 24. Sprint 23 - Hardening de Contratos do Simulador
+Objetivo: consolidar os contratos publicos do simulador fiscal antes de criar motor de cenarios, versionamento ou UI operacional.
+
+Tarefas concluidas:
+- [x] Documentar contratos do simulador fiscal em `docs/architecture/fiscal-simulation-contracts.md`.
+- [x] Criar testes de DTO allowlist para tomadores e documentos simulados.
+- [x] Garantir que DTOs nao exponham `tenantId`, documento bruto ou hash.
+- [x] Bloquear linguagem fiscal oficial proibida em DTOs do simulador.
+- [x] Garantir que payloads de request rejeitam `tenantId` controlado pelo client.
+- [x] Padronizar auditoria com flags de simulacao e ausencia de provider externo.
+
+Checklist de aceite:
+- [x] Simulador segue API-first e sem Prisma em React.
+- [x] Contratos deixam claro que nao ha valor fiscal.
+- [x] Tenant isolation, RBAC, LGPD, auditoria e idempotencia viram gates de release.
+- [x] Nenhuma emissao real, scraping, provider externo ou certificado foi introduzido.

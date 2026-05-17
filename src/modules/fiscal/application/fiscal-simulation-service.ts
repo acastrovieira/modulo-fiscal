@@ -21,6 +21,14 @@ import { assertPermissionForCommand, createCommandAuditEvent, type CommandContex
 import { InvalidStateError, NotFoundError, ValidationError } from "@/shared/errors/application-error";
 import { assertTenantScope } from "@/shared/security/tenant-scope";
 
+const fiscalSimulationAuditMetadata = {
+  simulatedOnly: true,
+  fiscalValue: false,
+  externalProviderCalled: false,
+  externalTransmission: false,
+  nfseIssued: false
+} as const;
+
 export type FiscalSimulationIdempotencyRecord = {
   id: string;
   tenantId: string;
@@ -149,7 +157,8 @@ export function createFiscalSimulationService(dependencies: { repository: Fiscal
         eventType: "fiscal_simulation.profile_configured",
         entityType: "FiscalSimulationProfile",
         entityId: profile.id,
-        afterPayload: { status: profile.status, simulationMode: profile.simulationMode }
+        afterPayload: { status: profile.status, simulationMode: profile.simulationMode },
+        metadata: fiscalSimulationAuditMetadata
       }));
 
       return profile;
@@ -179,7 +188,7 @@ export function createFiscalSimulationService(dependencies: { repository: Fiscal
         entityType: "FiscalServiceTaker",
         entityId: taker.id,
         afterPayload: { status: taker.status, documentType: taker.documentType },
-        metadata: { documentMasked: taker.documentMasked }
+        metadata: { ...fiscalSimulationAuditMetadata, documentMasked: taker.documentMasked }
       }));
 
       return taker;
@@ -241,7 +250,8 @@ export function createFiscalSimulationService(dependencies: { repository: Fiscal
           totalAmountCents: document.totalAmountCents.toString(),
           fiscalValue: document.fiscalValue,
           externalTransmission: document.externalTransmission
-        }
+        },
+        metadata: fiscalSimulationAuditMetadata
       }));
 
       return document;
@@ -256,7 +266,7 @@ export function createFiscalSimulationService(dependencies: { repository: Fiscal
       if (!canValidateSimulatedDocument(document.status)) throw new InvalidStateError(`Cannot validate simulated fiscal document from ${document.status}.`);
 
       const updated = await repository.updateSimulatedDocumentStatus({ id: document.id, tenantId: input.context.tenantId, status: "VALIDATED", actorId: input.context.actorId, now: input.now ?? new Date() });
-      await audit.record(createCommandAuditEvent(input.context, { eventType: "fiscal_simulation.document_validated", entityType: "SimulatedFiscalDocument", entityId: updated.id, beforePayload: { status: document.status }, afterPayload: { status: updated.status } }));
+      await audit.record(createCommandAuditEvent(input.context, { eventType: "fiscal_simulation.document_validated", entityType: "SimulatedFiscalDocument", entityId: updated.id, beforePayload: { status: document.status }, afterPayload: { status: updated.status }, metadata: fiscalSimulationAuditMetadata }));
       return updated;
     },
 
@@ -269,7 +279,7 @@ export function createFiscalSimulationService(dependencies: { repository: Fiscal
       if (!canSimulateIssueDocument(document.status)) throw new InvalidStateError(`Cannot simulate issue from ${document.status}.`);
 
       const updated = await repository.updateSimulatedDocumentStatus({ id: document.id, tenantId: input.context.tenantId, status: "SIMULATED_ISSUED", actorId: input.context.actorId, now: input.now ?? new Date() });
-      await audit.record(createCommandAuditEvent(input.context, { eventType: "fiscal_simulation.document_simulated_issued", entityType: "SimulatedFiscalDocument", entityId: updated.id, beforePayload: { status: document.status }, afterPayload: { status: updated.status, fiscalValue: updated.fiscalValue, externalTransmission: updated.externalTransmission } }));
+      await audit.record(createCommandAuditEvent(input.context, { eventType: "fiscal_simulation.document_simulated_issued", entityType: "SimulatedFiscalDocument", entityId: updated.id, beforePayload: { status: document.status }, afterPayload: { status: updated.status, fiscalValue: updated.fiscalValue, externalTransmission: updated.externalTransmission }, metadata: fiscalSimulationAuditMetadata }));
       return updated;
     },
 
@@ -282,7 +292,7 @@ export function createFiscalSimulationService(dependencies: { repository: Fiscal
       if (!canVoidSimulatedDocument(document.status)) throw new InvalidStateError(`Cannot void simulated fiscal document from ${document.status}.`);
 
       const updated = await repository.updateSimulatedDocumentStatus({ id: document.id, tenantId: input.context.tenantId, status: "VOIDED", actorId: input.context.actorId, now: input.now ?? new Date() });
-      await audit.record(createCommandAuditEvent(input.context, { eventType: "fiscal_simulation.document_voided", entityType: "SimulatedFiscalDocument", entityId: updated.id, beforePayload: { status: document.status }, afterPayload: { status: updated.status } }));
+      await audit.record(createCommandAuditEvent(input.context, { eventType: "fiscal_simulation.document_voided", entityType: "SimulatedFiscalDocument", entityId: updated.id, beforePayload: { status: document.status }, afterPayload: { status: updated.status }, metadata: fiscalSimulationAuditMetadata }));
       return updated;
     }
   };
