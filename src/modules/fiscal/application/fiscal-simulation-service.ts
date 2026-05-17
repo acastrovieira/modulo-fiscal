@@ -17,6 +17,11 @@ import {
   type SimulatedFiscalDocument,
   type SimulatedFiscalDocumentStatus
 } from "@/modules/fiscal/domain/fiscal-simulation";
+import {
+  evaluateFiscalSimulationScenarios,
+  fiscalSimulationScenarioSet,
+  type FiscalSimulationScenarioEvaluation
+} from "@/modules/fiscal/domain/fiscal-simulation-scenarios";
 import { assertPermissionForCommand, createCommandAuditEvent, type CommandContext } from "@/shared/application/command-context";
 import { InvalidStateError, NotFoundError, ValidationError } from "@/shared/errors/application-error";
 import { assertTenantScope } from "@/shared/security/tenant-scope";
@@ -106,6 +111,11 @@ export type SimulatedFiscalDocumentTransitionInput = {
   context: CommandContext;
   documentId: string;
   now?: Date;
+};
+
+export type EvaluateFiscalSimulationScenariosInput = {
+  context: CommandContext;
+  documentId: string;
 };
 
 function requiredText(value: string, message: string): string {
@@ -294,6 +304,43 @@ export function createFiscalSimulationService(dependencies: { repository: Fiscal
       const updated = await repository.updateSimulatedDocumentStatus({ id: document.id, tenantId: input.context.tenantId, status: "VOIDED", actorId: input.context.actorId, now: input.now ?? new Date() });
       await audit.record(createCommandAuditEvent(input.context, { eventType: "fiscal_simulation.document_voided", entityType: "SimulatedFiscalDocument", entityId: updated.id, beforePayload: { status: document.status }, afterPayload: { status: updated.status }, metadata: fiscalSimulationAuditMetadata }));
       return updated;
+    },
+
+    async evaluateScenarios(input: EvaluateFiscalSimulationScenariosInput): Promise<FiscalSimulationScenarioEvaluation> {
+      assertPermissionForCommand(input.context, "evaluateFiscalSimulationScenarios");
+      const [profile, document] = await Promise.all([
+        repository.findProfileByTenantId(input.context.tenantId),
+        repository.findSimulatedDocumentById(input.documentId)
+      ]);
+      assertConfiguredProfile(profile);
+      if (!document) throw new NotFoundError("Simulated fiscal document not found.");
+      assertTenantScope(input.context.tenantId, document);
+      assertSimulationOnly(document);
+
+      const taker = await repository.findServiceTakerById(document.serviceTakerId);
+      if (!taker) throw new NotFoundError("Fiscal service taker not found.");
+      assertTenantScope(input.context.tenantId, taker);
+
+      const evaluation = evaluateFiscalSimulationScenarios({ profile, taker, document });
+
+      await audit.record(createCommandAuditEvent(input.context, {
+        eventType: "fiscal_simulation.scenarios_evaluated",
+        entityType: "SimulatedFiscalDocument",
+        entityId: document.id,
+        afterPayload: {
+          status: evaluation.status,
+          scenarioSetId: evaluation.scenarioSetId,
+          scenarioSetVersion: evaluation.scenarioSetVersion,
+          findingsCount: evaluation.findings.length
+        },
+        metadata: {
+          ...fiscalSimulationAuditMetadata,
+          scenarioSetId: fiscalSimulationScenarioSet.id,
+          scenarioSetVersion: fiscalSimulationScenarioSet.version
+        }
+      }));
+
+      return evaluation;
     }
   };
 }

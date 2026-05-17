@@ -51,7 +51,8 @@ describe("RBAC permission checks", () => {
       "createSimulatedFiscalDocument",
       "validateSimulatedFiscalDocument",
       "simulateIssueFiscalDocument",
-      "voidSimulatedFiscalDocument"
+      "voidSimulatedFiscalDocument",
+      "evaluateFiscalSimulationScenarios"
     ];
 
     expect(Object.keys(commandPermissions).sort()).toEqual([...expectedCommands].sort());
