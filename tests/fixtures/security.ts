@@ -26,6 +26,12 @@ export function makeCommandContext(role: Role = "OWNER", tenantId = tenantAId): 
 const tenantAdminPermissions: Permission[] = ["tenant.switch", "tenant.members.view", "tenant.members.invite", "tenant.members.suspend", "tenant.invites.resend", "tenant.invites.revoke"];
 const fiscalManagerPermissions: Permission[] = [
   "fiscal_config.manage",
+  "fiscal_simulation.profile.manage",
+  "fiscal_simulation.takers.manage",
+  "fiscal_simulation.documents.create",
+  "fiscal_simulation.documents.validate",
+  "fiscal_simulation.documents.simulate",
+  "fiscal_simulation.documents.view",
   "imports.create",
   "imports.view",
   "candidates.view",
@@ -56,19 +62,31 @@ export const expectedRoleAccess: Record<Role, { allowed: Permission[]; denied: P
     denied: ["users.manage", "tenant.manage", "tenant.members.view", "tenant.members.invite", "tenant.members.suspend", "tenant.invites.resend", "tenant.invites.revoke", "issuance.execute"]
   },
   FISCAL_OPERATOR: {
-    allowed: ["tenant.switch", "imports.create", "imports.view", "candidates.view", "inconsistencies.resolve", "batches.simulate", "documents.download"],
+    allowed: [
+      "tenant.switch",
+      "fiscal_simulation.takers.manage",
+      "fiscal_simulation.documents.create",
+      "fiscal_simulation.documents.validate",
+      "fiscal_simulation.documents.view",
+      "imports.create",
+      "imports.view",
+      "candidates.view",
+      "inconsistencies.resolve",
+      "batches.simulate",
+      "documents.download"
+    ],
     denied: ["users.manage", "tenant.manage", "tenant.members.view", "tenant.members.invite", "tenant.members.suspend", "tenant.invites.resend", "tenant.invites.revoke", "batches.approve", "issuance.execute", "audit.view"]
   },
   FINANCIAL_OPERATOR: {
     allowed: ["tenant.switch", "imports.view", "documents.download"],
-    denied: ["users.manage", "tenant.manage", "tenant.members.view", "tenant.members.invite", "tenant.members.suspend", "tenant.invites.resend", "tenant.invites.revoke", "imports.create", "inconsistencies.resolve", "batches.simulate", "batches.approve", "audit.view"]
+    denied: ["users.manage", "tenant.manage", "tenant.members.view", "tenant.members.invite", "tenant.members.suspend", "tenant.invites.resend", "tenant.invites.revoke", "fiscal_simulation.profile.manage", "fiscal_simulation.takers.manage", "fiscal_simulation.documents.create", "fiscal_simulation.documents.validate", "fiscal_simulation.documents.simulate", "fiscal_simulation.documents.view", "imports.create", "inconsistencies.resolve", "batches.simulate", "batches.approve", "audit.view"]
   },
   ACCOUNTANT: {
-    allowed: ["tenant.switch", "imports.view", "candidates.view", "audit.view", "documents.download"],
-    denied: ["users.manage", "tenant.manage", "tenant.members.view", "tenant.members.invite", "tenant.members.suspend", "tenant.invites.resend", "tenant.invites.revoke", "imports.create", "inconsistencies.resolve", "batches.simulate", "batches.approve", "issuance.execute"]
+    allowed: ["tenant.switch", "fiscal_simulation.documents.view", "imports.view", "candidates.view", "audit.view", "documents.download"],
+    denied: ["users.manage", "tenant.manage", "tenant.members.view", "tenant.members.invite", "tenant.members.suspend", "tenant.invites.resend", "tenant.invites.revoke", "fiscal_simulation.profile.manage", "fiscal_simulation.takers.manage", "fiscal_simulation.documents.create", "fiscal_simulation.documents.validate", "fiscal_simulation.documents.simulate", "imports.create", "inconsistencies.resolve", "batches.simulate", "batches.approve", "issuance.execute"]
   },
   AUDITOR: {
-    allowed: ["tenant.switch", "audit.view", "documents.download"],
-    denied: ["users.manage", "tenant.manage", "tenant.members.view", "tenant.members.invite", "tenant.members.suspend", "tenant.invites.resend", "tenant.invites.revoke", "imports.create", "candidates.view", "inconsistencies.resolve", "batches.simulate", "batches.approve"]
+    allowed: ["tenant.switch", "fiscal_simulation.documents.view", "audit.view", "documents.download"],
+    denied: ["users.manage", "tenant.manage", "tenant.members.view", "tenant.members.invite", "tenant.members.suspend", "tenant.invites.resend", "tenant.invites.revoke", "fiscal_simulation.profile.manage", "fiscal_simulation.takers.manage", "fiscal_simulation.documents.create", "fiscal_simulation.documents.validate", "fiscal_simulation.documents.simulate", "imports.create", "candidates.view", "inconsistencies.resolve", "batches.simulate", "batches.approve"]
   }
 };

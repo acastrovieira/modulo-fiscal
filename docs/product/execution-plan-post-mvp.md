@@ -23,6 +23,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 19 | Invite lifecycle e aceite seguro | Concluida | 100% | Accept/revoke/resend com token hash e auditoria | Codex + @architect + seguranca/LGPD + @qa |
 | 20 | Onboarding e tenant bootstrap | Concluida | 100% | Primeiro tenant/OWNER com idempotencia | Codex + @architect + seguranca/LGPD + @qa |
 | 21 | Security, tenant e LGPD hardening | Concluida | 100% | Secret scanner, cookie clear seguro e inventario LGPD | Codex + seguranca/LGPD + @qa |
+| 22 | Simulador fiscal governado v1 | Concluida | 100% | Perfil, tomadores e documentos simulados sem provider | Codex + @architect + fiscal/LGPD + @qa |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -391,3 +392,23 @@ Checklist de aceite:
 - [ ] LGPD basica documentada e testada.
 - [x] Runbooks e checklist beta existem.
 - [ ] Nenhuma emissao real, scraping ou provider externo foi introduzido.
+
+## 23. Sprint 22 - Simulador Fiscal Governado v1
+Objetivo: criar o primeiro nucleo fiscal interno simulavel, governado por tenant, RBAC, auditoria e idempotencia, sem emissao real de NFS-e, scraping ou provider externo.
+
+Tarefas concluidas:
+- [x] Modelar perfil fiscal simulado por tenant.
+- [x] Modelar tomadores com documento mascarado e hash por tenant.
+- [x] Modelar documentos fiscais simulados com `simulationId`, `fiscalValue=false` e `externalTransmission=false`.
+- [x] Criar idempotencia por tenant, operacao e chave.
+- [x] Criar service de aplicacao com state machine `DRAFT -> VALIDATED -> SIMULATED_ISSUED` e `VOIDED`.
+- [x] Criar APIs backend-first para profile, takers, documents e transicoes.
+- [x] Criar permissioes RBAC especificas do simulador fiscal.
+- [x] Criar testes de perfil, tomador, documento, idempotencia, transicoes, RBAC e tenant isolation.
+
+Checklist de aceite:
+- [x] Nenhum fluxo chama provider externo.
+- [x] Nenhum fluxo implementa emissao real de NFS-e.
+- [x] Dados do tomador nao sao gravados em auditoria como documento bruto.
+- [x] Documento simulado sempre carrega disclaimer e flags de simulacao.
+- [x] Mutacoes criticas passam por service de aplicacao, nao por React.
