@@ -1,14 +1,15 @@
 ﻿# Beta Readiness Checklist - VetFiscal OS
 
 ## Status
-Ready for controlled review. Must be rechecked immediately before beta go-live.
+Scope frozen for controlled beta planning. Not approved for go-live until all release candidate gates are rechecked.
 
 ## Scope Control
-- [ ] Beta tenants are explicitly listed and approved.
-- [ ] Beta users are named and assigned least-privilege roles.
-- [ ] Product confirms no real NFS-e issuance in beta scope.
-- [ ] Product confirms no scraping and no municipal provider integration.
-- [ ] Support owner and engineering owner are defined.
+- [x] Beta tenants are explicitly listed as controlled/fictitious placeholders in `docs/product/beta-scope-freeze.md`.
+- [ ] Real beta tenants are approved for go-live.
+- [ ] Real beta users are named and assigned least-privilege roles.
+- [x] Product confirms no real NFS-e issuance in beta scope.
+- [x] Product confirms no scraping and no municipal provider integration.
+- [ ] Support owner and engineering owner are defined for the release candidate.
 
 ## Technical Gates
 - [ ] GitHub `Quality gates` check is green.
