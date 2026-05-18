@@ -8,6 +8,10 @@ import {
   type CommandContext
 } from "@/shared/application/command-context";
 import { InvalidStateError, NotFoundError } from "@/shared/errors/application-error";
+import {
+  runIdempotentCommand,
+  type CommandIdempotencyRepository
+} from "@/shared/idempotency/command-idempotency";
 import { assertTenantScope } from "@/shared/security/tenant-scope";
 
 export type FiscalImportBatchStatus =
@@ -94,6 +98,7 @@ export type MarkCandidateReadyForBatchInput = {
   context: CommandContext;
   candidateId: string;
   now?: Date;
+  idempotencyKey?: string | null;
 };
 
 type NormalizedFiscalRow = {
@@ -158,8 +163,21 @@ function parseFiscalRow(row: unknown): NormalizedFiscalRow {
   return row as NormalizedFiscalRow;
 }
 
-export function createFiscalCandidateService(dependencies: { repository: FiscalCandidateRepository; audit: AuditRecorder }) {
-  const { repository, audit } = dependencies;
+export function createFiscalCandidateService(dependencies: {
+  repository: FiscalCandidateRepository;
+  audit: AuditRecorder;
+  idempotencyRepository?: CommandIdempotencyRepository;
+}) {
+  const { repository, audit, idempotencyRepository } = dependencies;
+
+  async function loadCandidateForReplay(context: CommandContext, candidateId: string): Promise<FiscalCandidateRecord | null> {
+    const candidate = await repository.findCandidateById(candidateId);
+    if (candidate) {
+      assertTenantScope(context.tenantId, candidate);
+    }
+
+    return candidate;
+  }
 
   return {
     async createFiscalCandidatesFromImport(input: CreateFiscalCandidatesFromImportInput): Promise<FiscalCandidateRecord[]> {
@@ -259,44 +277,55 @@ export function createFiscalCandidateService(dependencies: { repository: FiscalC
     async markCandidateReadyForBatch(input: MarkCandidateReadyForBatchInput): Promise<FiscalCandidateRecord> {
       assertPermissionForCommand(input.context, "markCandidateReadyForBatch");
 
-      const candidate = await repository.findCandidateById(input.candidateId);
-      if (!candidate) {
-        throw new NotFoundError("Fiscal candidate not found.");
-      }
+      return runIdempotentCommand({
+        context: input.context,
+        operation: "fiscal_candidate.mark_ready",
+        idempotencyKey: input.idempotencyKey,
+        requestPayload: { candidateId: input.candidateId },
+        repository: idempotencyRepository,
+        loadExisting: (candidateId) => loadCandidateForReplay(input.context, candidateId),
+        getResponseRef: (candidate) => candidate.id,
+        execute: async () => {
+          const candidate = await repository.findCandidateById(input.candidateId);
+          if (!candidate) {
+            throw new NotFoundError("Fiscal candidate not found.");
+          }
 
-      assertTenantScope(input.context.tenantId, candidate);
+          assertTenantScope(input.context.tenantId, candidate);
 
-      if (!canMarkCandidateReadyForBatch(candidate.status)) {
-        throw new InvalidStateError(`Cannot mark fiscal candidate as ready from ${candidate.status}.`);
-      }
+          if (!canMarkCandidateReadyForBatch(candidate.status)) {
+            throw new InvalidStateError(`Cannot mark fiscal candidate as ready from ${candidate.status}.`);
+          }
 
-      const openBlockingInconsistencies = await repository.countOpenBlockingInconsistenciesByCandidateId(
-        candidate.id,
-        input.context.tenantId
-      );
-      if (openBlockingInconsistencies > 0) {
-        throw new InvalidStateError("Fiscal candidate has open blocking inconsistencies.");
-      }
+          const openBlockingInconsistencies = await repository.countOpenBlockingInconsistenciesByCandidateId(
+            candidate.id,
+            input.context.tenantId
+          );
+          if (openBlockingInconsistencies > 0) {
+            throw new InvalidStateError("Fiscal candidate has open blocking inconsistencies.");
+          }
 
-      const updated = await repository.updateFiscalCandidate({
-        id: candidate.id,
-        tenantId: input.context.tenantId,
-        status: "READY_FOR_BATCH",
-        reviewedBy: input.context.actorId,
-        reviewedAt: input.now ?? new Date()
+          const updated = await repository.updateFiscalCandidate({
+            id: candidate.id,
+            tenantId: input.context.tenantId,
+            status: "READY_FOR_BATCH",
+            reviewedBy: input.context.actorId,
+            reviewedAt: input.now ?? new Date()
+          });
+
+          await audit.record(
+            createCommandAuditEvent(input.context, {
+              eventType: "fiscal_candidate.marked_ready",
+              entityType: "FiscalCandidate",
+              entityId: updated.id,
+              beforePayload: { status: candidate.status },
+              afterPayload: { status: updated.status, reviewedBy: updated.reviewedBy, reviewedAt: updated.reviewedAt }
+            })
+          );
+
+          return updated;
+        }
       });
-
-      await audit.record(
-        createCommandAuditEvent(input.context, {
-          eventType: "fiscal_candidate.marked_ready",
-          entityType: "FiscalCandidate",
-          entityId: updated.id,
-          beforePayload: { status: candidate.status },
-          afterPayload: { status: updated.status, reviewedBy: updated.reviewedBy, reviewedAt: updated.reviewedAt }
-        })
-      );
-
-      return updated;
     }
   };
 }

@@ -8,6 +8,7 @@ import {
 } from "@/modules/fiscal/application/fiscal-batch-service";
 import type { FiscalCandidateRecord } from "@/modules/fiscal/application/fiscal-candidate-service";
 import { ForbiddenError, InvalidStateError, NotFoundError, TenantScopeError, ValidationError } from "@/shared/errors/application-error";
+import { makeIdempotencyRepository } from "../fixtures/idempotency";
 import { makeCommandContext, tenantAId, tenantBId, userAId } from "../fixtures/security";
 
 function makeCandidate(overrides: Partial<FiscalCandidateRecord> = {}): FiscalCandidateRecord {
@@ -202,6 +203,86 @@ describe("createFiscalBatch", () => {
       service.createFiscalBatch({ context: makeCommandContext("OWNER"), candidateIds: ["candidate-1"] })
     ).rejects.toThrow(InvalidStateError);
   });
+
+  it("replays the same idempotent create without creating a second batch", async () => {
+    const repository = makeRepository();
+    const audit = makeAudit();
+    const idempotency = makeIdempotencyRepository();
+    const service = createFiscalBatchService({ repository, audit, idempotencyRepository: idempotency.repository });
+
+    await service.createFiscalBatch({
+      context: makeCommandContext("FISCAL_OPERATOR"),
+      candidateIds: ["candidate-1"],
+      batchNumber: "BATCH-001",
+      idempotencyKey: "idem-create-batch"
+    });
+    await service.createFiscalBatch({
+      context: makeCommandContext("FISCAL_OPERATOR"),
+      candidateIds: ["candidate-1"],
+      batchNumber: "BATCH-001",
+      idempotencyKey: "idem-create-batch"
+    });
+
+    expect(repository.createFiscalBatch).toHaveBeenCalledTimes(1);
+    expect(audit.record).toHaveBeenCalledTimes(1);
+    expect(idempotency.repository.createCommandIdempotencyRecord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tenantId: tenantAId,
+        actorId: userAId,
+        operation: "fiscal_batch.create",
+        idempotencyKey: "idem-create-batch",
+        responseRef: "batch-1",
+        status: "SUCCEEDED"
+      })
+    );
+  });
+
+  it("blocks divergent replay for a fiscal batch create key", async () => {
+    const idempotency = makeIdempotencyRepository();
+    const service = createFiscalBatchService({
+      repository: makeRepository(),
+      audit: makeAudit(),
+      idempotencyRepository: idempotency.repository
+    });
+
+    await service.createFiscalBatch({
+      context: makeCommandContext("FISCAL_OPERATOR"),
+      candidateIds: ["candidate-1"],
+      batchNumber: "BATCH-001",
+      idempotencyKey: "idem-divergent"
+    });
+
+    await expect(
+      service.createFiscalBatch({
+        context: makeCommandContext("FISCAL_OPERATOR"),
+        candidateIds: ["candidate-2"],
+        batchNumber: "BATCH-002",
+        idempotencyKey: "idem-divergent"
+      })
+    ).rejects.toThrow(InvalidStateError);
+  });
+
+  it("scopes fiscal batch idempotency keys by tenant", async () => {
+    const idempotency = makeIdempotencyRepository();
+    const repository = makeRepository({
+      findCandidateById: vi.fn().mockImplementation(async (id: string) => makeCandidate({ id, tenantId: id === "candidate-b" ? tenantBId : tenantAId }))
+    });
+    const service = createFiscalBatchService({ repository, audit: makeAudit(), idempotencyRepository: idempotency.repository });
+
+    await service.createFiscalBatch({
+      context: makeCommandContext("FISCAL_OPERATOR"),
+      candidateIds: ["candidate-1"],
+      idempotencyKey: "same-key"
+    });
+    await service.createFiscalBatch({
+      context: makeCommandContext("FISCAL_OPERATOR", tenantBId),
+      candidateIds: ["candidate-b"],
+      idempotencyKey: "same-key"
+    });
+
+    expect(repository.createFiscalBatch).toHaveBeenCalledTimes(2);
+    expect(idempotency.records.size).toBe(2);
+  });
 });
 
 describe("submitBatchForReview", () => {
@@ -236,6 +317,19 @@ describe("submitBatchForReview", () => {
     const service = createFiscalBatchService({ repository, audit: makeAudit() });
 
     await expect(service.submitBatchForReview({ context: makeCommandContext("OWNER"), batchId: "batch-1" })).rejects.toThrow(InvalidStateError);
+  });
+
+  it("replays an idempotent submit without applying the transition twice", async () => {
+    const repository = makeRepository();
+    const audit = makeAudit();
+    const idempotency = makeIdempotencyRepository();
+    const service = createFiscalBatchService({ repository, audit, idempotencyRepository: idempotency.repository });
+
+    await service.submitBatchForReview({ context: makeCommandContext("FISCAL_OPERATOR"), batchId: "batch-1", idempotencyKey: "idem-submit" });
+    await service.submitBatchForReview({ context: makeCommandContext("FISCAL_OPERATOR"), batchId: "batch-1", idempotencyKey: "idem-submit" });
+
+    expect(repository.updateBatchStatus).toHaveBeenCalledTimes(1);
+    expect(audit.record).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -273,6 +367,18 @@ describe("simulateBatchInternally", () => {
     const service = createFiscalBatchService({ repository, audit: makeAudit() });
 
     await expect(service.simulateBatchInternally({ context: makeCommandContext("OWNER"), batchId: "batch-1" })).rejects.toThrow(InvalidStateError);
+  });
+
+  it("records idempotency for internal simulation", async () => {
+    const idempotency = makeIdempotencyRepository();
+    const repository = makeRepository({ findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "IN_REVIEW" })) });
+    const service = createFiscalBatchService({ repository, audit: makeAudit(), idempotencyRepository: idempotency.repository });
+
+    await service.simulateBatchInternally({ context: makeCommandContext("FISCAL_OPERATOR"), batchId: "batch-1", idempotencyKey: "idem-simulate" });
+
+    expect(idempotency.repository.createCommandIdempotencyRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ operation: "fiscal_batch.simulate_internal", responseRef: "batch-1", status: "SUCCEEDED" })
+    );
   });
 });
 
@@ -321,6 +427,24 @@ describe("approveBatchForFutureIssuance", () => {
       service.approveBatchForFutureIssuance({ context: makeCommandContext("OWNER"), batchId: "batch-1" })
     ).rejects.toThrow(InvalidStateError);
   });
+
+  it("records idempotency for future issuance approval without emitting NFS-e", async () => {
+    const idempotency = makeIdempotencyRepository();
+    const repository = makeRepository({ findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "SIMULATED" })) });
+    const audit = makeAudit();
+    const service = createFiscalBatchService({ repository, audit, idempotencyRepository: idempotency.repository });
+
+    await service.approveBatchForFutureIssuance({
+      context: makeCommandContext("FISCAL_MANAGER"),
+      batchId: "batch-1",
+      idempotencyKey: "idem-approve"
+    });
+
+    expect(idempotency.repository.createCommandIdempotencyRecord).toHaveBeenCalledWith(
+      expect.objectContaining({ operation: "fiscal_batch.approve_future_issuance", responseRef: "batch-1" })
+    );
+    expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ metadata: { externalProviderCalled: false, nfseIssued: false } }));
+  });
 });
 
 describe("cancelBatch", () => {
@@ -357,6 +481,30 @@ describe("cancelBatch", () => {
     await expect(
       service.cancelBatch({ context: makeCommandContext("OWNER"), batchId: "batch-1", reason: "Revisao" })
     ).rejects.toThrow(InvalidStateError);
+  });
+
+  it("replays an idempotent cancellation without releasing candidates twice", async () => {
+    const repository = makeRepository({ findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "IN_REVIEW" })) });
+    const audit = makeAudit();
+    const idempotency = makeIdempotencyRepository();
+    const service = createFiscalBatchService({ repository, audit, idempotencyRepository: idempotency.repository });
+
+    await service.cancelBatch({
+      context: makeCommandContext("FISCAL_MANAGER"),
+      batchId: "batch-1",
+      reason: "Importacao revisada",
+      idempotencyKey: "idem-cancel"
+    });
+    await service.cancelBatch({
+      context: makeCommandContext("FISCAL_MANAGER"),
+      batchId: "batch-1",
+      reason: "Importacao revisada",
+      idempotencyKey: "idem-cancel"
+    });
+
+    expect(repository.updateBatchStatus).toHaveBeenCalledTimes(1);
+    expect(repository.updateCandidateStatus).toHaveBeenCalledTimes(1);
+    expect(audit.record).toHaveBeenCalledTimes(1);
   });
 });
 

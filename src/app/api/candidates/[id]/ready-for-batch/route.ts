@@ -5,6 +5,7 @@ import { createPrismaFiscalCandidateRepository } from "@/modules/fiscal/infrastr
 import { audit } from "@/modules/audit/application/audit-service";
 import { createCommandContext } from "@/shared/application/command-context";
 import { apiErrorResponse } from "@/shared/http/api-error-response";
+import { createPrismaCommandIdempotencyRepository } from "@/shared/idempotency/prisma-command-idempotency-repository";
 import { createCorrelationId } from "@/shared/logging/correlation-id";
 
 type RouteContext = {
@@ -37,8 +38,16 @@ export async function POST(request: Request, { params }: RouteContext) {
     readyForBatchRequestSchema.parse(await request.json().catch(() => ({})));
 
     const repository = createPrismaFiscalCandidateRepository();
-    const service = createFiscalCandidateService({ repository, audit });
-    const candidate = await service.markCandidateReadyForBatch({ context, candidateId: id });
+    const service = createFiscalCandidateService({
+      repository,
+      audit,
+      idempotencyRepository: createPrismaCommandIdempotencyRepository()
+    });
+    const candidate = await service.markCandidateReadyForBatch({
+      context,
+      candidateId: id,
+      idempotencyKey: request.headers.get("idempotency-key")
+    });
 
     return NextResponse.json({ data: toReadyForBatchResponse(candidate), requestId });
   } catch (error) {
