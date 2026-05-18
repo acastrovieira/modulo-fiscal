@@ -6,6 +6,7 @@ import {
   type FiscalImportBatchRecord,
   type FiscalImportRowRecord
 } from "@/modules/fiscal/application/fiscal-candidate-service";
+import { evaluateFiscalCandidateReviewGate } from "@/modules/fiscal/domain/fiscal-candidate";
 import { createFiscalFingerprint, FISCAL_FINGERPRINT_VERSION } from "@/modules/fiscal/domain/fiscal-fingerprint";
 import { maskBrazilianDocument } from "@/modules/fiscal/domain/masking";
 import { ForbiddenError, InvalidStateError, NotFoundError, TenantScopeError } from "@/shared/errors/application-error";
@@ -134,6 +135,34 @@ describe("fiscal fingerprint", () => {
   });
 });
 
+describe("fiscal candidate review gate", () => {
+  it("keeps complete candidates in human review", () => {
+    const gate = evaluateFiscalCandidateReviewGate({
+      grossAmountCents: 15000n,
+      serviceDate: new Date("2026-05-10T00:00:00.000Z"),
+      competenceDate: null,
+      duplicateWithinImport: false,
+      rawCustomerDocumentReceived: false
+    });
+
+    expect(gate).toEqual({ initialStatus: "NEEDS_REVIEW", blockedReasons: [], warnings: [] });
+  });
+
+  it("blocks duplicate, missing amount and missing date candidates with explicit reasons", () => {
+    const gate = evaluateFiscalCandidateReviewGate({
+      grossAmountCents: null,
+      serviceDate: null,
+      competenceDate: null,
+      duplicateWithinImport: true,
+      rawCustomerDocumentReceived: true
+    });
+
+    expect(gate.initialStatus).toBe("BLOCKED");
+    expect(gate.blockedReasons).toEqual(["DUPLICATE_WITHIN_IMPORT", "MISSING_OR_INVALID_AMOUNT", "MISSING_SERVICE_DATE"]);
+    expect(gate.warnings).toEqual(["RAW_CUSTOMER_DOCUMENT_RECEIVED"]);
+  });
+});
+
 describe("createFiscalCandidatesFromImport", () => {
   it("creates candidates from normalized rows and records audit", async () => {
     const repository = makeRepository();
@@ -170,7 +199,14 @@ describe("createFiscalCandidatesFromImport", () => {
         actorId: userAId,
         eventType: "fiscal_candidate.created",
         entityType: "FiscalCandidate",
-        correlationId: "corr_test"
+        correlationId: "corr_test",
+        afterPayload: expect.objectContaining({
+          reviewGate: {
+            initialStatus: "NEEDS_REVIEW",
+            blockedReasons: [],
+            warnings: ["RAW_CUSTOMER_DOCUMENT_RECEIVED"]
+          }
+        })
       })
     );
   });
@@ -241,6 +277,39 @@ describe("createFiscalCandidatesFromImport", () => {
     const result = await service.createFiscalCandidatesFromImport({ context: makeCommandContext("OWNER"), importBatchId: "import-1" });
 
     expect(result[0].status).toBe("BLOCKED");
+    expect(repository.createFiscalCandidate).toHaveBeenCalledWith(
+      expect.objectContaining({ status: "BLOCKED" })
+    );
+  });
+
+  it("blocks duplicate rows from the versioned import parser", async () => {
+    const repository = makeRepository({
+      findNormalizedRowsByImportBatchId: vi.fn().mockResolvedValue([
+        makeImportRow({
+          normalizedPayload: {
+            customerName: "Maria Tutora",
+            customerDocumentMasked: "*******8901",
+            serviceDate: "2026-05-10",
+            description: "Consulta veterinaria",
+            amountCents: "15000",
+            duplicateWithinImport: true
+          }
+        })
+      ])
+    });
+    const audit = makeAudit();
+    const service = createFiscalCandidateService({ repository, audit });
+
+    const result = await service.createFiscalCandidatesFromImport({ context: makeCommandContext("OWNER"), importBatchId: "import-1" });
+
+    expect(result[0].status).toBe("BLOCKED");
+    expect(audit.record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        afterPayload: expect.objectContaining({
+          reviewGate: expect.objectContaining({ blockedReasons: ["DUPLICATE_WITHIN_IMPORT"] })
+        })
+      })
+    );
   });
 
   it("does not create candidates from rejected rows", async () => {

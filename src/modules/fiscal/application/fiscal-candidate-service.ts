@@ -1,5 +1,5 @@
 import type { AuditRecorder } from "@/modules/audit/application/audit-service";
-import { canMarkCandidateReadyForBatch, type FiscalCandidateStatus } from "@/modules/fiscal/domain/fiscal-candidate";
+import { canMarkCandidateReadyForBatch, evaluateFiscalCandidateReviewGate, type FiscalCandidateStatus } from "@/modules/fiscal/domain/fiscal-candidate";
 import { createFiscalFingerprint, FISCAL_FINGERPRINT_VERSION } from "@/modules/fiscal/domain/fiscal-fingerprint";
 import { maskBrazilianDocument } from "@/modules/fiscal/domain/masking";
 import {
@@ -158,19 +158,6 @@ function parseFiscalRow(row: unknown): NormalizedFiscalRow {
   return row as NormalizedFiscalRow;
 }
 
-function inferInitialStatus(input: {
-  grossAmountCents: bigint | null;
-  serviceDate: Date | null;
-  competenceDate: Date | null;
-  duplicate: boolean;
-}): FiscalCandidateStatus {
-  if (input.duplicate || input.grossAmountCents === null || input.grossAmountCents <= 0n || (!input.serviceDate && !input.competenceDate)) {
-    return "BLOCKED";
-  }
-
-  return "NEEDS_REVIEW";
-}
-
 export function createFiscalCandidateService(dependencies: { repository: FiscalCandidateRepository; audit: AuditRecorder }) {
   const { repository, audit } = dependencies;
 
@@ -205,6 +192,13 @@ export function createFiscalCandidateService(dependencies: { repository: FiscalC
         const competenceDate = toDate(normalized.competenceDate);
         const grossAmountCents = toCents(normalized.grossAmountCents ?? normalized.amountCents);
         const serviceDescription = normalized.serviceDescription?.trim() || normalized.description?.trim() || null;
+        const reviewGate = evaluateFiscalCandidateReviewGate({
+          grossAmountCents,
+          serviceDate,
+          competenceDate,
+          duplicateWithinImport: Boolean(normalized.duplicateWithinImport),
+          rawCustomerDocumentReceived: Boolean(normalized.customerDocument)
+        });
         const fingerprint = createFiscalFingerprint({
           tenantId: input.context.tenantId,
           customerDocumentMasked,
@@ -223,8 +217,6 @@ export function createFiscalCandidateService(dependencies: { repository: FiscalC
           continue;
         }
 
-        const status = inferInitialStatus({ grossAmountCents, serviceDate, competenceDate, duplicate: Boolean(normalized.duplicateWithinImport) });
-
         const candidate = await repository.createFiscalCandidate({
           tenantId: input.context.tenantId,
           importBatchId: importBatch.id,
@@ -236,7 +228,7 @@ export function createFiscalCandidateService(dependencies: { repository: FiscalC
           competenceDate,
           serviceDescription,
           grossAmountCents,
-          status,
+          status: reviewGate.initialStatus,
           fiscalFingerprintVersion: FISCAL_FINGERPRINT_VERSION,
           fiscalFingerprint: fingerprint
         });
@@ -252,7 +244,8 @@ export function createFiscalCandidateService(dependencies: { repository: FiscalC
               importBatchId: candidate.importBatchId,
               importRowId: candidate.importRowId,
               fiscalFingerprintVersion: candidate.fiscalFingerprintVersion,
-              duplicateDetected: Boolean(normalized.duplicateWithinImport)
+              duplicateDetected: Boolean(normalized.duplicateWithinImport),
+              reviewGate
             }
           })
         );
