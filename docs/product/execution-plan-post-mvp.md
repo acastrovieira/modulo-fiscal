@@ -31,7 +31,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 27 | Importacoes avancadas e contratos versionados | Concluida | 100% | Parser versionado, fingerprints e bloqueios LGPD | Codex + @architect + seguranca/LGPD + @qa |
 | 28 | Guardrails de revisao de candidatos | Concluida | 100% | Review gate auditavel antes de lotes | Codex + @architect + seguranca/LGPD + @qa |
 | 29 | Beta scope freeze | Concluida | 100% | PR #15 mergeado e escopo beta congelado | Codex + @pm + @po |
-| 30 | Command idempotency e transition ledger | Planejada | 0% | Comandos criticos idempotentes/auditaveis | Codex + @architect |
+| 30 | Command idempotency e transition ledger | Concluida | 100% | Comandos criticos idempotentes/auditaveis | Codex + @architect |
 | 31 | RBAC matrix e flow permissions | Planejada | 0% | Matriz papel/acao/estado validada | Codex + @architect + @qa |
 | 32 | Audit completeness e redaction | Planejada | 0% | Acoes criticas com auditoria segura | Codex + seguranca/LGPD + @qa |
 | 33 | Import replay, quarantine e parser governance | Planejada | 0% | Reprocessamento seguro de imports | Codex + @architect + @qa |
@@ -559,16 +559,16 @@ Checklist de aceite:
 ## 31. Sprint 30 - Command Idempotency e Transition Ledger
 Objetivo: padronizar idempotencia para comandos criticos alem de importacao e simulacao.
 
-Tarefas planejadas:
-- [ ] Criar contrato transversal de idempotencia por tenant, ator, operacao e chave.
-- [ ] Cobrir criacao de lote, submit, simulate, approve future issuance, cancel e revisao de candidato.
-- [ ] Registrar `requestHash`, `operation`, `responseRef` e status da tentativa.
-- [ ] Bloquear replay divergente com a mesma chave.
-- [ ] Testar replay no mesmo tenant e replay cruzado entre tenants.
+Tarefas concluidas:
+- [x] Criar contrato transversal de idempotencia por tenant, ator, operacao e chave.
+- [x] Cobrir criacao de lote, submit, simulate, approve future issuance, cancel e revisao de candidato.
+- [x] Registrar `requestHash`, `operation`, `responseRef` e status da tentativa.
+- [x] Bloquear replay divergente com a mesma chave.
+- [x] Testar replay no mesmo tenant e replay cruzado entre tenants.
 
 Gate:
-- [ ] Comandos criticos podem ser repetidos sem duplicar efeitos.
-- [ ] Idempotency key de um tenant nao funciona em outro.
+- [x] Comandos criticos podem ser repetidos sem duplicar efeitos.
+- [x] Idempotency key de um tenant nao funciona em outro.
 
 ## 32. Sprint 31 - RBAC Matrix e Flow Permissions
 Objetivo: fechar matriz de permissoes por fluxo, papel e estado.

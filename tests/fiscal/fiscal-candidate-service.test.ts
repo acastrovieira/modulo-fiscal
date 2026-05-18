@@ -10,6 +10,7 @@ import { evaluateFiscalCandidateReviewGate } from "@/modules/fiscal/domain/fisca
 import { createFiscalFingerprint, FISCAL_FINGERPRINT_VERSION } from "@/modules/fiscal/domain/fiscal-fingerprint";
 import { maskBrazilianDocument } from "@/modules/fiscal/domain/masking";
 import { ForbiddenError, InvalidStateError, NotFoundError, TenantScopeError } from "@/shared/errors/application-error";
+import { makeIdempotencyRepository } from "../fixtures/idempotency";
 import { makeCommandContext, tenantAId, tenantBId, userAId } from "../fixtures/security";
 
 function makeImportBatch(overrides: Partial<FiscalImportBatchRecord> = {}): FiscalImportBatchRecord {
@@ -389,5 +390,80 @@ describe("markCandidateReadyForBatch", () => {
     await expect(
       service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "candidate-1" })
     ).rejects.toThrow(InvalidStateError);
+  });
+
+  it("replays the same idempotent candidate review without updating twice", async () => {
+    const repository = makeRepository();
+    const audit = makeAudit();
+    const idempotency = makeIdempotencyRepository();
+    const service = createFiscalCandidateService({ repository, audit, idempotencyRepository: idempotency.repository });
+
+    await service.markCandidateReadyForBatch({
+      context: makeCommandContext("FISCAL_MANAGER"),
+      candidateId: "candidate-1",
+      idempotencyKey: "idem-candidate-ready"
+    });
+    await service.markCandidateReadyForBatch({
+      context: makeCommandContext("FISCAL_MANAGER"),
+      candidateId: "candidate-1",
+      idempotencyKey: "idem-candidate-ready"
+    });
+
+    expect(repository.updateFiscalCandidate).toHaveBeenCalledTimes(1);
+    expect(audit.record).toHaveBeenCalledTimes(1);
+    expect(idempotency.repository.createCommandIdempotencyRecord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tenantId: tenantAId,
+        operation: "fiscal_candidate.mark_ready",
+        idempotencyKey: "idem-candidate-ready",
+        responseRef: "candidate-1",
+        status: "SUCCEEDED"
+      })
+    );
+  });
+
+  it("blocks divergent replay for candidate review keys", async () => {
+    const idempotency = makeIdempotencyRepository();
+    const service = createFiscalCandidateService({
+      repository: makeRepository(),
+      audit: makeAudit(),
+      idempotencyRepository: idempotency.repository
+    });
+
+    await service.markCandidateReadyForBatch({
+      context: makeCommandContext("FISCAL_MANAGER"),
+      candidateId: "candidate-1",
+      idempotencyKey: "idem-candidate-divergent"
+    });
+
+    await expect(
+      service.markCandidateReadyForBatch({
+        context: makeCommandContext("FISCAL_MANAGER"),
+        candidateId: "candidate-2",
+        idempotencyKey: "idem-candidate-divergent"
+      })
+    ).rejects.toThrow(InvalidStateError);
+  });
+
+  it("scopes candidate review idempotency keys by tenant", async () => {
+    const idempotency = makeIdempotencyRepository();
+    const repository = makeRepository({
+      findCandidateById: vi.fn().mockImplementation(async (id: string) => makeCandidate({ id, tenantId: id === "candidate-b" ? tenantBId : tenantAId }))
+    });
+    const service = createFiscalCandidateService({ repository, audit: makeAudit(), idempotencyRepository: idempotency.repository });
+
+    await service.markCandidateReadyForBatch({
+      context: makeCommandContext("FISCAL_MANAGER"),
+      candidateId: "candidate-1",
+      idempotencyKey: "same-key"
+    });
+    await service.markCandidateReadyForBatch({
+      context: makeCommandContext("FISCAL_MANAGER", tenantBId),
+      candidateId: "candidate-b",
+      idempotencyKey: "same-key"
+    });
+
+    expect(repository.updateFiscalCandidate).toHaveBeenCalledTimes(2);
+    expect(idempotency.records.size).toBe(2);
   });
 });
