@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { supportedImportParserVersions } from "@/modules/imports/domain/import-parser";
 
 export const importStatusSchema = z.enum([
   "PENDING_VALIDATION",
@@ -19,6 +20,7 @@ export const createImportRequestSchema = z
 
 export const validateImportRequestSchema = z
   .object({
+    parserVersion: z.enum(supportedImportParserVersions).optional(),
     rows: z.array(z.unknown()).max(500)
   })
   .strict();

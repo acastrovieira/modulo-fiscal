@@ -22,7 +22,7 @@ export async function POST(request: Request, { params }: RouteContext) {
     ]);
     const repository = createPrismaImportRepository();
     const service = createImportService({ repository, audit });
-    const data = await service.validateImport({ context, importBatchId: id, rows: body.rows });
+    const data = await service.validateImport({ context, importBatchId: id, rows: body.rows, parserVersion: body.parserVersion });
 
     return NextResponse.json({ data, requestId });
   } catch (error) {

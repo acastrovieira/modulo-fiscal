@@ -1,5 +1,10 @@
 import type { AuditRecorder } from "@/modules/audit/application/audit-service";
 import {
+  assertSupportedImportParserVersion,
+  normalizeImportRow,
+  type ImportParserVersion
+} from "@/modules/imports/domain/import-parser";
+import {
   createCommandAuditEvent,
   assertPermissionForCommand,
   type CommandContext
@@ -95,6 +100,7 @@ export type ValidateImportInput = {
   context: CommandContext;
   importBatchId: string;
   rows: readonly unknown[];
+  parserVersion?: ImportParserVersion | string;
   now?: Date;
 };
 
@@ -102,14 +108,6 @@ function ensureDocumentIsProcessable(documentFile: DocumentFileRecord): void {
   if (!documentFile.checksumSha256) {
     throw new ValidationError("Document file must have a checksum before import.");
   }
-}
-
-function normalizeStructuredRow(row: unknown, rowNumber: number): ImportRowCreateInput["normalizedPayload"] {
-  if (row === null || typeof row !== "object" || Array.isArray(row)) {
-    throw new ValidationError(`Import row ${rowNumber} must be an object.`);
-  }
-
-  return row;
 }
 
 export function createImportService(dependencies: { repository: ImportRepository; audit: AuditRecorder }) {
@@ -165,6 +163,7 @@ export function createImportService(dependencies: { repository: ImportRepository
 
     async validateImport(input: ValidateImportInput): Promise<ImportBatchRecord> {
       assertPermissionForCommand(input.context, "validateImport");
+      const parserVersion = assertSupportedImportParserVersion(input.parserVersion);
 
       const importBatch = await repository.findImportBatchById(input.importBatchId);
       if (!importBatch) {
@@ -189,24 +188,32 @@ export function createImportService(dependencies: { repository: ImportRepository
           entityType: "ImportBatch",
           entityId: validating.id,
           beforePayload: { status: importBatch.status },
-          afterPayload: { status: validating.status }
+          afterPayload: { status: validating.status, parserVersion }
         })
       );
 
       const rows: ImportRowCreateInput[] = [];
+      const seenFingerprints = new Set<string>();
       let validRows = 0;
       let invalidRows = 0;
+      let duplicateRows = 0;
 
       input.rows.forEach((row, index) => {
         const rowNumber = index + 1;
         try {
+          const normalizedPayload = normalizeImportRow({ row, rowNumber, parserVersion, seenFingerprints });
+          if (normalizedPayload.duplicateWithinImport) {
+            duplicateRows += 1;
+          }
+
           rows.push({
             tenantId: input.context.tenantId,
             importBatchId: importBatch.id,
             rowNumber,
+            sourceRowId: normalizedPayload.sourceRowId,
             status: "NORMALIZED",
             rawPayload: row,
-            normalizedPayload: normalizeStructuredRow(row, rowNumber)
+            normalizedPayload
           });
           validRows += 1;
         } catch (error) {
@@ -217,6 +224,7 @@ export function createImportService(dependencies: { repository: ImportRepository
             status: "REJECTED",
             rawPayload: row,
             errorPayload: {
+              parserVersion,
               message: error instanceof Error ? error.message : "Invalid row"
             }
           });
@@ -249,7 +257,9 @@ export function createImportService(dependencies: { repository: ImportRepository
             status: finalized.status,
             totalRows: finalized.totalRows,
             validRows: finalized.validRows,
-            invalidRows: finalized.invalidRows
+            invalidRows: finalized.invalidRows,
+            duplicateRows,
+            parserVersion
           }
         })
       );
