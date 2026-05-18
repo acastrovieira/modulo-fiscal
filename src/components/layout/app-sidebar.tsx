@@ -1,7 +1,8 @@
-import { Activity, Archive, Building2, ClipboardCheck, FileInput, Gauge, Layers3, Landmark, ShieldCheck, TriangleAlert } from "lucide-react";
+import { Activity, Archive, Building2, ClipboardCheck, FileInput, Gauge, Layers3, Landmark, ReceiptText, ShieldCheck, TriangleAlert } from "lucide-react";
 
 const navigation = [
   { label: "Dashboard", href: "/dashboard", icon: Gauge },
+  { label: "Fiscal", href: "/dashboard/fiscal", icon: ReceiptText },
   { label: "Importacoes", href: "/dashboard/imports", icon: FileInput },
   { label: "Candidatos", href: "/dashboard/candidates", icon: ClipboardCheck },
   { label: "Inconsistencias", href: "/dashboard/inconsistencies", icon: TriangleAlert },
