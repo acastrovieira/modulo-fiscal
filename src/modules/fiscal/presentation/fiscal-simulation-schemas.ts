@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { FiscalServiceTaker, FiscalSimulationProfile, SimulatedFiscalDocument } from "@/modules/fiscal/domain/fiscal-simulation";
+import type { FiscalSimulationScenarioEvaluation } from "@/modules/fiscal/domain/fiscal-simulation-scenarios";
 
 const amountCentsSchema = z.union([z.number().int(), z.string().regex(/^\d+$/)]).transform((value) => BigInt(value));
 
@@ -24,6 +25,10 @@ export const createSimulatedFiscalDocumentRequestSchema = z.object({
     serviceCode: z.string().trim().min(2).max(40),
     amountCents: amountCentsSchema
   }).strict()).min(1).max(50)
+}).strict();
+
+export const evaluateFiscalSimulationScenariosRequestSchema = z.object({
+  scenarioSetVersion: z.literal("2026.05").optional()
 }).strict();
 
 export function toFiscalSimulationProfileDTO(profile: FiscalSimulationProfile) {
@@ -72,5 +77,29 @@ export function toSimulatedFiscalDocumentDTO(document: SimulatedFiscalDocument) 
       serviceCode: item.serviceCode,
       amountCents: item.amountCents.toString()
     })) ?? []
+  };
+}
+
+export function toFiscalSimulationScenarioEvaluationDTO(evaluation: FiscalSimulationScenarioEvaluation) {
+  return {
+    scenarioSetId: evaluation.scenarioSetId,
+    scenarioSetVersion: evaluation.scenarioSetVersion,
+    simulatedOnly: evaluation.simulatedOnly,
+    fiscalValue: evaluation.fiscalValue,
+    externalTransmission: evaluation.externalTransmission,
+    documentId: evaluation.documentId,
+    simulationId: evaluation.simulationId,
+    status: evaluation.status,
+    disclaimer: "SIMULACAO - SEM VALOR FISCAL - NAO TRANSMITIDO A AMBIENTE OFICIAL",
+    findings: evaluation.findings.map((finding) => ({
+      scenarioId: finding.scenarioId,
+      scenarioVersion: finding.scenarioVersion,
+      code: finding.code,
+      severity: finding.severity,
+      status: finding.status,
+      message: finding.message,
+      recommendation: finding.recommendation,
+      evidence: finding.evidence
+    }))
   };
 }

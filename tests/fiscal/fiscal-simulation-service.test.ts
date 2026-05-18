@@ -210,6 +210,39 @@ describe("fiscal simulation service", () => {
       .resolves.toMatchObject({ status: "SIMULATED_ISSUED", simulatedBy: userAId });
   });
 
+  it("evaluates versioned scenarios with tenant scope and audit", async () => {
+    const audit = makeAudit();
+    const repository = makeRepository({
+      findSimulatedDocumentById: vi.fn().mockResolvedValue(makeDocument({ status: "VALIDATED" }))
+    });
+    const service = createFiscalSimulationService({ repository, audit });
+
+    const evaluation = await service.evaluateScenarios({
+      context: makeCommandContext("AUDITOR"),
+      documentId: "simdoc-1"
+    });
+
+    expect(evaluation).toMatchObject({
+      scenarioSetId: "vetcare-simulation-baseline",
+      scenarioSetVersion: "2026.05",
+      simulatedOnly: true,
+      fiscalValue: false,
+      externalTransmission: false,
+      status: "PASSED"
+    });
+    expect(repository.findProfileByTenantId).toHaveBeenCalledWith(tenantAId);
+    expect(repository.findServiceTakerById).toHaveBeenCalledWith("taker-1");
+    expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({
+      eventType: "fiscal_simulation.scenarios_evaluated",
+      metadata: expect.objectContaining({
+        simulatedOnly: true,
+        scenarioSetVersion: "2026.05",
+        externalProviderCalled: false,
+        nfseIssued: false
+      })
+    }));
+  });
+
   it("blocks invalid role, missing profile, cross-tenant taker and non-positive amount", async () => {
     const service = createFiscalSimulationService({ repository: makeRepository(), audit: makeAudit() });
     await expect(service.upsertProfile({ context: makeCommandContext("AUDITOR"), municipalityCode: "3550308", taxRegime: "simples", serviceDefaultCode: "05.01" })).rejects.toBeInstanceOf(ForbiddenError);
@@ -221,5 +254,27 @@ describe("fiscal simulation service", () => {
     await expect(crossTenant.createSimulatedDocument({ context: makeCommandContext("FISCAL_OPERATOR"), serviceTakerId: "taker-1", description: "Consulta", idempotencyKey: "simulation-key-0004", items: [{ description: "Consulta", serviceCode: "05.01", amountCents: 15000n }] })).rejects.toBeInstanceOf(TenantScopeError);
 
     await expect(service.createSimulatedDocument({ context: makeCommandContext("FISCAL_OPERATOR"), serviceTakerId: "taker-1", description: "Consulta", idempotencyKey: "simulation-key-0005", items: [{ description: "Consulta", serviceCode: "05.01", amountCents: 0n }] })).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("blocks scenario evaluation for cross-tenant documents and unsafe simulation flags", async () => {
+    const crossTenant = createFiscalSimulationService({
+      repository: makeRepository({ findSimulatedDocumentById: vi.fn().mockResolvedValue(makeDocument({ tenantId: tenantBId })) }),
+      audit: makeAudit()
+    });
+
+    await expect(crossTenant.evaluateScenarios({
+      context: makeCommandContext("AUDITOR"),
+      documentId: "simdoc-1"
+    })).rejects.toBeInstanceOf(TenantScopeError);
+
+    const unsafe = createFiscalSimulationService({
+      repository: makeRepository({ findSimulatedDocumentById: vi.fn().mockResolvedValue(makeDocument({ fiscalValue: true })) }),
+      audit: makeAudit()
+    });
+
+    await expect(unsafe.evaluateScenarios({
+      context: makeCommandContext("AUDITOR"),
+      documentId: "simdoc-1"
+    })).rejects.toBeInstanceOf(InvalidStateError);
   });
 });

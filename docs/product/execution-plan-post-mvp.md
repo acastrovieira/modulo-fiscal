@@ -25,6 +25,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 21 | Security, tenant e LGPD hardening | Concluida | 100% | Secret scanner, cookie clear seguro e inventario LGPD | Codex + seguranca/LGPD + @qa |
 | 22 | Simulador fiscal governado v1 | Concluida | 100% | Perfil, tomadores e documentos simulados sem provider | Codex + @architect + fiscal/LGPD + @qa |
 | 23 | Hardening de contratos do simulador | Concluida | 100% | DTO allowlist, auditoria padronizada e linguagem segura | Codex + @architect + @qa |
+| 24 | Cenarios fiscais versionados | Concluida | 100% | Scenario set versionado, API de avaliacao e audit trail | Codex + @architect + fiscal/produto + @qa |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -429,4 +430,23 @@ Checklist de aceite:
 - [x] Simulador segue API-first e sem Prisma em React.
 - [x] Contratos deixam claro que nao ha valor fiscal.
 - [x] Tenant isolation, RBAC, LGPD, auditoria e idempotencia viram gates de release.
+- [x] Nenhuma emissao real, scraping, provider externo ou certificado foi introduzido.
+
+## 25. Sprint 24 - Cenarios Fiscais Versionados
+Objetivo: criar o primeiro motor versionado de cenarios fiscais simulados, com avaliacao deterministica e auditavel sobre documentos simulados.
+
+Tarefas concluidas:
+- [x] Criar scenario set `vetcare-simulation-baseline@2026.05`.
+- [x] Implementar avaliador de dominio puro para cenarios simulados.
+- [x] Criar findings para guardrail de simulacao, itens ausentes, documento desconhecido, codigo divergente e valor alto.
+- [x] Criar service de aplicacao com tenant scope, RBAC e auditoria.
+- [x] Criar API `POST /api/fiscal/simulation/documents/[id]/scenario-evaluation`.
+- [x] Criar DTO allowlist com disclaimer e flags de simulacao.
+- [x] Documentar contratos em `docs/architecture/fiscal-simulation-scenarios.md`.
+
+Checklist de aceite:
+- [x] Nenhuma avaliacao aceita `tenantId` do cliente.
+- [x] Nenhuma resposta publica expoe hash, documento bruto ou `tenantId`.
+- [x] Auditoria registra scenario set, versao e flags de simulacao.
+- [x] Resultado e deterministico para mesmo documento, perfil e tomador.
 - [x] Nenhuma emissao real, scraping, provider externo ou certificado foi introduzido.
