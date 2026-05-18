@@ -27,6 +27,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 23 | Hardening de contratos do simulador | Concluida | 100% | DTO allowlist, auditoria padronizada e linguagem segura | Codex + @architect + @qa |
 | 24 | Cenarios fiscais versionados | Concluida | 100% | Scenario set versionado, API de avaliacao e audit trail | Codex + @architect + fiscal/produto + @qa |
 | 25 | Observabilidade e governanca fiscal | Concluida | 100% | Relatorio audit-based, flags proibidas e endpoint governado | Codex + observabilidade + @qa |
+| 26 | UX operacional fiscal | Concluida | 100% | Cockpit fiscal para simulador, cenarios e governanca | Codex + frontend/UX + @qa |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -469,3 +470,21 @@ Checklist de aceite:
 - [x] Falta de eventos gera `attention`, nao vazamento ou erro bruto.
 - [x] Qualquer flag proibida gera `blocked`.
 - [x] Nenhuma integracao Sentry runtime, provider externo, scraping ou emissao real foi introduzida.
+
+## 27. Sprint 26 - UX Operacional Fiscal
+Objetivo: criar uma tela operacional fiscal para visualizar simulador, cenarios versionados e governanca sem criar CRUD generico.
+
+Tarefas concluidas:
+- [x] Criar rota `/dashboard/fiscal`.
+- [x] Adicionar item Fiscal na sidebar.
+- [x] Criar `FiscalOperationsCockpit` consumindo governanca fiscal.
+- [x] Criar view model testavel para status, cards e guardrails.
+- [x] Exibir jornada supervisionada do simulador.
+- [x] Exibir fila de governanca com eventos recentes.
+- [x] Testar wiring da rota, sidebar, endpoint e linguagem segura.
+
+Checklist de aceite:
+- [x] Nenhuma logica fiscal foi colocada diretamente em componente React.
+- [x] Tela consome API/backend, nao Prisma direto.
+- [x] UX reforca simulacao, ausencia de emissao real e tenant scope.
+- [x] Nenhum CRUD generico, provider externo, scraping ou certificado foi introduzido.
