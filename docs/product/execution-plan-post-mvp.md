@@ -30,6 +30,16 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 26 | UX operacional fiscal | Concluida | 100% | Cockpit fiscal para simulador, cenarios e governanca | Codex + frontend/UX + @qa |
 | 27 | Importacoes avancadas e contratos versionados | Concluida | 100% | Parser versionado, fingerprints e bloqueios LGPD | Codex + @architect + seguranca/LGPD + @qa |
 | 28 | Guardrails de revisao de candidatos | Concluida | 100% | Review gate auditavel antes de lotes | Codex + @architect + seguranca/LGPD + @qa |
+| 29 | Beta scope freeze | Concluida | 100% | PR #15 mergeado e escopo beta congelado | Codex + @pm + @po |
+| 30 | Command idempotency e transition ledger | Planejada | 0% | Comandos criticos idempotentes/auditaveis | Codex + @architect |
+| 31 | RBAC matrix e flow permissions | Planejada | 0% | Matriz papel/acao/estado validada | Codex + @architect + @qa |
+| 32 | Audit completeness e redaction | Planejada | 0% | Acoes criticas com auditoria segura | Codex + seguranca/LGPD + @qa |
+| 33 | Import replay, quarantine e parser governance | Planejada | 0% | Reprocessamento seguro de imports | Codex + @architect + @qa |
+| 34 | Candidate review workbench hardening | Planejada | 0% | Revisao humana robusta e rastreavel | Codex + Gemini + @qa |
+| 35 | Batch snapshot e concurrency guards | Planejada | 0% | Lotes com snapshot, lock e revalidacao | Codex + @architect + @qa |
+| 36 | Tenant isolation e abuse testing | Planejada | 0% | Zero vazamento cross-tenant | Codex + seguranca/LGPD + @qa |
+| 37 | Environments, Supabase e Vercel release prep | Planejada | 0% | Staging/beta com envs e deploy controlados | Codex + @devops |
+| 38 | Beta release candidate e evidence pack | Planejada | 0% | Go/no-go beta com evidencias | Codex + @pm + @qa + @devops |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -528,3 +538,153 @@ Checklist de aceite:
 - [x] Motivos de bloqueio ficam auditaveis sem gravar CPF/CNPJ bruto.
 - [x] Candidate service entende payload versionado sem colocar regra fiscal em React.
 - [x] Nenhum provider externo, scraping, certificado ou emissao real foi introduzido.
+
+## 30. Sprint 29 - Beta Scope Freeze
+Objetivo: consolidar a Sprint 28 e congelar exatamente o escopo do beta fiscal supervisionado.
+
+Tarefas concluidas:
+- [x] Confirmar merge do PR #15 na `main`.
+- [x] Criar branch `codex/sprint-29-beta-scope-freeze`.
+- [x] Criar matriz `MVP beta / post-beta / fora de escopo`.
+- [x] Definir jornada beta oficial.
+- [x] Criar lista de tenants/usuarios beta ficticios ou controlados.
+- [x] Atualizar checklist de go/no-go beta.
+- [x] Confirmar explicitamente que NFS-e real, scraping e provider externo permanecem fora.
+
+Checklist de aceite:
+- [x] Escopo beta esta documentado em `docs/product/beta-scope-freeze.md`.
+- [x] Nenhuma feature grande nova entra sem novo PRD/ADR.
+- [x] Beta permanece supervisionado, auditavel e sem efeito fiscal externo.
+
+## 31. Sprint 30 - Command Idempotency e Transition Ledger
+Objetivo: padronizar idempotencia para comandos criticos alem de importacao e simulacao.
+
+Tarefas planejadas:
+- [ ] Criar contrato transversal de idempotencia por tenant, ator, operacao e chave.
+- [ ] Cobrir criacao de lote, submit, simulate, approve future issuance, cancel e revisao de candidato.
+- [ ] Registrar `requestHash`, `operation`, `responseRef` e status da tentativa.
+- [ ] Bloquear replay divergente com a mesma chave.
+- [ ] Testar replay no mesmo tenant e replay cruzado entre tenants.
+
+Gate:
+- [ ] Comandos criticos podem ser repetidos sem duplicar efeitos.
+- [ ] Idempotency key de um tenant nao funciona em outro.
+
+## 32. Sprint 31 - RBAC Matrix e Flow Permissions
+Objetivo: fechar matriz de permissoes por fluxo, papel e estado.
+
+Tarefas planejadas:
+- [ ] Documentar matriz OWNER, ADMIN, FISCAL_MANAGER, FISCAL_OPERATOR, FINANCIAL_OPERATOR, ACCOUNTANT e AUDITOR.
+- [ ] Validar todos os comandos com `assertPermissionForCommand`.
+- [ ] Criar testes negativos por papel em imports, candidatos, inconsistencias, lotes, documentos, auditoria e tenant admin.
+- [ ] Conferir que UI esconde acoes, mas backend continua sendo a barreira real.
+
+Gate:
+- [ ] Nenhum papel sem permissao executa acao critica.
+- [ ] Nenhuma rota aceita `tenantId` vindo do client como fonte de verdade.
+
+## 33. Sprint 32 - Audit Completeness e Redaction
+Objetivo: garantir auditoria completa, pesquisavel e sem vazamento.
+
+Tarefas planejadas:
+- [ ] Mapear eventos obrigatorios por comando critico.
+- [ ] Garantir `tenantId`, `actorId`, `correlationId`, entidade, before/after seguro e metadata minima.
+- [ ] Cobrir tentativas negadas quando fiscalmente relevantes.
+- [ ] Criar testes que falham com CPF/CNPJ bruto, tokens, storage path, raw payload ou provider response em auditoria publica.
+- [ ] Atualizar docs de auditoria e LGPD.
+
+Gate:
+- [ ] Toda acao critica tem auditoria segura.
+- [ ] Nenhum dado sensivel completo aparece em DTO, log ou auditoria publica.
+
+## 34. Sprint 33 - Import Replay, Quarantine e Parser Governance
+Objetivo: tornar imports problematicos reprocessaveis sem perder rastreabilidade.
+
+Tarefas planejadas:
+- [ ] Definir estado operacional de quarentena para linhas/importacoes invalidas.
+- [ ] Permitir revalidacao com o mesmo parser versionado.
+- [ ] Registrar historico de tentativas de validacao.
+- [ ] Bloquear parser desconhecido ou downgrade nao aprovado.
+- [ ] Documentar governanca para futuras versoes do parser.
+- [ ] Testar payload malicioso, duplicidade, datas invalidas, valores invalidos e campos proibidos.
+
+Gate:
+- [ ] Import invalido falha fechado.
+- [ ] Reprocessamento preserva auditoria e nao cria candidatos duplicados silenciosamente.
+
+## 35. Sprint 34 - Candidate Review Workbench Hardening
+Objetivo: fortalecer a revisao humana antes de lote.
+
+Tarefas planejadas:
+- [ ] Exibir motivos de bloqueio e warnings LGPD no detalhe do candidato.
+- [ ] Permitir correcao/justificativa supervisionada sem CRUD generico.
+- [ ] Exigir justificativa para liberar candidato bloqueado quando aplicavel.
+- [ ] Adicionar limites para acoes em massa, se houver bulk review.
+- [ ] Garantir auditoria de reviewer, timestamp, motivo e estado anterior/posterior.
+- [ ] Realizar revisao visual com Gemini para UX densa e clara.
+
+Gate:
+- [ ] Candidato so vira `READY_FOR_BATCH` por fluxo humano auditavel.
+- [ ] Motivo de bloqueio nunca e perdido.
+
+## 36. Sprint 35 - Batch Snapshot e Concurrency Guards
+Objetivo: endurecer lotes contra corrida, mutacao posterior e inconsistencia de totais.
+
+Tarefas planejadas:
+- [ ] Criar snapshot dos campos fiscais relevantes ao incluir candidato em lote.
+- [ ] Impedir candidato em dois lotes ativos.
+- [ ] Revalidar inconsistencias abertas antes de submit, simulate e approve.
+- [ ] Recalcular total do lote de forma deterministica.
+- [ ] Proteger cancelamento, simulacao e aprovacao contra estado concorrente.
+- [ ] Testar corrida logica, lote duplicado, total divergente e candidato alterado apos inclusao.
+
+Gate:
+- [ ] Lote e reproduzivel e auditavel.
+- [ ] Nenhum lote avanca com candidato bloqueado ou inconsistencia aberta.
+
+## 37. Sprint 36 - Tenant Isolation e Abuse Testing
+Objetivo: provar isolamento multiempresa antes de qualquer beta com dados reais.
+
+Tarefas planejadas:
+- [ ] Criar bateria IDOR para todos os recursos por ID direto.
+- [ ] Testar troca de tenant durante fluxo.
+- [ ] Testar documentos, import rows, candidatos, lotes e auditoria de outro tenant.
+- [ ] Testar replay de idempotency key entre tenants.
+- [ ] Testar payloads grandes, campos extras, campos proibidos e parametros manipulados.
+- [ ] Criar relatorio de evidencias de isolamento.
+
+Gate:
+- [ ] Zero vazamento cross-tenant.
+- [ ] Qualquer falha cross-tenant bloqueia beta.
+
+## 38. Sprint 37 - Environments, Supabase e Vercel Release Prep
+Objetivo: preparar ambiente beta sem secrets no repositorio.
+
+Tarefas planejadas:
+- [ ] Documentar matriz `local`, `preview`, `staging` e `production`.
+- [ ] Definir variaveis por ambiente: Supabase URL/anon, `DATABASE_URL`, `APP_ENV`, flags e Sentry vazio/inativo.
+- [ ] Criar checklist Supabase Auth: redirects, dominio, templates e policies.
+- [ ] Definir politica de migrations em staging/prod.
+- [ ] Documentar rollback Vercel e rollback/forward-fix de banco.
+- [ ] Confirmar branch protection e Quality Gates obrigatorios.
+
+Gate:
+- [ ] Deploy beta/staging e reproduzivel.
+- [ ] Secrets permanecem fora do repositorio.
+- [ ] Rollback esta documentado antes de usuario real.
+
+## 39. Sprint 38 - Beta Release Candidate e Evidence Pack
+Objetivo: fechar um release candidate com evidencias objetivas.
+
+Tarefas planejadas:
+- [ ] Rodar todos os gates: lint, typecheck, test, security, prisma validate e build.
+- [ ] Rodar smoke manual/e2e da jornada beta com dois tenants.
+- [ ] Validar checklist LGPD, audit, tenant isolation e runbooks.
+- [ ] Criar pacote de evidencias: commit hash, CI URL, screenshots, logs seguros e resultado de testes.
+- [ ] Criar go/no-go final.
+- [ ] Registrar riscos aceitos e riscos bloqueadores.
+- [ ] Preparar roteiro do piloto com 1-3 tenants.
+
+Gate:
+- [ ] Beta so abre se nao houver P0/P1 aberto.
+- [ ] Nenhum incidente conhecido de tenant, auditoria, dado sensivel ou emissao real.
