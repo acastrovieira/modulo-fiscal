@@ -15,6 +15,13 @@ export const allowedOperationalEvents = [
   "fiscal_batch.approved_for_future_issuance",
   "fiscal_batch.cancelled",
   "documents.download_intent_recorded",
+  "fiscal_simulation.profile_configured",
+  "fiscal_simulation.service_taker_created",
+  "fiscal_simulation.document_created",
+  "fiscal_simulation.document_validated",
+  "fiscal_simulation.document_simulated_issued",
+  "fiscal_simulation.document_voided",
+  "fiscal_simulation.scenarios_evaluated",
   "tenant.security_boundary_checked"
 ] as const;
 

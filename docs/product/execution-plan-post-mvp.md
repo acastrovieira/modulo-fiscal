@@ -26,6 +26,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 22 | Simulador fiscal governado v1 | Concluida | 100% | Perfil, tomadores e documentos simulados sem provider | Codex + @architect + fiscal/LGPD + @qa |
 | 23 | Hardening de contratos do simulador | Concluida | 100% | DTO allowlist, auditoria padronizada e linguagem segura | Codex + @architect + @qa |
 | 24 | Cenarios fiscais versionados | Concluida | 100% | Scenario set versionado, API de avaliacao e audit trail | Codex + @architect + fiscal/produto + @qa |
+| 25 | Observabilidade e governanca fiscal | Concluida | 100% | Relatorio audit-based, flags proibidas e endpoint governado | Codex + observabilidade + @qa |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -450,3 +451,21 @@ Checklist de aceite:
 - [x] Auditoria registra scenario set, versao e flags de simulacao.
 - [x] Resultado e deterministico para mesmo documento, perfil e tomador.
 - [x] Nenhuma emissao real, scraping, provider externo ou certificado foi introduzido.
+
+## 26. Sprint 25 - Observabilidade e Governanca Fiscal
+Objetivo: criar a primeira visao governada de observabilidade fiscal para monitorar o simulador com base em auditoria tenant-scoped.
+
+Tarefas concluidas:
+- [x] Criar relatorio de governanca fiscal baseado em eventos `fiscal_simulation.*`.
+- [x] Criar endpoint `GET /api/observability/fiscal-governance`.
+- [x] Exigir permissao `audit.view` no backend.
+- [x] Detectar flags proibidas de emissao, provider externo, transmissao externa e valor fiscal.
+- [x] Expor metricas de documentos simulados, avaliacoes de cenarios e status de findings.
+- [x] Garantir DTO sem `tenantId`, payload bruto, documento completo ou hash.
+- [x] Documentar contratos em `docs/architecture/fiscal-governance-observability.md`.
+
+Checklist de aceite:
+- [x] Relatorio e sempre tenant-scoped pelo contexto autenticado.
+- [x] Falta de eventos gera `attention`, nao vazamento ou erro bruto.
+- [x] Qualquer flag proibida gera `blocked`.
+- [x] Nenhuma integracao Sentry runtime, provider externo, scraping ou emissao real foi introduzida.
