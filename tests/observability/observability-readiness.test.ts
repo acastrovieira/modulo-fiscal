@@ -72,7 +72,8 @@ describe("observability readiness", () => {
       "fiscal_batch.simulated_internally",
       "fiscal_batch.approved_for_future_issuance",
       "fiscal_batch.cancelled",
-      "documents.download_intent_recorded"
+      "documents.download_intent_recorded",
+      "fiscal_simulation.scenarios_evaluated"
     ]));
   });
 
