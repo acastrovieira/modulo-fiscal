@@ -99,10 +99,14 @@ export type MarkCandidateReadyForBatchInput = {
 type NormalizedFiscalRow = {
   customerName?: string | null;
   customerDocument?: string | null;
+  customerDocumentMasked?: string | null;
   serviceDate?: string | Date | null;
   competenceDate?: string | Date | null;
   serviceDescription?: string | null;
+  description?: string | null;
   grossAmountCents?: bigint | number | string | null;
+  amountCents?: bigint | number | string | null;
+  duplicateWithinImport?: boolean | null;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -196,11 +200,11 @@ export function createFiscalCandidateService(dependencies: { repository: FiscalC
         }
 
         const normalized = parseFiscalRow(row.normalizedPayload);
-        const customerDocumentMasked = maskBrazilianDocument(normalized.customerDocument ?? null);
+        const customerDocumentMasked = normalized.customerDocumentMasked ?? maskBrazilianDocument(normalized.customerDocument ?? null);
         const serviceDate = toDate(normalized.serviceDate);
         const competenceDate = toDate(normalized.competenceDate);
-        const grossAmountCents = toCents(normalized.grossAmountCents);
-        const serviceDescription = normalized.serviceDescription?.trim() || null;
+        const grossAmountCents = toCents(normalized.grossAmountCents ?? normalized.amountCents);
+        const serviceDescription = normalized.serviceDescription?.trim() || normalized.description?.trim() || null;
         const fingerprint = createFiscalFingerprint({
           tenantId: input.context.tenantId,
           customerDocumentMasked,
@@ -219,7 +223,7 @@ export function createFiscalCandidateService(dependencies: { repository: FiscalC
           continue;
         }
 
-        const status = inferInitialStatus({ grossAmountCents, serviceDate, competenceDate, duplicate: false });
+        const status = inferInitialStatus({ grossAmountCents, serviceDate, competenceDate, duplicate: Boolean(normalized.duplicateWithinImport) });
 
         const candidate = await repository.createFiscalCandidate({
           tenantId: input.context.tenantId,
@@ -248,7 +252,7 @@ export function createFiscalCandidateService(dependencies: { repository: FiscalC
               importBatchId: candidate.importBatchId,
               importRowId: candidate.importRowId,
               fiscalFingerprintVersion: candidate.fiscalFingerprintVersion,
-              duplicateDetected: false
+              duplicateDetected: Boolean(normalized.duplicateWithinImport)
             }
           })
         );

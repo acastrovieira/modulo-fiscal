@@ -353,14 +353,22 @@ describe("supervised fiscal MVP regression", () => {
     await importService.validateImport({
       context: makeCommandContext("FISCAL_OPERATOR"),
       importBatchId: importBatch.id,
-      rows: [{ customerName: "Maria Tutora", customerDocument: "12345678901", serviceDate: "2026-05-10", serviceDescription: "Consulta veterinaria", grossAmountCents: 15000 }]
+      rows: [
+        {
+          customerName: "Maria Tutora",
+          customerDocumentMasked: "***.***.***-01",
+          serviceDate: "2026-05-10",
+          serviceDescription: "Consulta veterinaria",
+          grossAmountCents: 15000
+        }
+      ]
     });
 
     const [candidate] = await candidateService.createFiscalCandidatesFromImport({
       context: makeCommandContext("FISCAL_OPERATOR"),
       importBatchId: importBatch.id
     });
-    expect(candidate.customerDocumentMasked).toBe("*******8901");
+    expect(candidate.customerDocumentMasked).toBe("***.***.***-01");
 
     const blocking = await inconsistencyService.openInconsistency({
       context: makeCommandContext("FISCAL_MANAGER"),

@@ -1,6 +1,6 @@
 # Plano de Orquestracao e Execucao - Pos-MVP VetFiscal OS
 
-Atualizado em: 2026-05-14
+Atualizado em: 2026-05-18
 
 ## 1. Objetivo
 Este plano continua o VetFiscal OS depois da fundacao MVP fiscal supervisionada concluida nas Sprints 0 a 8.
@@ -28,6 +28,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 24 | Cenarios fiscais versionados | Concluida | 100% | Scenario set versionado, API de avaliacao e audit trail | Codex + @architect + fiscal/produto + @qa |
 | 25 | Observabilidade e governanca fiscal | Concluida | 100% | Relatorio audit-based, flags proibidas e endpoint governado | Codex + observabilidade + @qa |
 | 26 | UX operacional fiscal | Concluida | 100% | Cockpit fiscal para simulador, cenarios e governanca | Codex + frontend/UX + @qa |
+| 27 | Importacoes avancadas e contratos versionados | Concluida | 100% | Parser versionado, fingerprints e bloqueios LGPD | Codex + @architect + seguranca/LGPD + @qa |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -488,3 +489,22 @@ Checklist de aceite:
 - [x] Tela consome API/backend, nao Prisma direto.
 - [x] UX reforca simulacao, ausencia de emissao real e tenant scope.
 - [x] Nenhum CRUD generico, provider externo, scraping ou certificado foi introduzido.
+
+## 28. Sprint 27 - Importacoes Avancadas e Contratos Versionados
+Objetivo: preparar importacoes estruturadas para evolucao segura com parser versionado, normalizacao allowlist, fingerprints e bloqueios LGPD, sem implementar integracao externa.
+
+Tarefas concluidas:
+- [x] Criar parser versionado `vetcare_structured_v1`.
+- [x] Normalizar aliases operacionais de linhas estruturadas.
+- [x] Rejeitar campos proibidos como `tenantId`, paths internos, hashes, tokens e documentos brutos.
+- [x] Detectar duplicidades dentro da importacao com fingerprint SHA-256 deterministico.
+- [x] Expor `parserVersion` no contrato de validacao de importacao.
+- [x] Registrar auditoria com versao do parser, totais e duplicidades sem payload sensivel.
+- [x] Documentar contratos em `docs/architecture/import-parser-contracts.md`.
+- [x] Criar testes de parser, schema, auditoria segura e cenarios negativos.
+
+Checklist de aceite:
+- [x] Parser desconhecido falha antes de alterar estado da importacao.
+- [x] Nenhuma resposta ou auditoria publica expoe CPF/CNPJ bruto.
+- [x] Duplicidade e rastreavel, mas permanece human-in-the-loop.
+- [x] Nenhum provider externo, scraping, certificado ou emissao real foi introduzido.

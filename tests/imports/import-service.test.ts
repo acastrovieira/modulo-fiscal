@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createImportService, type DocumentFileRecord, type ImportBatchRecord, type ImportRepository } from "@/modules/imports/application/import-service";
+import { defaultImportParserVersion } from "@/modules/imports/domain/import-parser";
 import { ForbiddenError, InvalidStateError, NotFoundError, TenantScopeError, ValidationError } from "@/shared/errors/application-error";
 import { makeCommandContext, tenantAId, tenantBId, userAId } from "../fixtures/security";
 
@@ -188,7 +189,17 @@ describe("validateImport", () => {
     const result = await service.validateImport({
       context: makeCommandContext("FISCAL_OPERATOR"),
       importBatchId: "import-1",
-      rows: [{ sourceRowId: "1", description: "Consulta", amount: 10000 }],
+      parserVersion: defaultImportParserVersion,
+      rows: [
+        {
+          source_row_id: "1",
+          serviceDescription: "Consulta",
+          amountCents: "10000",
+          tutorName: "Maria Demo",
+          customerDocumentMasked: "***.123.***-**",
+          serviceDate: "2026-05-13"
+        }
+      ],
       now
     });
 
@@ -203,7 +214,16 @@ describe("validateImport", () => {
         tenantId: tenantAId,
         importBatchId: "import-1",
         rowNumber: 1,
-        status: "NORMALIZED"
+        sourceRowId: "1",
+        status: "NORMALIZED",
+        normalizedPayload: expect.objectContaining({
+          parserVersion: defaultImportParserVersion,
+          description: "Consulta",
+          amountCents: "10000",
+          customerName: "Maria Demo",
+          customerDocumentMasked: "***.123.***-**",
+          duplicateWithinImport: false
+        })
       })
     ]);
     expect(repository.updateImportBatch).toHaveBeenNthCalledWith(2, {
@@ -226,7 +246,7 @@ describe("validateImport", () => {
     const result = await service.validateImport({
       context: makeCommandContext("OWNER"),
       importBatchId: "import-1",
-      rows: [{ ok: true }, null]
+      rows: [{ description: "Vacina", amount: 4500 }, null]
     });
 
     expect(result.status).toBe("HAS_ERRORS");
@@ -236,6 +256,80 @@ describe("validateImport", () => {
         expect.objectContaining({ status: "REJECTED" })
       ])
     );
+  });
+
+  it("flags duplicate rows within the same parser version without blocking review", async () => {
+    const repository = makeRepository();
+    const audit = makeAudit();
+    const service = createImportService({ repository, audit });
+
+    const result = await service.validateImport({
+      context: makeCommandContext("OWNER"),
+      importBatchId: "import-1",
+      rows: [
+        { sourceRowId: "line-1", description: "Consulta", amount: 10000, serviceDate: "2026-05-13" },
+        { sourceRowId: "line-1", description: "Consulta", amount: 10000, serviceDate: "2026-05-13" }
+      ]
+    });
+
+    expect(result.status).toBe("READY_FOR_REVIEW");
+    expect(repository.createImportRows).toHaveBeenCalledWith([
+      expect.objectContaining({
+        normalizedPayload: expect.objectContaining({ duplicateWithinImport: false })
+      }),
+      expect.objectContaining({
+        normalizedPayload: expect.objectContaining({ duplicateWithinImport: true })
+      })
+    ]);
+    expect(audit.record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "imports.validation_finished",
+        afterPayload: expect.objectContaining({ duplicateRows: 1, parserVersion: defaultImportParserVersion })
+      })
+    );
+  });
+
+  it("rejects client-controlled tenant and raw document fields in rows", async () => {
+    const repository = makeRepository();
+    const audit = makeAudit();
+    const service = createImportService({ repository, audit });
+
+    const result = await service.validateImport({
+      context: makeCommandContext("OWNER"),
+      importBatchId: "import-1",
+      rows: [
+        { description: "Consulta", amount: 10000, tenantId: tenantBId },
+        { description: "Consulta", amount: 10000, customerDocument: "12345678901" }
+      ]
+    });
+
+    expect(result.status).toBe("HAS_ERRORS");
+    expect(repository.createImportRows).toHaveBeenCalledWith([
+      expect.objectContaining({
+        status: "REJECTED",
+        errorPayload: expect.objectContaining({ parserVersion: defaultImportParserVersion })
+      }),
+      expect.objectContaining({
+        status: "REJECTED",
+        errorPayload: expect.objectContaining({ parserVersion: defaultImportParserVersion })
+      })
+    ]);
+    expect(JSON.stringify(audit.record.mock.calls)).not.toContain("12345678901");
+  });
+
+  it("fails fast for unsupported parser versions", async () => {
+    const repository = makeRepository();
+    const service = createImportService({ repository, audit: makeAudit() });
+
+    await expect(
+      service.validateImport({
+        context: makeCommandContext("OWNER"),
+        importBatchId: "import-1",
+        rows: [],
+        parserVersion: "unknown_parser_v1"
+      })
+    ).rejects.toThrow(ValidationError);
+    expect(repository.findImportBatchById).not.toHaveBeenCalled();
   });
 
   it("marks an empty structural import as VALIDATED", async () => {
@@ -252,7 +346,7 @@ describe("validateImport", () => {
     expect(repository.createImportRows).not.toHaveBeenCalled();
   });
 
-it("blocks validation for roles without imports.create", async () => {
+  it("blocks validation for roles without imports.create", async () => {
     const service = createImportService({ repository: makeRepository(), audit: makeAudit() });
 
     await expect(
