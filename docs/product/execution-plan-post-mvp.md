@@ -29,6 +29,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 25 | Observabilidade e governanca fiscal | Concluida | 100% | Relatorio audit-based, flags proibidas e endpoint governado | Codex + observabilidade + @qa |
 | 26 | UX operacional fiscal | Concluida | 100% | Cockpit fiscal para simulador, cenarios e governanca | Codex + frontend/UX + @qa |
 | 27 | Importacoes avancadas e contratos versionados | Concluida | 100% | Parser versionado, fingerprints e bloqueios LGPD | Codex + @architect + seguranca/LGPD + @qa |
+| 28 | Guardrails de revisao de candidatos | Concluida | 100% | Review gate auditavel antes de lotes | Codex + @architect + seguranca/LGPD + @qa |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -507,4 +508,23 @@ Checklist de aceite:
 - [x] Parser desconhecido falha antes de alterar estado da importacao.
 - [x] Nenhuma resposta ou auditoria publica expoe CPF/CNPJ bruto.
 - [x] Duplicidade e rastreavel, mas permanece human-in-the-loop.
+- [x] Nenhum provider externo, scraping, certificado ou emissao real foi introduzido.
+
+## 29. Sprint 28 - Guardrails de Revisao de Candidatos
+Objetivo: tornar explicitos os motivos de bloqueio e avisos LGPD na criacao de candidatos fiscais antes do workflow de lotes.
+
+Tarefas concluidas:
+- [x] Criar review gate deterministico no dominio de candidatos.
+- [x] Bloquear candidatos duplicados dentro da importacao.
+- [x] Bloquear candidatos sem valor valido em centavos.
+- [x] Bloquear candidatos sem data de servico ou competencia.
+- [x] Registrar warning quando payload legado trouxer documento bruto.
+- [x] Incluir `reviewGate` em auditoria `fiscal_candidate.created`.
+- [x] Documentar contratos em `docs/architecture/fiscal-candidate-review-guardrails.md`.
+- [x] Criar testes de dominio e service para bloqueios e warnings.
+
+Checklist de aceite:
+- [x] Candidato duplicado nao avanca para lote sem revisao humana.
+- [x] Motivos de bloqueio ficam auditaveis sem gravar CPF/CNPJ bruto.
+- [x] Candidate service entende payload versionado sem colocar regra fiscal em React.
 - [x] Nenhum provider externo, scraping, certificado ou emissao real foi introduzido.
