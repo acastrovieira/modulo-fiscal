@@ -65,6 +65,16 @@ describe("currentUser/currentTenant contracts", () => {
     await expect(currentUser()).resolves.toMatchObject({ email: "owner@vetfiscal.local" });
   });
 
+  it("does not enable local OWNER fallback in production even if app env is misconfigured as Local", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_APP_ENV", "Local");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "");
+    const { currentUser } = await import("@/shared/auth/current-user");
+
+    await expect(currentUser()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  });
+
   it("fails predictably outside local/test when Supabase Auth is not configured", async () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_APP_ENV", "Production");

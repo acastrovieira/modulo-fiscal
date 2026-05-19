@@ -57,6 +57,23 @@ describe("import parser governance", () => {
     }
   });
 
+  it("rejects forbidden sensitive fields inside nested import payloads", () => {
+    expect(() =>
+      normalizeImportRow({
+        row: {
+          description: "Consulta",
+          amountCents: "10000",
+          metadata: {
+            nested: [{ cpf: "12345678901" }, { accessToken: "secret-token" }]
+          }
+        },
+        rowNumber: 1,
+        parserVersion: defaultImportParserVersion,
+        seenFingerprints: new Set<string>()
+      })
+    ).toThrow(ValidationError);
+  });
+
   it("rejects invalid dates and invalid amounts before fiscal candidates are created", () => {
     expect(() =>
       normalizeImportRow({

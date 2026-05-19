@@ -12,5 +12,5 @@ export const localCurrentTenant = {
 } as const;
 
 export function shouldUseLocalAuthFallback(): boolean {
-  return process.env.NODE_ENV === "test" || process.env.NEXT_PUBLIC_APP_ENV === "Local";
+  return process.env.NODE_ENV === "test" || (process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_APP_ENV === "Local");
 }

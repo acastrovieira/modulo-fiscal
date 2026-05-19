@@ -23,7 +23,7 @@ import {
 const uuid = "11111111-1111-4111-8111-111111111111";
 
 describe("request tenant boundary", () => {
-  it.each([
+  const schemas = [
     ["create import", createImportRequestSchema, { documentFileId: uuid }],
     ["validate import", validateImportRequestSchema, { rows: [] }],
     ["ready candidate", readyForBatchRequestSchema, { reviewJustification: "Conferencia humana concluida" }],
@@ -40,7 +40,15 @@ describe("request tenant boundary", () => {
       items: [{ description: "Consulta", serviceCode: "05.01", amountCents: 15000 }]
     }],
     ["evaluate simulation scenarios", evaluateFiscalSimulationScenariosRequestSchema, {}]
-  ])("%s rejects client-controlled tenantId", (_name, schema, payload) => {
+  ] as const;
+
+  it.each(schemas)("%s rejects client-controlled tenantId", (_name, schema, payload) => {
     expect(() => schema.parse({ ...payload, tenantId: uuid })).toThrow();
+  });
+
+  it.each(schemas)("%s rejects client-controlled audit and workflow fields", (_name, schema, payload) => {
+    for (const forbiddenField of ["actorId", "actorRole", "correlationId", "createdBy", "updatedBy", "status"]) {
+      expect(() => schema.parse({ ...payload, [forbiddenField]: "client-controlled" }), forbiddenField).toThrow();
+    }
   });
 });

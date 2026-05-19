@@ -85,11 +85,22 @@ function assertPlainObject(row: unknown, rowNumber: number): asserts row is Reco
   }
 }
 
-function assertNoForbiddenKeys(row: Record<string, unknown>, rowNumber: number): void {
-  for (const key of Object.keys(row)) {
+function assertNoForbiddenKeys(value: unknown, rowNumber: number, path = "row"): void {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertNoForbiddenKeys(item, rowNumber, `${path}[${index}]`));
+    return;
+  }
+
+  if (value === null || typeof value !== "object") {
+    return;
+  }
+
+  const record = value as Record<string, unknown>;
+  for (const key of Object.keys(record)) {
     if (forbiddenRowKeys.has(key)) {
-      throw new ValidationError(`Import row ${rowNumber} contains forbidden field ${key}.`);
+      throw new ValidationError(`Import row ${rowNumber} contains forbidden field ${path}.${key}.`);
     }
+    assertNoForbiddenKeys(record[key], rowNumber, `${path}.${key}`);
   }
 }
 
