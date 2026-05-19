@@ -7,6 +7,7 @@ import {
   canSimulateBatchInternally,
   canSubmitBatchForReview,
   type FiscalBatch,
+  type FiscalBatchCandidateSnapshot,
   type FiscalBatchItem,
   type FiscalBatchStatus
 } from "@/modules/fiscal/domain/fiscal-batch";
@@ -57,11 +58,13 @@ export type CreateFiscalBatchRepositoryInput = {
     candidateId: string;
     status: "INCLUDED";
     grossAmountCents: bigint;
+    candidateSnapshot: FiscalBatchCandidateSnapshot;
   }>;
 };
 
 export type FiscalBatchRepository = {
   findCandidateById(id: string): Promise<FiscalCandidateRecord | null>;
+  countActiveBatchItemsByCandidateId(candidateId: string, tenantId: string): Promise<number>;
   countOpenBlockingInconsistenciesByCandidateId(candidateId: string, tenantId: string): Promise<number>;
   createFiscalBatch(input: CreateFiscalBatchRepositoryInput): Promise<FiscalBatchRecord>;
   findBatchById(id: string): Promise<FiscalBatchRecord | null>;
@@ -105,6 +108,30 @@ function assertCancellationReason(reason: string): void {
   }
 }
 
+function dateOnly(date: Date | null): string | null {
+  return date ? date.toISOString().slice(0, 10) : null;
+}
+
+function createCandidateSnapshot(candidate: FiscalCandidateRecord): FiscalBatchCandidateSnapshot {
+  return {
+    customerName: candidate.customerName,
+    customerDocumentMasked: candidate.customerDocumentMasked,
+    serviceDate: dateOnly(candidate.serviceDate),
+    competenceDate: dateOnly(candidate.competenceDate),
+    serviceDescription: candidate.serviceDescription,
+    grossAmountCents: (candidate.grossAmountCents ?? 0n).toString(),
+    fiscalFingerprintVersion: candidate.fiscalFingerprintVersion,
+    fiscalFingerprint: candidate.fiscalFingerprint
+  };
+}
+
+function assertDeterministicBatchTotal(batch: FiscalBatchRecord, items: FiscalBatchItemRecord[]): void {
+  const itemsTotal = items.reduce((total, item) => total + item.grossAmountCents, 0n);
+  if (itemsTotal !== batch.totalGrossAmountCents) {
+    throw new InvalidStateError("Fiscal batch total does not match included item snapshots.");
+  }
+}
+
 async function loadIncludedItems(repository: FiscalBatchRepository, batch: FiscalBatchRecord): Promise<FiscalBatchItemRecord[]> {
   if (batch.items) {
     return batch.items.filter((item) => item.status === "INCLUDED");
@@ -123,6 +150,39 @@ async function updateBatchCandidates(
     assertTenantScope(tenantId, item);
     await repository.updateCandidateStatus(item.candidateId, tenantId, status);
   }
+}
+
+async function assertBatchCanAdvance(
+  repository: FiscalBatchRepository,
+  batch: FiscalBatchRecord,
+  expectedCandidateStatuses: ReadonlySet<FiscalCandidateRecord["status"]>
+): Promise<FiscalBatchItemRecord[]> {
+  const items = await loadIncludedItems(repository, batch);
+  if (items.length === 0) {
+    throw new InvalidStateError("Fiscal batch has no included items to advance.");
+  }
+
+  assertDeterministicBatchTotal(batch, items);
+
+  for (const item of items) {
+    assertTenantScope(batch.tenantId, item);
+    const candidate = await repository.findCandidateById(item.candidateId);
+    if (!candidate) {
+      throw new NotFoundError("Fiscal candidate not found.");
+    }
+    assertTenantScope(batch.tenantId, candidate);
+
+    if (!expectedCandidateStatuses.has(candidate.status)) {
+      throw new InvalidStateError(`Fiscal candidate ${candidate.id} is not in an expected batch state.`);
+    }
+
+    const openBlocking = await repository.countOpenBlockingInconsistenciesByCandidateId(candidate.id, batch.tenantId);
+    if (openBlocking > 0) {
+      throw new InvalidStateError("Fiscal batch has candidates with open blocking inconsistencies.");
+    }
+  }
+
+  return items;
 }
 
 export function createFiscalBatchService(dependencies: {
@@ -177,6 +237,11 @@ export function createFiscalBatchService(dependencies: {
               throw new InvalidStateError("Fiscal candidate has open blocking inconsistencies.");
             }
 
+            const activeBatchItems = await repository.countActiveBatchItemsByCandidateId(candidate.id, input.context.tenantId);
+            if (activeBatchItems > 0) {
+              throw new InvalidStateError("Fiscal candidate already belongs to an active batch.");
+            }
+
             candidates.push(candidate);
           }
 
@@ -191,7 +256,8 @@ export function createFiscalBatchService(dependencies: {
               tenantId: input.context.tenantId,
               candidateId: candidate.id,
               status: "INCLUDED",
-              grossAmountCents: candidate.grossAmountCents ?? 0n
+              grossAmountCents: candidate.grossAmountCents ?? 0n,
+              candidateSnapshot: createCandidateSnapshot(candidate)
             }))
           });
 
@@ -239,6 +305,8 @@ export function createFiscalBatchService(dependencies: {
             throw new InvalidStateError(`Cannot submit fiscal batch from ${batch.status}.`);
           }
 
+          const items = await assertBatchCanAdvance(repository, batch, new Set(["IN_BATCH"]));
+
           const submittedAt = input.now ?? new Date();
           const updated = await repository.updateBatchStatus({
             id: batch.id,
@@ -254,7 +322,8 @@ export function createFiscalBatchService(dependencies: {
               entityType: "FiscalBatch",
               entityId: updated.id,
               beforePayload: { status: batch.status },
-              afterPayload: { status: updated.status, submittedBy: updated.submittedBy, submittedAt: updated.submittedAt }
+              afterPayload: { status: updated.status, submittedBy: updated.submittedBy, submittedAt: updated.submittedAt },
+              metadata: { itemsCount: items.length, totalGrossAmountCents: batch.totalGrossAmountCents.toString() }
             })
           );
 
@@ -285,10 +354,7 @@ export function createFiscalBatchService(dependencies: {
             throw new InvalidStateError(`Cannot simulate fiscal batch from ${batch.status}.`);
           }
 
-          const items = await loadIncludedItems(repository, batch);
-          if (items.length === 0) {
-            throw new InvalidStateError("Fiscal batch has no included items to simulate.");
-          }
+          const items = await assertBatchCanAdvance(repository, batch, new Set(["IN_BATCH"]));
 
           const simulatedAt = input.now ?? new Date();
           const updated = await repository.updateBatchStatus({
@@ -338,10 +404,7 @@ export function createFiscalBatchService(dependencies: {
             throw new InvalidStateError(`Cannot approve fiscal batch from ${batch.status}.`);
           }
 
-          const items = await loadIncludedItems(repository, batch);
-          if (items.length === 0) {
-            throw new InvalidStateError("Fiscal batch has no included items to approve.");
-          }
+          const items = await assertBatchCanAdvance(repository, batch, new Set(["SIMULATED"]));
 
           const approvedAt = input.now ?? new Date();
           const updated = await repository.updateBatchStatus({

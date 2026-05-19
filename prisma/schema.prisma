@@ -468,6 +468,7 @@ model FiscalBatchItem {
   candidateId      String                @db.Uuid
   status           FiscalBatchItemStatus @default(INCLUDED)
   grossAmountCents BigInt
+  candidateSnapshot Json
   createdAt        DateTime              @default(now()) @db.Timestamptz(6)
   updatedAt        DateTime              @updatedAt @db.Timestamptz(6)
   tenant           Tenant                @relation(fields: [tenantId], references: [id], onDelete: Restrict)

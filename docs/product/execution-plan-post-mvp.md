@@ -36,7 +36,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 32 | Audit completeness e redaction | Concluida | 100% | Acoes criticas com auditoria segura | Codex + seguranca/LGPD + @qa |
 | 33 | Import replay, quarantine e parser governance | Concluida | 100% | Reprocessamento seguro de imports | Codex + @architect + @qa |
 | 34 | Candidate review workbench hardening | Concluida | 100% | Revisao humana robusta e rastreavel | Codex + Gemini + @qa |
-| 35 | Batch snapshot e concurrency guards | Planejada | 0% | Lotes com snapshot, lock e revalidacao | Codex + @architect + @qa |
+| 35 | Batch snapshot e concurrency guards | Concluida | 100% | Lotes com snapshot, lock e revalidacao | Codex + @architect + @qa |
 | 36 | Tenant isolation e abuse testing | Planejada | 0% | Zero vazamento cross-tenant | Codex + seguranca/LGPD + @qa |
 | 37 | Environments, Supabase e Vercel release prep | Planejada | 0% | Staging/beta com envs e deploy controlados | Codex + @devops |
 | 38 | Beta release candidate e evidence pack | Planejada | 0% | Go/no-go beta com evidencias | Codex + @pm + @qa + @devops |
@@ -630,17 +630,17 @@ Gate:
 ## 36. Sprint 35 - Batch Snapshot e Concurrency Guards
 Objetivo: endurecer lotes contra corrida, mutacao posterior e inconsistencia de totais.
 
-Tarefas planejadas:
-- [ ] Criar snapshot dos campos fiscais relevantes ao incluir candidato em lote.
-- [ ] Impedir candidato em dois lotes ativos.
-- [ ] Revalidar inconsistencias abertas antes de submit, simulate e approve.
-- [ ] Recalcular total do lote de forma deterministica.
-- [ ] Proteger cancelamento, simulacao e aprovacao contra estado concorrente.
-- [ ] Testar corrida logica, lote duplicado, total divergente e candidato alterado apos inclusao.
+Tarefas concluidas:
+- [x] Criar snapshot dos campos fiscais relevantes ao incluir candidato em lote.
+- [x] Impedir candidato em dois lotes ativos por guarda de aplicacao.
+- [x] Revalidar inconsistencias abertas antes de submit, simulate e approve.
+- [x] Recalcular total do lote de forma deterministica.
+- [x] Proteger submit, simulacao e aprovacao contra estado concorrente de candidato.
+- [x] Testar lote duplicado, total divergente e candidato alterado apos inclusao.
 
 Gate:
-- [ ] Lote e reproduzivel e auditavel.
-- [ ] Nenhum lote avanca com candidato bloqueado ou inconsistencia aberta.
+- [x] Lote e reproduzivel e auditavel.
+- [x] Nenhum lote avanca com candidato bloqueado ou inconsistencia aberta.
 
 ## 37. Sprint 36 - Tenant Isolation e Abuse Testing
 Objetivo: provar isolamento multiempresa antes de qualquer beta com dados reais.

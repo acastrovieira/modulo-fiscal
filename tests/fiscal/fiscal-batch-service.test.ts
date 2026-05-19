@@ -66,6 +66,16 @@ function makeBatchItem(overrides: Partial<FiscalBatchItemRecord> = {}): FiscalBa
     candidateId: "candidate-1",
     status: "INCLUDED",
     grossAmountCents: 15000n,
+    candidateSnapshot: {
+      customerName: "Maria Tutora",
+      customerDocumentMasked: "*******8901",
+      serviceDate: "2026-05-10",
+      competenceDate: null,
+      serviceDescription: "Consulta veterinaria",
+      grossAmountCents: "15000",
+      fiscalFingerprintVersion: "v1",
+      fiscalFingerprint: "fingerprint-1"
+    },
     ...overrides
   };
 }
@@ -73,6 +83,7 @@ function makeBatchItem(overrides: Partial<FiscalBatchItemRecord> = {}): FiscalBa
 function makeRepository(overrides: Partial<FiscalBatchRepository> = {}): FiscalBatchRepository {
   const repository: FiscalBatchRepository = {
     findCandidateById: vi.fn().mockImplementation(async (id: string) => makeCandidate({ id })),
+    countActiveBatchItemsByCandidateId: vi.fn().mockResolvedValue(0),
     countOpenBlockingInconsistenciesByCandidateId: vi.fn().mockResolvedValue(0),
     createFiscalBatch: vi.fn().mockImplementation(async (input: CreateFiscalBatchRepositoryInput) =>
       makeBatch({
@@ -87,7 +98,8 @@ function makeRepository(overrides: Partial<FiscalBatchRepository> = {}): FiscalB
             tenantId: item.tenantId,
             candidateId: item.candidateId,
             status: item.status,
-            grossAmountCents: item.grossAmountCents
+            grossAmountCents: item.grossAmountCents,
+            candidateSnapshot: item.candidateSnapshot
           })
         )
       })
@@ -207,6 +219,15 @@ describe("createFiscalBatch", () => {
     ).rejects.toThrow(InvalidStateError);
   });
 
+  it("blocks candidates already included in another active batch", async () => {
+    const repository = makeRepository({ countActiveBatchItemsByCandidateId: vi.fn().mockResolvedValue(1) });
+    const service = createFiscalBatchService({ repository, audit: makeAudit() });
+
+    await expect(
+      service.createFiscalBatch({ context: makeCommandContext("OWNER"), candidateIds: ["candidate-1"] })
+    ).rejects.toThrow(InvalidStateError);
+  });
+
   it("replays the same idempotent create without creating a second batch", async () => {
     const repository = makeRepository();
     const audit = makeAudit();
@@ -290,7 +311,7 @@ describe("createFiscalBatch", () => {
 
 describe("submitBatchForReview", () => {
   it("submits a draft batch for review and records audit", async () => {
-    const repository = makeRepository();
+    const repository = makeRepository({ findCandidateById: vi.fn().mockImplementation(async (id: string) => makeCandidate({ id, status: "IN_BATCH" })) });
     const audit = makeAudit();
     const service = createFiscalBatchService({ repository, audit });
     const now = new Date("2026-05-13T15:00:00.000Z");
@@ -299,6 +320,16 @@ describe("submitBatchForReview", () => {
 
     expect(result).toMatchObject({ status: "IN_REVIEW", submittedBy: userAId, submittedAt: now });
     expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ eventType: "fiscal_batch.submitted_for_review" }));
+  });
+
+  it("blocks submit when included item totals diverge from the batch total", async () => {
+    const repository = makeRepository({
+      findBatchById: vi.fn().mockResolvedValue(makeBatch({ totalGrossAmountCents: 20000n })),
+      findCandidateById: vi.fn().mockImplementation(async (id: string) => makeCandidate({ id, status: "IN_BATCH" }))
+    });
+    const service = createFiscalBatchService({ repository, audit: makeAudit() });
+
+    await expect(service.submitBatchForReview({ context: makeCommandContext("OWNER"), batchId: "batch-1" })).rejects.toThrow(InvalidStateError);
   });
 
   it("blocks batches from another tenant", async () => {
@@ -323,7 +354,7 @@ describe("submitBatchForReview", () => {
   });
 
   it("replays an idempotent submit without applying the transition twice", async () => {
-    const repository = makeRepository();
+    const repository = makeRepository({ findCandidateById: vi.fn().mockImplementation(async (id: string) => makeCandidate({ id, status: "IN_BATCH" })) });
     const audit = makeAudit();
     const idempotency = makeIdempotencyRepository();
     const service = createFiscalBatchService({ repository, audit, idempotencyRepository: idempotency.repository });
@@ -338,7 +369,10 @@ describe("submitBatchForReview", () => {
 
 describe("simulateBatchInternally", () => {
   it("simulates a batch internally, updates candidates and records no external issuance metadata", async () => {
-    const repository = makeRepository({ findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "IN_REVIEW" })) });
+    const repository = makeRepository({
+      findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "IN_REVIEW" })),
+      findCandidateById: vi.fn().mockImplementation(async (id: string) => makeCandidate({ id, status: "IN_BATCH" }))
+    });
     const audit = makeAudit();
     const service = createFiscalBatchService({ repository, audit });
     const now = new Date("2026-05-13T16:00:00.000Z");
@@ -374,7 +408,10 @@ describe("simulateBatchInternally", () => {
 
   it("records idempotency for internal simulation", async () => {
     const idempotency = makeIdempotencyRepository();
-    const repository = makeRepository({ findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "IN_REVIEW" })) });
+    const repository = makeRepository({
+      findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "IN_REVIEW" })),
+      findCandidateById: vi.fn().mockImplementation(async (id: string) => makeCandidate({ id, status: "IN_BATCH" }))
+    });
     const service = createFiscalBatchService({ repository, audit: makeAudit(), idempotencyRepository: idempotency.repository });
 
     await service.simulateBatchInternally({ context: makeCommandContext("FISCAL_OPERATOR"), batchId: "batch-1", idempotencyKey: "idem-simulate" });
@@ -387,7 +424,10 @@ describe("simulateBatchInternally", () => {
 
 describe("approveBatchForFutureIssuance", () => {
   it("approves only a simulated batch for future issuance and does not emit NFS-e", async () => {
-    const repository = makeRepository({ findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "SIMULATED" })) });
+    const repository = makeRepository({
+      findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "SIMULATED" })),
+      findCandidateById: vi.fn().mockImplementation(async (id: string) => makeCandidate({ id, status: "SIMULATED" }))
+    });
     const audit = makeAudit();
     const service = createFiscalBatchService({ repository, audit });
     const now = new Date("2026-05-13T17:00:00.000Z");
@@ -433,7 +473,10 @@ describe("approveBatchForFutureIssuance", () => {
 
   it("records idempotency for future issuance approval without emitting NFS-e", async () => {
     const idempotency = makeIdempotencyRepository();
-    const repository = makeRepository({ findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "SIMULATED" })) });
+    const repository = makeRepository({
+      findBatchById: vi.fn().mockResolvedValue(makeBatch({ status: "SIMULATED" })),
+      findCandidateById: vi.fn().mockImplementation(async (id: string) => makeCandidate({ id, status: "SIMULATED" }))
+    });
     const audit = makeAudit();
     const service = createFiscalBatchService({ repository, audit, idempotencyRepository: idempotency.repository });
 

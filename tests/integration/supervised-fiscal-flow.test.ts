@@ -216,6 +216,13 @@ class InMemoryFiscalWorkflowRepository implements ImportRepository, FiscalCandid
     ).length;
   }
 
+  async countActiveBatchItemsByCandidateId(candidateId: string, tenantId: string): Promise<number> {
+    return [...this.batchItems.values()].filter((item) => {
+      const batch = this.batches.get(item.batchId);
+      return item.tenantId === tenantId && item.candidateId === candidateId && item.status === "INCLUDED" && batch?.status !== "CANCELLED";
+    }).length;
+  }
+
   async updateFiscalCandidate(input: {
     id: string;
     tenantId: string;
@@ -322,7 +329,8 @@ class InMemoryFiscalWorkflowRepository implements ImportRepository, FiscalCandid
         batchId: id,
         candidateId: item.candidateId,
         status: item.status,
-        grossAmountCents: item.grossAmountCents
+        grossAmountCents: item.grossAmountCents,
+        candidateSnapshot: item.candidateSnapshot
       };
       this.batchItems.set(batchItem.id, batchItem);
       return batchItem;
