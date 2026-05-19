@@ -55,6 +55,7 @@ describe("release prep smoke", () => {
     const evidence = readProjectFile("docs/product/beta-release-candidate-evidence-pack.md");
     const pilot = readProjectFile("docs/product/beta-pilot-readiness-plan.md");
     const pilotEvidence = readProjectFile("docs/product/beta-pilot-evidence-log.md");
+    const roadmap = readProjectFile("docs/product/controlled-beta-execution-roadmap.md");
     const runbook = readProjectFile("docs/operations/runbooks/beta-release.md");
     const smoke = readProjectFile("docs/operations/runbooks/beta-pilot-smoke.md");
 
@@ -84,5 +85,11 @@ describe("release prep smoke", () => {
     expect(smoke).toMatch(/Tenant B Flow/i);
     expect(smoke).toMatch(/Abuse Checks/i);
     expect(smoke).toMatch(/Do not paste secrets, tokens, raw payloads or full personal documents/i);
+
+    expect(roadmap).toMatch(/Staging\/Beta Environment Activation/i);
+    expect(roadmap).toMatch(/Two-Tenant Smoke Test/i);
+    expect(roadmap).toMatch(/PRD Fiscal Real \/ Homologation/i);
+    expect(roadmap).toMatch(/No real NFS-e issuance before Sprint 47 approval/i);
+    expect(roadmap).toMatch(/No municipal provider integration/i);
   });
 });
