@@ -8,6 +8,9 @@ describe("LGPD redaction helpers", () => {
       email: "tutora@example.com",
       phone: "11987654321",
       storagePath: "tenant/private/file.csv",
+      providerResponse: { official: true },
+      idempotencyKey: "retry-key",
+      checksumSha256: "0123456789abcdef0123456789abcdef",
       nested: { note: "CNPJ 12.345.678/0001-90" }
     });
 
@@ -16,6 +19,9 @@ describe("LGPD redaction helpers", () => {
       email: "[redacted]",
       phone: "[redacted]",
       storagePath: "[redacted]",
+      providerResponse: "[redacted]",
+      idempotencyKey: "[redacted]",
+      checksumSha256: "[redacted]",
       nested: { note: "CNPJ **.***.***/****-**" }
     });
     expect(containsPublicDocumentNumber(redacted)).toBe(false);
