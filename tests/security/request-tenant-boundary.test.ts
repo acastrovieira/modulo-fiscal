@@ -26,7 +26,7 @@ describe("request tenant boundary", () => {
   it.each([
     ["create import", createImportRequestSchema, { documentFileId: uuid }],
     ["validate import", validateImportRequestSchema, { rows: [] }],
-    ["ready candidate", readyForBatchRequestSchema, {}],
+    ["ready candidate", readyForBatchRequestSchema, { reviewJustification: "Conferencia humana concluida" }],
     ["open inconsistency", openInconsistencyRequestSchema, { type: "MISSING_AMOUNT", severity: "BLOCKING", message: "Valor ausente" }],
     ["close inconsistency", closeInconsistencyRequestSchema, { resolutionNote: "Revisado" }],
     ["create batch", createBatchRequestSchema, { candidateIds: [uuid] }],

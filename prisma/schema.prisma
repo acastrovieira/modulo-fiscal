@@ -377,6 +377,9 @@ model FiscalCandidate {
   status                   FiscalCandidateStatus   @default(DRAFT)
   fiscalFingerprintVersion String                  @default("v1")
   fiscalFingerprint        String
+  reviewBlockReasons       Json?
+  reviewWarnings           Json?
+  reviewJustification      String?
   reviewedBy               String?                 @db.Uuid
   reviewedAt               DateTime?               @db.Timestamptz(6)
   createdAt                DateTime                @default(now()) @db.Timestamptz(6)

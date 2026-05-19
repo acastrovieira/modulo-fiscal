@@ -22,6 +22,9 @@ export type FiscalCandidate = {
   status: FiscalCandidateStatus;
   fiscalFingerprintVersion: string;
   fiscalFingerprint: string;
+  reviewBlockReasons: FiscalCandidateReviewBlockReason[];
+  reviewWarnings: FiscalCandidateReviewWarning[];
+  reviewJustification: string | null;
   reviewedBy: string | null;
   reviewedAt: Date | null;
 };
@@ -48,9 +51,18 @@ export type FiscalCandidateReviewGate = {
 };
 
 const readyTransitionSources: readonly FiscalCandidateStatus[] = ["NEEDS_REVIEW"];
+const minimumReviewJustificationLength = 12;
 
 export function canMarkCandidateReadyForBatch(status: FiscalCandidateStatus): boolean {
   return readyTransitionSources.includes(status);
+}
+
+export function normalizeReviewJustification(value: string): string {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+export function isReviewJustificationValid(value: string): boolean {
+  return normalizeReviewJustification(value).length >= minimumReviewJustificationLength;
 }
 
 export function evaluateFiscalCandidateReviewGate(input: FiscalCandidateReviewGateInput): FiscalCandidateReviewGate {

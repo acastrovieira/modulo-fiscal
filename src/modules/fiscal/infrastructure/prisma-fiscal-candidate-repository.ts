@@ -1,6 +1,6 @@
 import type { FiscalCandidateRecord, FiscalCandidateRepository, FiscalImportBatchRecord, FiscalImportRowRecord, CreateFiscalCandidateInput } from "@/modules/fiscal/application/fiscal-candidate-service";
 import type { FiscalCandidateDetailRecord, FiscalCandidateListRecord, FiscalCandidateQueryRepository } from "@/modules/fiscal/application/fiscal-candidate-queries";
-import type { FiscalCandidateStatus } from "@/modules/fiscal/domain/fiscal-candidate";
+import type { FiscalCandidateReviewBlockReason, FiscalCandidateReviewWarning, FiscalCandidateStatus } from "@/modules/fiscal/domain/fiscal-candidate";
 import { prisma } from "@/shared/database/prisma";
 
 type PrismaCandidate = NonNullable<Awaited<ReturnType<typeof prisma.fiscalCandidate.findFirst>>>;
@@ -23,6 +23,22 @@ type CandidateDetail = CandidateWithCounts & {
   }>;
 };
 
+function toStringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
+function toReviewBlockReasons(value: unknown): FiscalCandidateReviewBlockReason[] {
+  return toStringArray(value).filter((item): item is FiscalCandidateReviewBlockReason =>
+    ["DUPLICATE_WITHIN_IMPORT", "MISSING_OR_INVALID_AMOUNT", "MISSING_SERVICE_DATE"].includes(item)
+  );
+}
+
+function toReviewWarnings(value: unknown): FiscalCandidateReviewWarning[] {
+  return toStringArray(value).filter((item): item is FiscalCandidateReviewWarning =>
+    ["RAW_CUSTOMER_DOCUMENT_RECEIVED"].includes(item)
+  );
+}
+
 function toFiscalCandidateRecord(candidate: PrismaCandidate): FiscalCandidateRecord {
   return {
     id: candidate.id,
@@ -39,6 +55,9 @@ function toFiscalCandidateRecord(candidate: PrismaCandidate): FiscalCandidateRec
     status: candidate.status,
     fiscalFingerprintVersion: candidate.fiscalFingerprintVersion,
     fiscalFingerprint: candidate.fiscalFingerprint,
+    reviewBlockReasons: toReviewBlockReasons(candidate.reviewBlockReasons),
+    reviewWarnings: toReviewWarnings(candidate.reviewWarnings),
+    reviewJustification: candidate.reviewJustification,
     reviewedBy: candidate.reviewedBy,
     reviewedAt: candidate.reviewedAt
   };
@@ -59,6 +78,9 @@ function toCandidateListRecord(candidate: CandidateWithCounts): FiscalCandidateL
     grossAmountCents: candidate.grossAmountCents,
     status: candidate.status,
     fiscalFingerprintVersion: candidate.fiscalFingerprintVersion,
+    reviewBlockReasons: toReviewBlockReasons(candidate.reviewBlockReasons),
+    reviewWarnings: toReviewWarnings(candidate.reviewWarnings),
+    reviewJustification: candidate.reviewJustification,
     reviewedAt: candidate.reviewedAt,
     createdAt: candidate.createdAt,
     updatedAt: candidate.updatedAt,
@@ -134,10 +156,11 @@ export function createPrismaFiscalCandidateRepository(): FiscalCandidateReposito
       status: FiscalCandidateStatus;
       reviewedBy?: string;
       reviewedAt?: Date;
+      reviewJustification?: string;
     }): Promise<FiscalCandidateRecord> {
       const candidate = await prisma.fiscalCandidate.update({
         where: { id_tenantId: { id: input.id, tenantId: input.tenantId } },
-        data: { status: input.status, reviewedBy: input.reviewedBy, reviewedAt: input.reviewedAt }
+        data: { status: input.status, reviewedBy: input.reviewedBy, reviewedAt: input.reviewedAt, reviewJustification: input.reviewJustification }
       });
       return toFiscalCandidateRecord(candidate);
     },

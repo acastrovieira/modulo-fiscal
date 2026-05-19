@@ -56,6 +56,9 @@ function makeCandidate(overrides: Partial<FiscalCandidateRecord> = {}): FiscalCa
     status: "NEEDS_REVIEW",
     fiscalFingerprintVersion: FISCAL_FINGERPRINT_VERSION,
     fiscalFingerprint: "fingerprint-1",
+    reviewBlockReasons: [],
+    reviewWarnings: [],
+    reviewJustification: null,
     reviewedBy: null,
     reviewedAt: null,
     ...overrides
@@ -81,7 +84,9 @@ function makeRepository(overrides: Partial<FiscalCandidateRepository> = {}) {
         grossAmountCents: input.grossAmountCents,
         status: input.status,
         fiscalFingerprintVersion: input.fiscalFingerprintVersion,
-        fiscalFingerprint: input.fiscalFingerprint
+        fiscalFingerprint: input.fiscalFingerprint,
+        reviewBlockReasons: input.reviewBlockReasons,
+        reviewWarnings: input.reviewWarnings
       })
     ),
     markImportRowCandidateCreated: vi.fn().mockResolvedValue(undefined),
@@ -93,7 +98,8 @@ function makeRepository(overrides: Partial<FiscalCandidateRepository> = {}) {
         tenantId: input.tenantId,
         status: input.status,
         reviewedBy: input.reviewedBy ?? null,
-        reviewedAt: input.reviewedAt ?? null
+        reviewedAt: input.reviewedAt ?? null,
+        reviewJustification: input.reviewJustification ?? null
       })
     ),
     ...overrides
@@ -184,13 +190,15 @@ describe("createFiscalCandidatesFromImport", () => {
       customerDocumentMasked: "*******8901",
       grossAmountCents: 15000n,
       status: "NEEDS_REVIEW",
-      fiscalFingerprintVersion: "v1"
-    });
+        fiscalFingerprintVersion: "v1"
+      });
     expect(repository.createFiscalCandidate).toHaveBeenCalledWith(
       expect.objectContaining({
         tenantId: tenantAId,
         status: "NEEDS_REVIEW",
-        grossAmountCents: 15000n
+        grossAmountCents: 15000n,
+        reviewBlockReasons: [],
+        reviewWarnings: ["RAW_CUSTOMER_DOCUMENT_RECEIVED"]
       })
     );
     expect(repository.markImportRowCandidateCreated).toHaveBeenCalledWith("row-1", tenantAId);
@@ -334,16 +342,18 @@ describe("markCandidateReadyForBatch", () => {
     const result = await service.markCandidateReadyForBatch({
       context: makeCommandContext("FISCAL_MANAGER"),
       candidateId: "candidate-1",
+      reviewJustification: "Conferencia humana concluida",
       now
     });
 
-    expect(result).toMatchObject({ status: "READY_FOR_BATCH", reviewedBy: userAId, reviewedAt: now });
+    expect(result).toMatchObject({ status: "READY_FOR_BATCH", reviewedBy: userAId, reviewedAt: now, reviewJustification: "Conferencia humana concluida" });
     expect(repository.updateFiscalCandidate).toHaveBeenCalledWith({
       id: "candidate-1",
       tenantId: tenantAId,
       status: "READY_FOR_BATCH",
       reviewedBy: userAId,
-      reviewedAt: now
+      reviewedAt: now,
+      reviewJustification: "Conferencia humana concluida"
     });
     expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ eventType: "fiscal_candidate.marked_ready" }));
   });
@@ -352,7 +362,7 @@ describe("markCandidateReadyForBatch", () => {
     const service = createFiscalCandidateService({ repository: makeRepository(), audit: makeAudit() });
 
     await expect(
-      service.markCandidateReadyForBatch({ context: makeCommandContext("AUDITOR"), candidateId: "candidate-1" })
+      service.markCandidateReadyForBatch({ context: makeCommandContext("AUDITOR"), candidateId: "candidate-1", reviewJustification: "Conferencia humana concluida" })
     ).rejects.toThrow(ForbiddenError);
   });
 
@@ -361,7 +371,7 @@ describe("markCandidateReadyForBatch", () => {
     const service = createFiscalCandidateService({ repository, audit: makeAudit() });
 
     await expect(
-      service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "candidate-1" })
+      service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "candidate-1", reviewJustification: "Conferencia humana concluida" })
     ).rejects.toThrow(TenantScopeError);
   });
 
@@ -370,7 +380,7 @@ describe("markCandidateReadyForBatch", () => {
     const service = createFiscalCandidateService({ repository, audit: makeAudit() });
 
     await expect(
-      service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "missing" })
+      service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "missing", reviewJustification: "Conferencia humana concluida" })
     ).rejects.toThrow(NotFoundError);
   });
 
@@ -379,7 +389,7 @@ describe("markCandidateReadyForBatch", () => {
     const service = createFiscalCandidateService({ repository, audit: makeAudit() });
 
     await expect(
-      service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "candidate-1" })
+      service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "candidate-1", reviewJustification: "Conferencia humana concluida" })
     ).rejects.toThrow(InvalidStateError);
   });
 
@@ -388,7 +398,7 @@ describe("markCandidateReadyForBatch", () => {
     const service = createFiscalCandidateService({ repository, audit: makeAudit() });
 
     await expect(
-      service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "candidate-1" })
+      service.markCandidateReadyForBatch({ context: makeCommandContext("OWNER"), candidateId: "candidate-1", reviewJustification: "Conferencia humana concluida" })
     ).rejects.toThrow(InvalidStateError);
   });
 
@@ -401,11 +411,13 @@ describe("markCandidateReadyForBatch", () => {
     await service.markCandidateReadyForBatch({
       context: makeCommandContext("FISCAL_MANAGER"),
       candidateId: "candidate-1",
+      reviewJustification: "Conferencia humana concluida",
       idempotencyKey: "idem-candidate-ready"
     });
     await service.markCandidateReadyForBatch({
       context: makeCommandContext("FISCAL_MANAGER"),
       candidateId: "candidate-1",
+      reviewJustification: "Conferencia humana concluida",
       idempotencyKey: "idem-candidate-ready"
     });
 
@@ -422,6 +434,18 @@ describe("markCandidateReadyForBatch", () => {
     );
   });
 
+  it("requires a human review justification before releasing a candidate", async () => {
+    const service = createFiscalCandidateService({ repository: makeRepository(), audit: makeAudit() });
+
+    await expect(
+      service.markCandidateReadyForBatch({
+        context: makeCommandContext("FISCAL_MANAGER"),
+        candidateId: "candidate-1",
+        reviewJustification: "ok"
+      })
+    ).rejects.toThrow(InvalidStateError);
+  });
+
   it("blocks divergent replay for candidate review keys", async () => {
     const idempotency = makeIdempotencyRepository();
     const service = createFiscalCandidateService({
@@ -433,6 +457,7 @@ describe("markCandidateReadyForBatch", () => {
     await service.markCandidateReadyForBatch({
       context: makeCommandContext("FISCAL_MANAGER"),
       candidateId: "candidate-1",
+      reviewJustification: "Conferencia humana concluida",
       idempotencyKey: "idem-candidate-divergent"
     });
 
@@ -440,6 +465,7 @@ describe("markCandidateReadyForBatch", () => {
       service.markCandidateReadyForBatch({
         context: makeCommandContext("FISCAL_MANAGER"),
         candidateId: "candidate-2",
+        reviewJustification: "Conferencia humana concluida",
         idempotencyKey: "idem-candidate-divergent"
       })
     ).rejects.toThrow(InvalidStateError);
@@ -455,11 +481,13 @@ describe("markCandidateReadyForBatch", () => {
     await service.markCandidateReadyForBatch({
       context: makeCommandContext("FISCAL_MANAGER"),
       candidateId: "candidate-1",
+      reviewJustification: "Conferencia humana concluida",
       idempotencyKey: "same-key"
     });
     await service.markCandidateReadyForBatch({
       context: makeCommandContext("FISCAL_MANAGER", tenantBId),
       candidateId: "candidate-b",
+      reviewJustification: "Conferencia humana concluida",
       idempotencyKey: "same-key"
     });
 

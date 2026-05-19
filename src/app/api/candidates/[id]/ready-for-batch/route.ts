@@ -31,11 +31,11 @@ function toReadyForBatchResponse(candidate: Awaited<ReturnType<ReturnType<typeof
 }
 
 export async function POST(request: Request, { params }: RouteContext) {
-  const requestId = createCorrelationId();
+    const requestId = createCorrelationId();
 
   try {
     const [{ id }, context] = await Promise.all([params, createCommandContext({ correlationId: requestId })]);
-    readyForBatchRequestSchema.parse(await request.json().catch(() => ({})));
+    const body = readyForBatchRequestSchema.parse(await request.json().catch(() => ({})));
 
     const repository = createPrismaFiscalCandidateRepository();
     const service = createFiscalCandidateService({
@@ -46,6 +46,7 @@ export async function POST(request: Request, { params }: RouteContext) {
     const candidate = await service.markCandidateReadyForBatch({
       context,
       candidateId: id,
+      reviewJustification: body.reviewJustification,
       idempotencyKey: request.headers.get("idempotency-key")
     });
 
