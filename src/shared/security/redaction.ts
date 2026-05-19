@@ -1,6 +1,6 @@
 ﻿export type RedactedPayload = Record<string, unknown> | unknown[] | string | number | boolean | null;
 
-const sensitiveKeyPattern = /(password|senha|token|secret|authorization|cookie|certificate|certificado|privateKey|storagePath|rawPayload|providerResponse|signedUrl|bucket|cpf|cnpj|document|email|phone|telefone)/i;
+const sensitiveKeyPattern = /(password|senha|token|secret|authorization|cookie|certificate|certificado|privateKey|storagePath|rawPayload|providerResponse|signedUrl|bucket|checksum|idempotencyKey|cpf|cnpj|document|email|phone|telefone)/i;
 const cpfPattern = /\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g;
 const cnpjPattern = /\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g;
 const emailPattern = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;

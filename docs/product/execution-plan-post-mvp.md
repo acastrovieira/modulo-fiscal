@@ -33,7 +33,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 29 | Beta scope freeze | Concluida | 100% | PR #15 mergeado e escopo beta congelado | Codex + @pm + @po |
 | 30 | Command idempotency e transition ledger | Concluida | 100% | Comandos criticos idempotentes/auditaveis | Codex + @architect |
 | 31 | RBAC matrix e flow permissions | Concluida | 100% | Matriz papel/acao/estado validada | Codex + @architect + @qa |
-| 32 | Audit completeness e redaction | Planejada | 0% | Acoes criticas com auditoria segura | Codex + seguranca/LGPD + @qa |
+| 32 | Audit completeness e redaction | Concluida | 100% | Acoes criticas com auditoria segura | Codex + seguranca/LGPD + @qa |
 | 33 | Import replay, quarantine e parser governance | Planejada | 0% | Reprocessamento seguro de imports | Codex + @architect + @qa |
 | 34 | Candidate review workbench hardening | Planejada | 0% | Revisao humana robusta e rastreavel | Codex + Gemini + @qa |
 | 35 | Batch snapshot e concurrency guards | Planejada | 0% | Lotes com snapshot, lock e revalidacao | Codex + @architect + @qa |
@@ -586,16 +586,16 @@ Gate:
 ## 33. Sprint 32 - Audit Completeness e Redaction
 Objetivo: garantir auditoria completa, pesquisavel e sem vazamento.
 
-Tarefas planejadas:
-- [ ] Mapear eventos obrigatorios por comando critico.
-- [ ] Garantir `tenantId`, `actorId`, `correlationId`, entidade, before/after seguro e metadata minima.
-- [ ] Cobrir tentativas negadas quando fiscalmente relevantes.
-- [ ] Criar testes que falham com CPF/CNPJ bruto, tokens, storage path, raw payload ou provider response em auditoria publica.
-- [ ] Atualizar docs de auditoria e LGPD.
+Tarefas concluidas:
+- [x] Mapear eventos obrigatorios por comando critico.
+- [x] Garantir `tenantId`, `actorId`, `correlationId`, entidade, before/after seguro e metadata minima.
+- [x] Cobrir tentativas negadas quando fiscalmente relevantes como decisao futura documentada.
+- [x] Criar testes que falham com CPF/CNPJ bruto, tokens, storage path, raw payload ou provider response em auditoria publica.
+- [x] Atualizar docs de auditoria e LGPD.
 
 Gate:
-- [ ] Toda acao critica tem auditoria segura.
-- [ ] Nenhum dado sensivel completo aparece em DTO, log ou auditoria publica.
+- [x] Toda acao critica tem auditoria segura.
+- [x] Nenhum dado sensivel completo aparece em DTO, log ou auditoria publica.
 
 ## 34. Sprint 33 - Import Replay, Quarantine e Parser Governance
 Objetivo: tornar imports problematicos reprocessaveis sem perder rastreabilidade.

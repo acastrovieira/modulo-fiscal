@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import type { AuditEventInput } from "@/modules/audit/domain/audit-event";
+import { redactAuditPayload } from "@/shared/security/redaction";
 
 export type AuditRecorder = {
   record(input: AuditEventInput): Promise<void>;
@@ -24,6 +25,14 @@ function toJsonValue(value: unknown): Prisma.InputJsonValue | undefined {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
 
+function toSafeAuditJsonValue(value: unknown): Prisma.InputJsonValue | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  return toJsonValue(redactAuditPayload(value));
+}
+
 export function createAuditRecorder(db?: AuditEventRepository): AuditRecorder {
   return {
     async record(input) {
@@ -36,9 +45,9 @@ export function createAuditRecorder(db?: AuditEventRepository): AuditRecorder {
           eventType: input.eventType,
           entityType: input.entityType,
           entityId: input.entityId ?? null,
-          beforePayload: toJsonValue(input.beforePayload),
-          afterPayload: toJsonValue(input.afterPayload),
-          metadata: toJsonValue(input.metadata),
+          beforePayload: toSafeAuditJsonValue(input.beforePayload),
+          afterPayload: toSafeAuditJsonValue(input.afterPayload),
+          metadata: toSafeAuditJsonValue(input.metadata),
           correlationId: input.correlationId
         }
       });

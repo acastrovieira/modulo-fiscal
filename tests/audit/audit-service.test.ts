@@ -77,6 +77,44 @@ describe("audit.record", () => {
     });
   });
 
+  it("redacts sensitive payloads before persistence", async () => {
+    const create = vi.fn().mockResolvedValue({ id: "audit-1" });
+    const audit = createAuditRecorder({ auditEvent: { create } } as never);
+
+    await audit.record({
+      tenantId: "11111111-1111-4111-8111-111111111111",
+      actorId: "00000000-0000-4000-8000-000000000001",
+      eventType: "documents.download_intent_recorded",
+      entityType: "DocumentFile",
+      entityId: "doc-1",
+      beforePayload: { customerDocument: "12345678901", status: "DRAFT" },
+      afterPayload: { email: "tutora@example.com", status: "READY" },
+      metadata: {
+        storagePath: "tenant/private/file.csv",
+        providerResponse: { raw: "official payload" },
+        idempotencyKey: "client-retry-key",
+        checksumSha256: "0123456789abcdef0123456789abcdef"
+      },
+      correlationId: "corr_test"
+    });
+
+    expect(create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        beforePayload: { customerDocument: "[redacted]", status: "DRAFT" },
+        afterPayload: { email: "[redacted]", status: "READY" },
+        metadata: {
+          storagePath: "[redacted]",
+          providerResponse: "[redacted]",
+          idempotencyKey: "[redacted]",
+          checksumSha256: "[redacted]"
+        }
+      })
+    });
+    expect(JSON.stringify(create.mock.calls)).not.toContain("12345678901");
+    expect(JSON.stringify(create.mock.calls)).not.toContain("tutora@example.com");
+    expect(JSON.stringify(create.mock.calls)).not.toContain("tenant/private/file.csv");
+  });
+
   it("propagates repository failures for critical audit events", async () => {
     const audit = createAuditRecorder({
       auditEvent: {
