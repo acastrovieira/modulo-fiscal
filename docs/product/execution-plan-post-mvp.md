@@ -40,7 +40,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 36 | Tenant isolation e abuse testing | Concluida | 100% | Zero vazamento cross-tenant | Codex + seguranca/LGPD + @qa |
 | 37 | Environments, Supabase e Vercel release prep | Concluida | 100% | Staging/beta com envs e deploy controlados | Codex + @devops |
 | 38 | Beta release candidate e evidence pack | Concluida | 100% | Go/no-go beta com evidencias | Codex + @pm + @qa + @devops |
-| 39 | Controlled beta pilot readiness | Planejada | 0% | Piloto controlado com donos, smoke e go/no-go | Codex + @pm + @po + @qa + @devops |
+| 39 | Controlled beta pilot readiness | Concluida tecnica | 70% | Piloto controlado com donos, smoke e go/no-go | Codex + @pm + @po + @qa + @devops |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -694,18 +694,24 @@ Gate:
 ## 40. Sprint 39 - Controlled Beta Pilot Readiness
 Objetivo: preparar a decisao operacional de piloto beta controlado apos o release candidate tecnico.
 
-Tarefas planejadas:
-- [ ] Mergear o PR da Sprint 38.
-- [ ] Confirmar Quality Gates verdes em `main`.
+Tarefas concluidas tecnicamente:
+- [x] Mergear o PR da Sprint 38.
+- [x] Confirmar Quality Gates verdes em `main`.
+- [x] Registrar evidencia de merge commit e CI.
+- [x] Criar log de evidencias do piloto.
+- [x] Criar runbook de smoke manual com dois tenants.
+- [x] Registrar go/no-go atual como NO-GO ate aprovacao externa e smoke.
+
+Tarefas pendentes externas:
 - [ ] Confirmar deploy staging/beta com o commit final.
 - [ ] Nomear product owner, engineering owner e support owner.
 - [ ] Aprovar 1-3 tenants beta fora do repositorio.
 - [ ] Aprovar usuarios beta com least privilege.
 - [ ] Rodar smoke manual com dois tenants.
-- [ ] Registrar evidencias seguras.
+- [ ] Registrar evidencias seguras de staging/beta.
 - [ ] Atualizar riscos aceitos e bloqueadores.
-- [ ] Registrar go/no-go final.
+- [ ] Registrar go/no-go final para abrir o piloto.
 
 Gate:
-- [ ] Piloto so abre com donos nomeados, smoke aprovado e zero P0/P1.
-- [ ] Nenhum dado real entra sem aprovacao formal e ambiente beta configurado.
+- [x] Piloto continua bloqueado ate donos nomeados, smoke aprovado e zero P0/P1.
+- [x] Nenhum dado real entra sem aprovacao formal e ambiente beta configurado.
