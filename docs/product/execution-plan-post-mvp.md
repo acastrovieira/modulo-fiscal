@@ -32,7 +32,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 28 | Guardrails de revisao de candidatos | Concluida | 100% | Review gate auditavel antes de lotes | Codex + @architect + seguranca/LGPD + @qa |
 | 29 | Beta scope freeze | Concluida | 100% | PR #15 mergeado e escopo beta congelado | Codex + @pm + @po |
 | 30 | Command idempotency e transition ledger | Concluida | 100% | Comandos criticos idempotentes/auditaveis | Codex + @architect |
-| 31 | RBAC matrix e flow permissions | Planejada | 0% | Matriz papel/acao/estado validada | Codex + @architect + @qa |
+| 31 | RBAC matrix e flow permissions | Concluida | 100% | Matriz papel/acao/estado validada | Codex + @architect + @qa |
 | 32 | Audit completeness e redaction | Planejada | 0% | Acoes criticas com auditoria segura | Codex + seguranca/LGPD + @qa |
 | 33 | Import replay, quarantine e parser governance | Planejada | 0% | Reprocessamento seguro de imports | Codex + @architect + @qa |
 | 34 | Candidate review workbench hardening | Planejada | 0% | Revisao humana robusta e rastreavel | Codex + Gemini + @qa |
@@ -573,15 +573,15 @@ Gate:
 ## 32. Sprint 31 - RBAC Matrix e Flow Permissions
 Objetivo: fechar matriz de permissoes por fluxo, papel e estado.
 
-Tarefas planejadas:
-- [ ] Documentar matriz OWNER, ADMIN, FISCAL_MANAGER, FISCAL_OPERATOR, FINANCIAL_OPERATOR, ACCOUNTANT e AUDITOR.
-- [ ] Validar todos os comandos com `assertPermissionForCommand`.
-- [ ] Criar testes negativos por papel em imports, candidatos, inconsistencias, lotes, documentos, auditoria e tenant admin.
-- [ ] Conferir que UI esconde acoes, mas backend continua sendo a barreira real.
+Tarefas concluidas:
+- [x] Documentar matriz OWNER, ADMIN, FISCAL_MANAGER, FISCAL_OPERATOR, FINANCIAL_OPERATOR, ACCOUNTANT e AUDITOR.
+- [x] Validar todos os comandos com `assertPermissionForCommand`.
+- [x] Criar testes negativos por papel em imports, candidatos, inconsistencias, lotes, documentos, auditoria e tenant admin.
+- [x] Conferir que UI esconde acoes, mas backend continua sendo a barreira real.
 
 Gate:
-- [ ] Nenhum papel sem permissao executa acao critica.
-- [ ] Nenhuma rota aceita `tenantId` vindo do client como fonte de verdade.
+- [x] Nenhum papel sem permissao executa acao critica.
+- [x] Nenhuma rota aceita `tenantId` vindo do client como fonte de verdade.
 
 ## 33. Sprint 32 - Audit Completeness e Redaction
 Objetivo: garantir auditoria completa, pesquisavel e sem vazamento.
