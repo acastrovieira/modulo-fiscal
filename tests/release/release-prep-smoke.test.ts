@@ -50,4 +50,26 @@ describe("release prep smoke", () => {
     expect(envExample).not.toMatch(/SUPABASE_SERVICE_ROLE_KEY="[^"]+"/);
     expect(envExample).not.toMatch(/postgres:\/\/[^"\s]*:[^"\s]*@[^"\s]*supabase/i);
   });
+
+  it("keeps the beta release candidate blocked until evidence and owners are ready", () => {
+    const evidence = readProjectFile("docs/product/beta-release-candidate-evidence-pack.md");
+    const pilot = readProjectFile("docs/product/beta-pilot-readiness-plan.md");
+    const runbook = readProjectFile("docs/operations/runbooks/beta-release.md");
+
+    expect(evidence).toMatch(/Current decision: NO-GO for real beta users/i);
+    expect(evidence).toMatch(/No real NFS-e issuance/i);
+    expect(evidence).toMatch(/No scraping/i);
+    expect(evidence).toMatch(/No municipal provider integration/i);
+    expect(evidence).toMatch(/Quality Gates/i);
+    expect(evidence).toMatch(/two tenants/i);
+
+    expect(pilot).toMatch(/Product owner/i);
+    expect(pilot).toMatch(/Engineering owner/i);
+    expect(pilot).toMatch(/Support owner/i);
+    expect(pilot).toMatch(/least privilege/i);
+    expect(pilot).toMatch(/go\/no-go/i);
+
+    expect(runbook).toMatch(/No-Go Conditions/i);
+    expect(runbook).toMatch(/real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal jobs/i);
+  });
 });

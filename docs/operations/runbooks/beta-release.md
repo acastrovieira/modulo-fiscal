@@ -3,6 +3,8 @@
 ## Objective
 Release VetFiscal OS to a controlled beta without enabling real NFS-e issuance, scraping, municipal providers, certificates or fiscal jobs.
 
+Release candidate evidence must be collected in `docs/product/beta-release-candidate-evidence-pack.md` before any real beta tenant is enabled.
+
 ## Pre-Release Gates
 - [ ] Branch is clean.
 - [ ] Pull request targets protected `main`.
@@ -35,3 +37,9 @@ Release VetFiscal OS to a controlled beta without enabling real NFS-e issuance, 
 - [ ] No municipal provider call.
 - [ ] No certificate usage.
 - [ ] No fiscal queue/job execution.
+
+## No-Go Conditions
+- Any failed GitHub Quality Gate.
+- Any open P0/P1 tenant isolation, audit, redaction or secret exposure issue.
+- Any unapproved real tenant or user.
+- Any enabled path for real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal jobs.

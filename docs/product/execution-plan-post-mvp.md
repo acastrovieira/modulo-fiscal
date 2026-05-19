@@ -39,7 +39,8 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 35 | Batch snapshot e concurrency guards | Concluida | 100% | Lotes com snapshot, lock e revalidacao | Codex + @architect + @qa |
 | 36 | Tenant isolation e abuse testing | Concluida | 100% | Zero vazamento cross-tenant | Codex + seguranca/LGPD + @qa |
 | 37 | Environments, Supabase e Vercel release prep | Concluida | 100% | Staging/beta com envs e deploy controlados | Codex + @devops |
-| 38 | Beta release candidate e evidence pack | Planejada | 0% | Go/no-go beta com evidencias | Codex + @pm + @qa + @devops |
+| 38 | Beta release candidate e evidence pack | Concluida | 100% | Go/no-go beta com evidencias | Codex + @pm + @qa + @devops |
+| 39 | Controlled beta pilot readiness | Planejada | 0% | Piloto controlado com donos, smoke e go/no-go | Codex + @pm + @po + @qa + @devops |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
@@ -676,15 +677,35 @@ Gate:
 ## 39. Sprint 38 - Beta Release Candidate e Evidence Pack
 Objetivo: fechar um release candidate com evidencias objetivas.
 
-Tarefas planejadas:
-- [ ] Rodar todos os gates: lint, typecheck, test, security, prisma validate e build.
-- [ ] Rodar smoke manual/e2e da jornada beta com dois tenants.
-- [ ] Validar checklist LGPD, audit, tenant isolation e runbooks.
-- [ ] Criar pacote de evidencias: commit hash, CI URL, screenshots, logs seguros e resultado de testes.
-- [ ] Criar go/no-go final.
-- [ ] Registrar riscos aceitos e riscos bloqueadores.
-- [ ] Preparar roteiro do piloto com 1-3 tenants.
+Tarefas concluidas:
+- [x] Criar pacote de evidencias do release candidate.
+- [x] Validar checklist LGPD, audit, tenant isolation e runbooks por documentacao.
+- [x] Criar go/no-go tecnico inicial.
+- [x] Registrar riscos aceitos e riscos bloqueadores.
+- [x] Preparar roteiro do piloto com 1-3 tenants.
+- [x] Criar teste de release docs para manter guardrails.
+- [ ] Anexar CI URL depois que o PR for aberto.
+- [ ] Rodar smoke manual/e2e da jornada beta com dois tenants em staging/beta.
 
 Gate:
-- [ ] Beta so abre se nao houver P0/P1 aberto.
-- [ ] Nenhum incidente conhecido de tenant, auditoria, dado sensivel ou emissao real.
+- [x] Beta real permanece NO-GO ate merge, CI verde, donos nomeados e smoke staging/beta.
+- [x] Nenhum incidente conhecido de tenant, auditoria, dado sensivel ou emissao real foi introduzido nesta sprint.
+
+## 40. Sprint 39 - Controlled Beta Pilot Readiness
+Objetivo: preparar a decisao operacional de piloto beta controlado apos o release candidate tecnico.
+
+Tarefas planejadas:
+- [ ] Mergear o PR da Sprint 38.
+- [ ] Confirmar Quality Gates verdes em `main`.
+- [ ] Confirmar deploy staging/beta com o commit final.
+- [ ] Nomear product owner, engineering owner e support owner.
+- [ ] Aprovar 1-3 tenants beta fora do repositorio.
+- [ ] Aprovar usuarios beta com least privilege.
+- [ ] Rodar smoke manual com dois tenants.
+- [ ] Registrar evidencias seguras.
+- [ ] Atualizar riscos aceitos e bloqueadores.
+- [ ] Registrar go/no-go final.
+
+Gate:
+- [ ] Piloto so abre com donos nomeados, smoke aprovado e zero P0/P1.
+- [ ] Nenhum dado real entra sem aprovacao formal e ambiente beta configurado.
