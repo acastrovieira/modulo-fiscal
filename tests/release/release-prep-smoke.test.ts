@@ -54,7 +54,9 @@ describe("release prep smoke", () => {
   it("keeps the beta release candidate blocked until evidence and owners are ready", () => {
     const evidence = readProjectFile("docs/product/beta-release-candidate-evidence-pack.md");
     const pilot = readProjectFile("docs/product/beta-pilot-readiness-plan.md");
+    const pilotEvidence = readProjectFile("docs/product/beta-pilot-evidence-log.md");
     const runbook = readProjectFile("docs/operations/runbooks/beta-release.md");
+    const smoke = readProjectFile("docs/operations/runbooks/beta-pilot-smoke.md");
 
     expect(evidence).toMatch(/Current decision: NO-GO for real beta users/i);
     expect(evidence).toMatch(/No real NFS-e issuance/i);
@@ -68,8 +70,19 @@ describe("release prep smoke", () => {
     expect(pilot).toMatch(/Support owner/i);
     expect(pilot).toMatch(/least privilege/i);
     expect(pilot).toMatch(/go\/no-go/i);
+    expect(pilot).toMatch(/Current Blockers/i);
+
+    expect(pilotEvidence).toMatch(/Current decision: NO-GO for real beta usage/i);
+    expect(pilotEvidence).toMatch(/5c14c9eef1cec88c70d07520afd1ff7928193728/i);
+    expect(pilotEvidence).toMatch(/Manual Smoke Evidence Template/i);
+    expect(pilotEvidence).toMatch(/Any enabled path for real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal jobs/i);
 
     expect(runbook).toMatch(/No-Go Conditions/i);
     expect(runbook).toMatch(/real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal jobs/i);
+
+    expect(smoke).toMatch(/Tenant A Flow/i);
+    expect(smoke).toMatch(/Tenant B Flow/i);
+    expect(smoke).toMatch(/Abuse Checks/i);
+    expect(smoke).toMatch(/Do not paste secrets, tokens, raw payloads or full personal documents/i);
   });
 });

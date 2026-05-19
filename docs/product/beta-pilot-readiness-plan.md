@@ -1,7 +1,7 @@
 # Controlled Beta Pilot Readiness Plan - Sprint 39
 
 ## Status
-Planned operational handoff after Sprint 38 release candidate.
+Operational handoff prepared. Real beta usage remains NO-GO until the pending external approvals and staging/beta smoke are completed.
 
 Sprint 39 exists to move from a technical release candidate to a controlled pilot decision. It must not add real NFS-e issuance, scraping, municipal provider integration, certificate usage or fiscal background jobs.
 
@@ -9,8 +9,8 @@ Sprint 39 exists to move from a technical release candidate to a controlled pilo
 Prepare the first controlled beta pilot with 1-3 tenants by confirming ownership, environment readiness, access boundaries, smoke evidence and support procedures.
 
 ## Checklist
-- [ ] Merge the Sprint 38 release candidate PR.
-- [ ] Confirm GitHub `Quality gates` are green on `main`.
+- [x] Merge the Sprint 38 release candidate PR.
+- [x] Confirm GitHub `Quality gates` are green on `main`.
 - [ ] Confirm staging/beta deployment uses the final merge commit.
 - [ ] Assign product owner for beta go/no-go.
 - [ ] Assign engineering owner for incident response.
@@ -22,7 +22,7 @@ Prepare the first controlled beta pilot with 1-3 tenants by confirming ownership
 - [ ] Capture safe logs and CI links.
 - [ ] Review residual risks and mark each as accepted or blocking.
 - [ ] Confirm rollback and database migration procedures.
-- [ ] Record final go/no-go decision.
+- [x] Record current go/no-go decision as NO-GO until external approvals and smoke pass.
 
 ## Pilot Roles
 | Responsibility | Required Before Pilot | Notes |
@@ -46,6 +46,19 @@ Prepare the first controlled beta pilot with 1-3 tenants by confirming ownership
 - Go/no-go is recorded.
 - If GO, pilot window and rollback owner are documented.
 - If NO-GO, blockers are converted into new sprint tasks.
+
+## Execution Evidence
+- Sprint 38 PR: `https://github.com/acastrovieira/modulo-fiscal/pull/24`
+- Sprint 38 merge commit: `5c14c9eef1cec88c70d07520afd1ff7928193728`
+- Sprint 38 Quality Gates: `https://github.com/acastrovieira/modulo-fiscal/actions/runs/26103778717/job/76761820308`
+- Pilot evidence log: `docs/product/beta-pilot-evidence-log.md`
+- Pilot smoke runbook: `docs/operations/runbooks/beta-pilot-smoke.md`
+
+## Current Blockers
+- Product, engineering and support owners are not named in the repository.
+- Real beta tenants and users are not approved in the repository.
+- Staging/beta deployment URL is not captured in the repository.
+- Two-tenant manual smoke has not been run in staging/beta.
 
 ## Recommended Squad
 - Codex: release coordination, evidence capture, PR and regression gates.

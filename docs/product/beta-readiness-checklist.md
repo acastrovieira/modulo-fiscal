@@ -1,7 +1,7 @@
 ﻿# Beta Readiness Checklist - VetFiscal OS
 
 ## Status
-Scope frozen for controlled beta planning. Not approved for go-live until all release candidate gates are rechecked.
+Scope frozen for controlled beta planning. Sprint 38 release candidate was merged, but real beta usage remains NO-GO until Sprint 39 external approvals and staging/beta smoke are completed.
 
 Sprint 38 release candidate evidence is tracked in `docs/product/beta-release-candidate-evidence-pack.md`.
 
@@ -14,7 +14,7 @@ Sprint 38 release candidate evidence is tracked in `docs/product/beta-release-ca
 - [ ] Support owner and engineering owner are defined for the release candidate.
 
 ## Technical Gates
-- [ ] GitHub `Quality gates` check is green.
+- [x] GitHub `Quality gates` check is green.
 - [x] `npm run lint` passed.
 - [x] `npm run typecheck` passed.
 - [x] `npm test` passed.
@@ -37,12 +37,13 @@ Sprint 38 release candidate evidence is tracked in `docs/product/beta-release-ca
 - [ ] Runbook of stuck batch reviewed.
 - [ ] Runbook of tenant isolation incident reviewed.
 - [x] Beta release runbook reviewed.
+- [x] Beta pilot smoke runbook created.
 - [ ] Residual risk matrix reviewed and accepted or blocked.
 
 ## Evidence To Attach To PR Or Release Note
 - [x] Release candidate evidence pack.
-- [ ] Final commit hash.
-- [ ] CI URL after PR creation.
-- [ ] Gate outputs or summary.
+- [x] Final Sprint 38 merge commit hash.
+- [x] CI URL after PR creation.
+- [x] Gate outputs or summary.
 - [ ] Known risks and accepted mitigations.
 - [ ] Explicit confirmation that NFS-e real remains disabled.

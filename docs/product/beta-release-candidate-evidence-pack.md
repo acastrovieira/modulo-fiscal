@@ -19,8 +19,8 @@ The beta is not approved for real users until the pull request is merged, GitHub
 | Evidence | Status | Notes |
 | --- | --- | --- |
 | Base commit | Captured | `f3df1c8` before Sprint 38 changes. |
-| Pull request commit | Pending PR | Final commit hash is captured by GitHub after push. |
-| CI URL | Pending PR | Attach GitHub `Quality gates` URL after opening the PR. |
+| Pull request commit | Captured | Sprint 38 merge commit `5c14c9eef1cec88c70d07520afd1ff7928193728`. |
+| CI URL | Captured | `https://github.com/acastrovieira/modulo-fiscal/actions/runs/26103778717/job/76761820308` |
 | Local lint | Passed | `npm run lint` passed on 2026-05-19. |
 | Local typecheck | Passed | `npm run typecheck` passed on 2026-05-19. |
 | Local tests | Passed | `npm test` passed on 2026-05-19 with 305 tests. |
@@ -56,7 +56,7 @@ Run this with two controlled tenants in a staging/beta environment after the PR 
 Current decision: NO-GO for real beta users.
 
 Reasons:
-- PR must be reviewed, merged and validated by GitHub Quality Gates.
+- Sprint 38 PR is merged and validated by GitHub Quality Gates.
 - Real beta tenants and beta users are not named in the repository.
 - Support owner, engineering owner and rollback owner still require explicit assignment.
 - Manual smoke with two tenants must run in staging/beta with the final deployed build.
@@ -85,3 +85,5 @@ Reasons:
 - Vercel release runbook: `docs/operations/vercel-release.md`
 - Supabase setup: `docs/operations/supabase-setup.md`
 - Database migrations: `docs/operations/database-migrations.md`
+- Sprint 39 pilot evidence log: `docs/product/beta-pilot-evidence-log.md`
+- Pilot smoke runbook: `docs/operations/runbooks/beta-pilot-smoke.md`
