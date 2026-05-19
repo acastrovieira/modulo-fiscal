@@ -7,6 +7,10 @@ export type ImportParserVersion = (typeof supportedImportParserVersions)[number]
 
 export const defaultImportParserVersion: ImportParserVersion = "vetcare_structured_v1";
 
+const parserVersionOrder: Record<ImportParserVersion, number> = {
+  vetcare_structured_v1: 1
+};
+
 export type NormalizedImportRow = {
   parserVersion: ImportParserVersion;
   sourceRowId: string | null;
@@ -32,6 +36,16 @@ const forbiddenRowKeys = new Set([
   "cnpj",
   "providerToken",
   "provider_token",
+  "accessToken",
+  "access_token",
+  "refreshToken",
+  "refresh_token",
+  "authorization",
+  "cookie",
+  "privateKey",
+  "private_key",
+  "providerPayload",
+  "provider_payload",
   "serviceRoleKey",
   "service_role_key"
 ]);
@@ -46,6 +60,23 @@ export function assertSupportedImportParserVersion(value?: string): ImportParser
   }
 
   throw new ValidationError("Unsupported import parser version.");
+}
+
+export function assertImportParserReplayAllowed(input: {
+  latestParserVersion?: string | null;
+  requestedParserVersion: ImportParserVersion;
+}): void {
+  if (!input.latestParserVersion) {
+    return;
+  }
+
+  const latestParserVersion = assertSupportedImportParserVersion(input.latestParserVersion);
+  if (input.requestedParserVersion !== latestParserVersion) {
+    const requestedOrder = parserVersionOrder[input.requestedParserVersion];
+    const latestOrder = parserVersionOrder[latestParserVersion];
+    const reason = requestedOrder < latestOrder ? "downgrade" : "parser change";
+    throw new ValidationError(`Import replay with parser ${reason} is not allowed without an explicit migration workflow.`);
+  }
 }
 
 function assertPlainObject(row: unknown, rowNumber: number): asserts row is Record<string, unknown> {
@@ -90,6 +121,24 @@ function readAmountCents(row: Record<string, unknown>): string {
   throw new ValidationError("Import row amount must be a positive integer in cents.");
 }
 
+function readIsoDate(row: Record<string, unknown>, keys: readonly string[], rowNumber: number): string | null {
+  const value = readString(row, keys);
+  if (!value) {
+    return null;
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    throw new ValidationError(`Import row ${rowNumber} has invalid date format.`);
+  }
+
+  const date = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) {
+    throw new ValidationError(`Import row ${rowNumber} has invalid date.`);
+  }
+
+  return value;
+}
+
 function createRowFingerprint(input: {
   parserVersion: ImportParserVersion;
   sourceRowId: string | null;
@@ -128,7 +177,7 @@ export function normalizeImportRow(input: {
   const amountCents = readAmountCents(input.row);
   const customerName = readString(input.row, ["customerName", "customer_name", "tutorName", "tutor_name"]);
   const customerDocumentMasked = readString(input.row, ["customerDocumentMasked", "customer_document_masked", "documentMasked", "document_masked"]);
-  const serviceDate = readString(input.row, ["serviceDate", "service_date", "competenceDate", "competence_date"]);
+  const serviceDate = readIsoDate(input.row, ["serviceDate", "service_date", "competenceDate", "competence_date"], input.rowNumber);
   const rowFingerprint = createRowFingerprint({
     parserVersion: input.parserVersion,
     sourceRowId,

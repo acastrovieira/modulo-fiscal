@@ -33,7 +33,7 @@ export type ImportDetailRowRecord = {
   tenantId: string;
   rowNumber: number;
   sourceRowId: string | null;
-  status: "RECEIVED" | "NORMALIZED" | "REJECTED" | "CANDIDATE_CREATED";
+  status: "RECEIVED" | "NORMALIZED" | "REJECTED" | "QUARANTINED" | "CANDIDATE_CREATED";
   normalizedPayload: unknown;
   errorPayload: unknown;
 };

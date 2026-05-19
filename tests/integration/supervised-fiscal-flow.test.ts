@@ -131,17 +131,35 @@ class InMemoryFiscalWorkflowRepository implements ImportRepository, FiscalCandid
     return updated;
   }
 
-  async createImportRows(rows: ImportRowCreateInput[]): Promise<void> {
-    for (const row of rows) {
+  async replaceImportRows(input: { importBatchId: string; tenantId: string; rows: ImportRowCreateInput[] }): Promise<void> {
+    for (const [id, row] of this.importRows.entries()) {
+      if (row.importBatchId === input.importBatchId && row.tenantId === input.tenantId) {
+        this.importRows.delete(id);
+      }
+    }
+
+    for (const row of input.rows) {
       const id = `row-${this.nextRow++}`;
       this.importRows.set(id, {
         id,
         tenantId: row.tenantId,
         importBatchId: row.importBatchId,
-        status: row.status,
+        status: row.status === "QUARANTINED" ? "REJECTED" : row.status,
         normalizedPayload: row.normalizedPayload ?? null
       });
     }
+  }
+
+  async countFiscalCandidatesByImportBatchId(importBatchId: string, tenantId: string): Promise<number> {
+    return [...this.candidates.values()].filter((candidate) => candidate.importBatchId === importBatchId && candidate.tenantId === tenantId).length;
+  }
+
+  async findLatestValidationAttempt(): Promise<null> {
+    return null;
+  }
+
+  async createValidationAttempt(): Promise<void> {
+    return undefined;
   }
 
   async findNormalizedRowsByImportBatchId(importBatchId: string): Promise<FiscalImportRowRecord[]> {
