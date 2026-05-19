@@ -67,7 +67,10 @@ function makeRepository(overrides: Partial<ImportRepository> = {}) {
         validatedAt: input.validatedAt ?? null
       })
     ),
-    createImportRows: vi.fn().mockResolvedValue(undefined),
+    replaceImportRows: vi.fn().mockResolvedValue(undefined),
+    countFiscalCandidatesByImportBatchId: vi.fn().mockResolvedValue(0),
+    findLatestValidationAttempt: vi.fn().mockResolvedValue(null),
+    createValidationAttempt: vi.fn().mockResolvedValue(undefined),
     ...overrides
   };
 
@@ -209,7 +212,10 @@ describe("validateImport", () => {
       tenantId: tenantAId,
       status: "VALIDATING"
     });
-    expect(repository.createImportRows).toHaveBeenCalledWith([
+    expect(repository.replaceImportRows).toHaveBeenCalledWith({
+      importBatchId: "import-1",
+      tenantId: tenantAId,
+      rows: [
       expect.objectContaining({
         tenantId: tenantAId,
         importBatchId: "import-1",
@@ -225,7 +231,8 @@ describe("validateImport", () => {
           duplicateWithinImport: false
         })
       })
-    ]);
+      ]
+    });
     expect(repository.updateImportBatch).toHaveBeenNthCalledWith(2, {
       id: "import-1",
       tenantId: tenantAId,
@@ -250,11 +257,13 @@ describe("validateImport", () => {
     });
 
     expect(result.status).toBe("HAS_ERRORS");
-    expect(repository.createImportRows).toHaveBeenCalledWith(
-      expect.arrayContaining([
+    expect(repository.replaceImportRows).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rows: expect.arrayContaining([
         expect.objectContaining({ status: "NORMALIZED" }),
-        expect.objectContaining({ status: "REJECTED" })
-      ])
+        expect.objectContaining({ status: "QUARANTINED" })
+        ])
+      })
     );
   });
 
@@ -273,14 +282,18 @@ describe("validateImport", () => {
     });
 
     expect(result.status).toBe("READY_FOR_REVIEW");
-    expect(repository.createImportRows).toHaveBeenCalledWith([
+    expect(repository.replaceImportRows).toHaveBeenCalledWith({
+      importBatchId: "import-1",
+      tenantId: tenantAId,
+      rows: [
       expect.objectContaining({
         normalizedPayload: expect.objectContaining({ duplicateWithinImport: false })
       }),
       expect.objectContaining({
         normalizedPayload: expect.objectContaining({ duplicateWithinImport: true })
       })
-    ]);
+      ]
+    });
     expect(audit.record).toHaveBeenCalledWith(
       expect.objectContaining({
         eventType: "imports.validation_finished",
@@ -304,16 +317,20 @@ describe("validateImport", () => {
     });
 
     expect(result.status).toBe("HAS_ERRORS");
-    expect(repository.createImportRows).toHaveBeenCalledWith([
+    expect(repository.replaceImportRows).toHaveBeenCalledWith({
+      importBatchId: "import-1",
+      tenantId: tenantAId,
+      rows: [
       expect.objectContaining({
-        status: "REJECTED",
+        status: "QUARANTINED",
         errorPayload: expect.objectContaining({ parserVersion: defaultImportParserVersion })
       }),
       expect.objectContaining({
-        status: "REJECTED",
+        status: "QUARANTINED",
         errorPayload: expect.objectContaining({ parserVersion: defaultImportParserVersion })
       })
-    ]);
+      ]
+    });
     expect(JSON.stringify(audit.record.mock.calls)).not.toContain("12345678901");
   });
 
@@ -343,7 +360,7 @@ describe("validateImport", () => {
     });
 
     expect(result.status).toBe("VALIDATED");
-    expect(repository.createImportRows).not.toHaveBeenCalled();
+    expect(repository.replaceImportRows).toHaveBeenCalledWith({ importBatchId: "import-1", tenantId: tenantAId, rows: [] });
   });
 
   it("blocks validation for roles without imports.create", async () => {
@@ -380,12 +397,68 @@ describe("validateImport", () => {
 
   it("fails when import status cannot be validated", async () => {
     const repository = makeRepository({
-      findImportBatchById: vi.fn().mockResolvedValue(makeImportBatch({ status: "READY_FOR_REVIEW" }))
+      findImportBatchById: vi.fn().mockResolvedValue(makeImportBatch({ status: "ARCHIVED" }))
     });
     const service = createImportService({ repository, audit: makeAudit() });
 
     await expect(
       service.validateImport({ context: makeCommandContext("OWNER"), importBatchId: "import-1", rows: [] })
     ).rejects.toThrow(InvalidStateError);
+  });
+
+  it("replays validation with the same parser by replacing rows and recording another attempt", async () => {
+    const repository = makeRepository({
+      findImportBatchById: vi.fn().mockResolvedValue(makeImportBatch({ status: "HAS_ERRORS", validRows: 1, invalidRows: 1 })),
+      findLatestValidationAttempt: vi.fn().mockResolvedValue({
+        id: "attempt-1",
+        tenantId: tenantAId,
+        importBatchId: "import-1",
+        parserVersion: defaultImportParserVersion,
+        status: "QUARANTINED",
+        totalRows: 2,
+        validRows: 1,
+        invalidRows: 1,
+        duplicateRows: 0,
+        createdBy: userAId,
+        correlationId: "corr_previous",
+        errorsSummary: [],
+        createdAt: new Date("2026-05-13T12:00:00.000Z")
+      })
+    });
+    const service = createImportService({ repository, audit: makeAudit() });
+
+    const result = await service.validateImport({
+      context: makeCommandContext("FISCAL_OPERATOR"),
+      importBatchId: "import-1",
+      parserVersion: defaultImportParserVersion,
+      rows: [{ description: "Consulta revisada", amountCents: "10000" }]
+    });
+
+    expect(result.status).toBe("READY_FOR_REVIEW");
+    expect(repository.replaceImportRows).toHaveBeenCalledTimes(1);
+    expect(repository.createValidationAttempt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tenantId: tenantAId,
+        importBatchId: "import-1",
+        parserVersion: defaultImportParserVersion,
+        status: "SUCCEEDED",
+        totalRows: 1,
+        validRows: 1,
+        invalidRows: 0
+      })
+    );
+  });
+
+  it("blocks replay after fiscal candidates were already created", async () => {
+    const repository = makeRepository({
+      findImportBatchById: vi.fn().mockResolvedValue(makeImportBatch({ status: "READY_FOR_REVIEW" })),
+      countFiscalCandidatesByImportBatchId: vi.fn().mockResolvedValue(1)
+    });
+    const service = createImportService({ repository, audit: makeAudit() });
+
+    await expect(
+      service.validateImport({ context: makeCommandContext("OWNER"), importBatchId: "import-1", rows: [] })
+    ).rejects.toThrow(InvalidStateError);
+    expect(repository.replaceImportRows).not.toHaveBeenCalled();
   });
 });

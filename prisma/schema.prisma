@@ -55,6 +55,7 @@ enum ImportRowStatus {
   RECEIVED
   NORMALIZED
   REJECTED
+  QUARANTINED
   CANDIDATE_CREATED
 }
 
@@ -146,6 +147,7 @@ model Tenant {
   documents             DocumentFile[]
   importBatches         ImportBatch[]
   importRows            ImportRow[]
+  importValidationAttempts ImportValidationAttempt[]
   fiscalCandidates      FiscalCandidate[]
   fiscalInconsistencies FiscalInconsistency[]
   fiscalBatches         FiscalBatch[]
@@ -303,6 +305,7 @@ model ImportBatch {
   documentFile    DocumentFile            @relation(fields: [documentFileId, tenantId], references: [id, tenantId], onDelete: Restrict)
   creator         Profile?                @relation("ImportBatchCreator", fields: [createdBy], references: [id], onDelete: SetNull)
   rows            ImportRow[]
+  validationAttempts ImportValidationAttempt[]
   candidates      FiscalCandidate[]
   inconsistencies FiscalInconsistency[]
 
@@ -335,6 +338,28 @@ model ImportRow {
   @@index([tenantId, importBatchId, status])
   @@index([tenantId, status])
   @@map("import_rows")
+}
+
+model ImportValidationAttempt {
+  id            String   @id @default(uuid()) @db.Uuid
+  tenantId      String   @db.Uuid
+  importBatchId String   @db.Uuid
+  parserVersion String
+  status        String
+  totalRows     Int      @default(0)
+  validRows     Int      @default(0)
+  invalidRows   Int      @default(0)
+  duplicateRows Int      @default(0)
+  createdBy     String?  @db.Uuid
+  correlationId String
+  errorsSummary Json?
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  importBatch   ImportBatch @relation(fields: [importBatchId, tenantId], references: [id, tenantId], onDelete: Cascade)
+
+  @@index([tenantId, importBatchId, createdAt])
+  @@index([tenantId, parserVersion, createdAt])
+  @@map("import_validation_attempts")
 }
 
 model FiscalCandidate {

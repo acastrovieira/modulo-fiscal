@@ -33,7 +33,7 @@ export type FiscalImportRowRecord = {
   id: string;
   tenantId: string;
   importBatchId: string;
-  status: "RECEIVED" | "NORMALIZED" | "REJECTED" | "CANDIDATE_CREATED";
+  status: "RECEIVED" | "NORMALIZED" | "REJECTED" | "QUARANTINED" | "CANDIDATE_CREATED";
   normalizedPayload: unknown;
 };
 

@@ -1,5 +1,6 @@
 import type { AuditRecorder } from "@/modules/audit/application/audit-service";
 import {
+  assertImportParserReplayAllowed,
   assertSupportedImportParserVersion,
   normalizeImportRow,
   type ImportParserVersion
@@ -20,7 +21,8 @@ export type ImportBatchStatus =
   | "READY_FOR_REVIEW"
   | "ARCHIVED";
 
-export type ImportRowStatus = "RECEIVED" | "NORMALIZED" | "REJECTED" | "CANDIDATE_CREATED";
+export type ImportRowStatus = "RECEIVED" | "NORMALIZED" | "REJECTED" | "QUARANTINED" | "CANDIDATE_CREATED";
+export type ImportValidationAttemptStatus = "SUCCEEDED" | "QUARANTINED";
 
 export type DocumentFileRecord = {
   id: string;
@@ -64,6 +66,22 @@ export type ImportRowCreateInput = {
   errorPayload?: unknown;
 };
 
+export type ImportValidationAttemptRecord = {
+  id: string;
+  tenantId: string;
+  importBatchId: string;
+  parserVersion: string;
+  status: ImportValidationAttemptStatus;
+  totalRows: number;
+  validRows: number;
+  invalidRows: number;
+  duplicateRows: number;
+  createdBy: string | null;
+  correlationId: string;
+  errorsSummary: unknown;
+  createdAt: Date;
+};
+
 export type ImportRepository = {
   findDocumentFileById(id: string): Promise<DocumentFileRecord | null>;
   findImportBatchById(id: string): Promise<ImportBatchRecord | null>;
@@ -86,7 +104,22 @@ export type ImportRepository = {
     invalidRows?: number;
     validatedAt?: Date;
   }): Promise<ImportBatchRecord>;
-  createImportRows(rows: ImportRowCreateInput[]): Promise<void>;
+  replaceImportRows(input: { importBatchId: string; tenantId: string; rows: ImportRowCreateInput[] }): Promise<void>;
+  countFiscalCandidatesByImportBatchId(importBatchId: string, tenantId: string): Promise<number>;
+  findLatestValidationAttempt(importBatchId: string, tenantId: string): Promise<ImportValidationAttemptRecord | null>;
+  createValidationAttempt(input: {
+    tenantId: string;
+    importBatchId: string;
+    parserVersion: string;
+    status: ImportValidationAttemptStatus;
+    totalRows: number;
+    validRows: number;
+    invalidRows: number;
+    duplicateRows: number;
+    createdBy: string | null;
+    correlationId: string;
+    errorsSummary?: unknown;
+  }): Promise<void>;
 };
 
 export type CreateImportFromDocumentInput = {
@@ -108,6 +141,23 @@ function ensureDocumentIsProcessable(documentFile: DocumentFileRecord): void {
   if (!documentFile.checksumSha256) {
     throw new ValidationError("Document file must have a checksum before import.");
   }
+}
+
+function canValidateImportStatus(status: ImportBatchStatus): boolean {
+  return ["PENDING_VALIDATION", "HAS_ERRORS", "VALIDATED", "READY_FOR_REVIEW"].includes(status);
+}
+
+function summarizeErrors(rows: ImportRowCreateInput[]): Array<{ rowNumber: number; message: string }> {
+  return rows
+    .filter((row) => row.status === "QUARANTINED")
+    .slice(0, 20)
+    .map((row) => {
+      const errorPayload = row.errorPayload as { message?: unknown } | undefined;
+      return {
+        rowNumber: row.rowNumber,
+        message: typeof errorPayload?.message === "string" ? errorPayload.message : "Invalid row"
+      };
+    });
 }
 
 export function createImportService(dependencies: { repository: ImportRepository; audit: AuditRecorder }) {
@@ -172,9 +222,20 @@ export function createImportService(dependencies: { repository: ImportRepository
 
       assertTenantScope(input.context.tenantId, importBatch);
 
-      if (importBatch.status !== "PENDING_VALIDATION") {
+      if (!canValidateImportStatus(importBatch.status)) {
         throw new InvalidStateError(`Import batch cannot be validated from ${importBatch.status}.`);
       }
+
+      const existingCandidates = await repository.countFiscalCandidatesByImportBatchId(importBatch.id, input.context.tenantId);
+      if (existingCandidates > 0) {
+        throw new InvalidStateError("Import batch with fiscal candidates cannot be replayed.");
+      }
+
+      const latestAttempt = await repository.findLatestValidationAttempt(importBatch.id, input.context.tenantId);
+      assertImportParserReplayAllowed({
+        latestParserVersion: latestAttempt?.parserVersion,
+        requestedParserVersion: parserVersion
+      });
 
       const validating = await repository.updateImportBatch({
         id: importBatch.id,
@@ -221,10 +282,11 @@ export function createImportService(dependencies: { repository: ImportRepository
             tenantId: input.context.tenantId,
             importBatchId: importBatch.id,
             rowNumber,
-            status: "REJECTED",
+            status: "QUARANTINED",
             rawPayload: row,
             errorPayload: {
               parserVersion,
+              quarantine: true,
               message: error instanceof Error ? error.message : "Invalid row"
             }
           });
@@ -232,11 +294,24 @@ export function createImportService(dependencies: { repository: ImportRepository
         }
       });
 
-      if (rows.length > 0) {
-        await repository.createImportRows(rows);
-      }
+      await repository.replaceImportRows({ importBatchId: importBatch.id, tenantId: input.context.tenantId, rows });
 
       const finalStatus: ImportBatchStatus = invalidRows > 0 ? "HAS_ERRORS" : validRows > 0 ? "READY_FOR_REVIEW" : "VALIDATED";
+      const attemptStatus: ImportValidationAttemptStatus = invalidRows > 0 ? "QUARANTINED" : "SUCCEEDED";
+      await repository.createValidationAttempt({
+        tenantId: input.context.tenantId,
+        importBatchId: importBatch.id,
+        parserVersion,
+        status: attemptStatus,
+        totalRows: input.rows.length,
+        validRows,
+        invalidRows,
+        duplicateRows,
+        createdBy: input.context.actorId,
+        correlationId: input.context.correlationId,
+        errorsSummary: summarizeErrors(rows)
+      });
+
       const finalized = await repository.updateImportBatch({
         id: importBatch.id,
         tenantId: input.context.tenantId,
@@ -259,7 +334,8 @@ export function createImportService(dependencies: { repository: ImportRepository
             validRows: finalized.validRows,
             invalidRows: finalized.invalidRows,
             duplicateRows,
-            parserVersion
+            parserVersion,
+            validationAttemptStatus: attemptStatus
           }
         })
       );

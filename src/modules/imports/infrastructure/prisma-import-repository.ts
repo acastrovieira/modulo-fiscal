@@ -1,5 +1,11 @@
 import type { Prisma } from "@prisma/client";
-import type { DocumentFileRecord, ImportBatchRecord, ImportRepository, ImportRowCreateInput } from "@/modules/imports/application/import-service";
+import type {
+  DocumentFileRecord,
+  ImportBatchRecord,
+  ImportRepository,
+  ImportRowCreateInput,
+  ImportValidationAttemptRecord
+} from "@/modules/imports/application/import-service";
 import type { ImportDetailRecord, ImportListRecord, ImportListStatus, ImportQueryRepository } from "@/modules/imports/application/import-queries";
 import { prisma } from "@/shared/database/prisma";
 
@@ -16,7 +22,7 @@ type ImportBatchDetail = ImportBatchWithDocument & {
     tenantId: string;
     rowNumber: number;
     sourceRowId: string | null;
-    status: "RECEIVED" | "NORMALIZED" | "REJECTED" | "CANDIDATE_CREATED";
+    status: "RECEIVED" | "NORMALIZED" | "REJECTED" | "QUARANTINED" | "CANDIDATE_CREATED";
     normalizedPayload: Prisma.JsonValue | null;
     errorPayload: Prisma.JsonValue | null;
   }>;
@@ -81,6 +87,38 @@ function jsonInput(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 }
 
+function toImportValidationAttemptRecord(attempt: {
+  id: string;
+  tenantId: string;
+  importBatchId: string;
+  parserVersion: string;
+  status: string;
+  totalRows: number;
+  validRows: number;
+  invalidRows: number;
+  duplicateRows: number;
+  createdBy: string | null;
+  correlationId: string;
+  errorsSummary: Prisma.JsonValue | null;
+  createdAt: Date;
+}): ImportValidationAttemptRecord {
+  return {
+    id: attempt.id,
+    tenantId: attempt.tenantId,
+    importBatchId: attempt.importBatchId,
+    parserVersion: attempt.parserVersion,
+    status: attempt.status as ImportValidationAttemptRecord["status"],
+    totalRows: attempt.totalRows,
+    validRows: attempt.validRows,
+    invalidRows: attempt.invalidRows,
+    duplicateRows: attempt.duplicateRows,
+    createdBy: attempt.createdBy,
+    correlationId: attempt.correlationId,
+    errorsSummary: attempt.errorsSummary,
+    createdAt: attempt.createdAt
+  };
+}
+
 export function createPrismaImportRepository(): ImportRepository & ImportQueryRepository {
   return {
     async findDocumentFileById(id: string): Promise<DocumentFileRecord | null> {
@@ -117,22 +155,56 @@ export function createPrismaImportRepository(): ImportRepository & ImportQueryRe
       return toImportBatchRecord(batch);
     },
 
-    async createImportRows(rows: ImportRowCreateInput[]): Promise<void> {
-      if (rows.length === 0) {
-        return;
-      }
+    async replaceImportRows(input): Promise<void> {
+      await prisma.$transaction(async (tx) => {
+        await tx.importRow.deleteMany({ where: { importBatchId: input.importBatchId, tenantId: input.tenantId } });
 
-      await prisma.importRow.createMany({
-        data: rows.map((row) => ({
-          tenantId: row.tenantId,
-          importBatchId: row.importBatchId,
-          rowNumber: row.rowNumber,
-          sourceRowId: row.sourceRowId ?? null,
-          status: row.status,
-          rawPayload: jsonInput(row.rawPayload),
-          normalizedPayload: row.normalizedPayload === undefined ? undefined : jsonInput(row.normalizedPayload),
-          errorPayload: row.errorPayload === undefined ? undefined : jsonInput(row.errorPayload)
-        }))
+        if (input.rows.length === 0) {
+          return;
+        }
+
+        await tx.importRow.createMany({
+          data: input.rows.map((row: ImportRowCreateInput) => ({
+            tenantId: row.tenantId,
+            importBatchId: row.importBatchId,
+            rowNumber: row.rowNumber,
+            sourceRowId: row.sourceRowId ?? null,
+            status: row.status,
+            rawPayload: jsonInput(row.rawPayload),
+            normalizedPayload: row.normalizedPayload === undefined ? undefined : jsonInput(row.normalizedPayload),
+            errorPayload: row.errorPayload === undefined ? undefined : jsonInput(row.errorPayload)
+          }))
+        });
+      });
+    },
+
+    async countFiscalCandidatesByImportBatchId(importBatchId: string, tenantId: string): Promise<number> {
+      return prisma.fiscalCandidate.count({ where: { importBatchId, tenantId } });
+    },
+
+    async findLatestValidationAttempt(importBatchId: string, tenantId: string): Promise<ImportValidationAttemptRecord | null> {
+      const attempt = await prisma.importValidationAttempt.findFirst({
+        where: { importBatchId, tenantId },
+        orderBy: { createdAt: "desc" }
+      });
+      return attempt ? toImportValidationAttemptRecord(attempt) : null;
+    },
+
+    async createValidationAttempt(input): Promise<void> {
+      await prisma.importValidationAttempt.create({
+        data: {
+          tenantId: input.tenantId,
+          importBatchId: input.importBatchId,
+          parserVersion: input.parserVersion,
+          status: input.status,
+          totalRows: input.totalRows,
+          validRows: input.validRows,
+          invalidRows: input.invalidRows,
+          duplicateRows: input.duplicateRows,
+          createdBy: input.createdBy,
+          correlationId: input.correlationId,
+          errorsSummary: input.errorsSummary === undefined ? undefined : jsonInput(input.errorsSummary)
+        }
       });
     },
 

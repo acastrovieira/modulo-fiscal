@@ -34,7 +34,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 30 | Command idempotency e transition ledger | Concluida | 100% | Comandos criticos idempotentes/auditaveis | Codex + @architect |
 | 31 | RBAC matrix e flow permissions | Concluida | 100% | Matriz papel/acao/estado validada | Codex + @architect + @qa |
 | 32 | Audit completeness e redaction | Concluida | 100% | Acoes criticas com auditoria segura | Codex + seguranca/LGPD + @qa |
-| 33 | Import replay, quarantine e parser governance | Planejada | 0% | Reprocessamento seguro de imports | Codex + @architect + @qa |
+| 33 | Import replay, quarantine e parser governance | Concluida | 100% | Reprocessamento seguro de imports | Codex + @architect + @qa |
 | 34 | Candidate review workbench hardening | Planejada | 0% | Revisao humana robusta e rastreavel | Codex + Gemini + @qa |
 | 35 | Batch snapshot e concurrency guards | Planejada | 0% | Lotes com snapshot, lock e revalidacao | Codex + @architect + @qa |
 | 36 | Tenant isolation e abuse testing | Planejada | 0% | Zero vazamento cross-tenant | Codex + seguranca/LGPD + @qa |
@@ -600,17 +600,17 @@ Gate:
 ## 34. Sprint 33 - Import Replay, Quarantine e Parser Governance
 Objetivo: tornar imports problematicos reprocessaveis sem perder rastreabilidade.
 
-Tarefas planejadas:
-- [ ] Definir estado operacional de quarentena para linhas/importacoes invalidas.
-- [ ] Permitir revalidacao com o mesmo parser versionado.
-- [ ] Registrar historico de tentativas de validacao.
-- [ ] Bloquear parser desconhecido ou downgrade nao aprovado.
-- [ ] Documentar governanca para futuras versoes do parser.
-- [ ] Testar payload malicioso, duplicidade, datas invalidas, valores invalidos e campos proibidos.
+Tarefas concluidas:
+- [x] Definir estado operacional de quarentena para linhas/importacoes invalidas.
+- [x] Permitir revalidacao com o mesmo parser versionado.
+- [x] Registrar historico de tentativas de validacao.
+- [x] Bloquear parser desconhecido ou downgrade nao aprovado.
+- [x] Documentar governanca para futuras versoes do parser.
+- [x] Testar payload malicioso, duplicidade, datas invalidas, valores invalidos e campos proibidos.
 
 Gate:
-- [ ] Import invalido falha fechado.
-- [ ] Reprocessamento preserva auditoria e nao cria candidatos duplicados silenciosamente.
+- [x] Import invalido falha fechado.
+- [x] Reprocessamento preserva auditoria e nao cria candidatos duplicados silenciosamente.
 
 ## 35. Sprint 34 - Candidate Review Workbench Hardening
 Objetivo: fortalecer a revisao humana antes de lote.
