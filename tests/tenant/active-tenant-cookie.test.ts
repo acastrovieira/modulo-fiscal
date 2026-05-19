@@ -1,7 +1,11 @@
-﻿import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createActiveTenantCookieOptions, createExpiredActiveTenantCookieOptions, parseRequestedTenantId } from "@/shared/auth/active-tenant";
 
 describe("active tenant cookie", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("accepts only uuid tenant ids", () => {
     expect(parseRequestedTenantId("11111111-1111-4111-8111-111111111111")).toBe("11111111-1111-4111-8111-111111111111");
     expect(parseRequestedTenantId("not-a-tenant")).toBeUndefined();
@@ -12,6 +16,14 @@ describe("active tenant cookie", () => {
 
     expect(options).toMatchObject({ httpOnly: true, sameSite: "lax", path: "/" });
     expect(options.maxAge).toBeGreaterThan(0);
+  });
+
+  it("uses secure cookies in production only", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    expect(createActiveTenantCookieOptions().secure).toBe(true);
+
+    vi.stubEnv("NODE_ENV", "development");
+    expect(createActiveTenantCookieOptions().secure).toBe(false);
   });
 
   it("clears active tenant with the same hardened cookie scope", () => {

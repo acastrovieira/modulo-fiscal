@@ -53,4 +53,18 @@ describe("tenant session service", () => {
 
     await expect(service.switchActiveTenant({ userId: "user-1", targetTenantId: "22222222-2222-4222-8222-222222222222" })).rejects.toBeInstanceOf(ForbiddenError);
   });
+
+  it("blocks tenant switch when the target tenant is inactive", async () => {
+    const service = createTenantSessionService(makeRepository({
+      async findActiveMembership() {
+        return {
+          tenantId: "11111111-1111-4111-8111-111111111111",
+          role: "OWNER",
+          tenant: { id: "11111111-1111-4111-8111-111111111111", name: "Clinica A", legalName: null, status: "SUSPENDED" }
+        };
+      }
+    }));
+
+    await expect(service.switchActiveTenant({ userId: "user-1", targetTenantId: "11111111-1111-4111-8111-111111111111" })).rejects.toBeInstanceOf(ForbiddenError);
+  });
 });

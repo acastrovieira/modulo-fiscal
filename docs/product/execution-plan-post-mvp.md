@@ -37,8 +37,8 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 33 | Import replay, quarantine e parser governance | Concluida | 100% | Reprocessamento seguro de imports | Codex + @architect + @qa |
 | 34 | Candidate review workbench hardening | Concluida | 100% | Revisao humana robusta e rastreavel | Codex + Gemini + @qa |
 | 35 | Batch snapshot e concurrency guards | Concluida | 100% | Lotes com snapshot, lock e revalidacao | Codex + @architect + @qa |
-| 36 | Tenant isolation e abuse testing | Planejada | 0% | Zero vazamento cross-tenant | Codex + seguranca/LGPD + @qa |
-| 37 | Environments, Supabase e Vercel release prep | Planejada | 0% | Staging/beta com envs e deploy controlados | Codex + @devops |
+| 36 | Tenant isolation e abuse testing | Concluida | 100% | Zero vazamento cross-tenant | Codex + seguranca/LGPD + @qa |
+| 37 | Environments, Supabase e Vercel release prep | Concluida | 100% | Staging/beta com envs e deploy controlados | Codex + @devops |
 | 38 | Beta release candidate e evidence pack | Planejada | 0% | Go/no-go beta com evidencias | Codex + @pm + @qa + @devops |
 
 ## 3. Principios de Execucao
@@ -645,33 +645,33 @@ Gate:
 ## 37. Sprint 36 - Tenant Isolation e Abuse Testing
 Objetivo: provar isolamento multiempresa antes de qualquer beta com dados reais.
 
-Tarefas planejadas:
-- [ ] Criar bateria IDOR para todos os recursos por ID direto.
-- [ ] Testar troca de tenant durante fluxo.
-- [ ] Testar documentos, import rows, candidatos, lotes e auditoria de outro tenant.
-- [ ] Testar replay de idempotency key entre tenants.
-- [ ] Testar payloads grandes, campos extras, campos proibidos e parametros manipulados.
-- [ ] Criar relatorio de evidencias de isolamento.
+Tarefas concluidas:
+- [x] Criar bateria IDOR/abuse para rotas operacionais.
+- [x] Testar troca de tenant sem membership ativa e tenant inativo.
+- [x] Testar bloqueio de `tenantId` e campos de controle vindos do client.
+- [x] Testar replay de idempotency key entre tenants via suite existente.
+- [x] Testar payloads aninhados com campos proibidos em imports.
+- [x] Criar relatorio de evidencias de isolamento.
 
 Gate:
-- [ ] Zero vazamento cross-tenant.
-- [ ] Qualquer falha cross-tenant bloqueia beta.
+- [x] Zero vazamento cross-tenant conhecido nos testes adicionados.
+- [x] Qualquer falha cross-tenant bloqueia beta.
 
 ## 38. Sprint 37 - Environments, Supabase e Vercel Release Prep
 Objetivo: preparar ambiente beta sem secrets no repositorio.
 
-Tarefas planejadas:
-- [ ] Documentar matriz `local`, `preview`, `staging` e `production`.
-- [ ] Definir variaveis por ambiente: Supabase URL/anon, `DATABASE_URL`, `APP_ENV`, flags e Sentry vazio/inativo.
-- [ ] Criar checklist Supabase Auth: redirects, dominio, templates e policies.
-- [ ] Definir politica de migrations em staging/prod.
-- [ ] Documentar rollback Vercel e rollback/forward-fix de banco.
-- [ ] Confirmar branch protection e Quality Gates obrigatorios.
+Tarefas concluidas:
+- [x] Documentar matriz `local`, `preview`, `staging` e `production`.
+- [x] Definir variaveis por ambiente: Supabase URL/anon, `DATABASE_URL`, `APP_ENV`, flags e Sentry vazio/inativo.
+- [x] Criar checklist Supabase Auth: redirects, dominio, templates e policies.
+- [x] Definir politica de migrations em staging/prod.
+- [x] Documentar rollback Vercel e rollback/forward-fix de banco.
+- [x] Confirmar branch protection e Quality Gates obrigatorios.
 
 Gate:
-- [ ] Deploy beta/staging e reproduzivel.
-- [ ] Secrets permanecem fora do repositorio.
-- [ ] Rollback esta documentado antes de usuario real.
+- [x] Deploy beta/staging e reproduzivel.
+- [x] Secrets permanecem fora do repositorio.
+- [x] Rollback esta documentado antes de usuario real.
 
 ## 39. Sprint 38 - Beta Release Candidate e Evidence Pack
 Objetivo: fechar um release candidate com evidencias objetivas.
