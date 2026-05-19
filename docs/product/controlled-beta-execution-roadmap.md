@@ -1,0 +1,191 @@
+# Controlled Beta Execution Roadmap - Sprints 40-47
+
+## Status
+Sprint 39 is merged into `main`. The project is ready to prepare a controlled staging/beta environment, but real beta usage remains blocked until owners, tenants, users, deployment and two-tenant smoke evidence are complete.
+
+## Dashboard
+| Sprint | Name | Status | Main gate |
+| --- | --- | --- | --- |
+| 40 | Staging/Beta Environment Activation | Next | Environment URL, login and healthcheck work without secrets in repo |
+| 41 | Beta Users, Roles and Tenant Setup | Planned | Approved users can authenticate with least-privilege roles |
+| 42 | Two-Tenant Smoke Test | Planned | Full journey passes with cross-tenant access blocked |
+| 43 | UX/Test Feedback Hardening | Planned | No P0/P1 and beta-facing UX is usable |
+| 44 | Pilot Go/No-Go Pack | Planned | Formal decision recorded with evidence |
+| 45 | Controlled Pilot Run | Planned | 1-3 tenants complete pilot without critical incident |
+| 46 | Pilot Findings and Stabilization | Planned | Pilot findings triaged, fixed or converted into backlog |
+| 47 | PRD Fiscal Real / Homologation | Future | No real fiscal implementation without PRD, ADR and approval |
+
+## Sprint 40 - Staging/Beta Environment Activation
+Objective: activate a real test environment without committing secrets.
+
+Checklist:
+- [ ] Choose target environment: Vercel Preview, Staging or Beta.
+- [ ] Link the correct Vercel project to `modulo-fiscal`.
+- [ ] Configure provider-side environment variables for database, Supabase and app environment.
+- [ ] Keep real fiscal feature flags disabled.
+- [ ] Configure Supabase Auth URLs, callback, site URL, templates and authorized domain.
+- [ ] Apply staging/beta database migrations.
+- [ ] Run safe demo seed only if the environment is demo.
+- [ ] Confirm `/api/health`, `/login` and authenticated `/dashboard`.
+
+Gate:
+- [ ] Environment is accessible.
+- [ ] Login works.
+- [ ] No secrets are versioned.
+- [ ] No real fiscal feature is enabled.
+
+Recommended squad: Codex, @devops and Security/LGPD.
+
+## Sprint 41 - Beta Users, Roles and Tenant Setup
+Objective: prepare controlled test access with least privilege.
+
+Checklist:
+- [ ] Name product owner, engineering owner, support owner and optional QA owner.
+- [ ] Approve 1-3 beta tenants outside the repository.
+- [ ] Approve beta users outside the repository.
+- [ ] Assign roles by least privilege.
+- [ ] Create or validate memberships.
+- [ ] Validate tenant switch.
+- [ ] Confirm users without membership cannot access the dashboard.
+- [ ] Confirm suspended users cannot access the tenant.
+- [ ] Record evidence in `docs/product/beta-pilot-evidence-log.md`.
+
+Gate:
+- [ ] Users authenticate.
+- [ ] Roles are coherent.
+- [ ] No user sees the wrong tenant.
+
+Recommended squad: Codex, @qa and Security/LGPD.
+
+## Sprint 42 - Two-Tenant Smoke Test
+Objective: prove the full beta journey with two tenants.
+
+Checklist:
+- [ ] Run Tenant A journey: login, dashboard, imports, candidates, inconsistencies, batches, audit and documents.
+- [ ] Run Tenant B journey with the same route list.
+- [ ] Try direct Tenant A resource URLs while Tenant B is active.
+- [ ] Confirm blocked access does not enumerate resources.
+- [ ] Confirm sensitive data is masked.
+- [ ] Confirm no UI or API implies real NFS-e issuance.
+- [ ] Capture screenshots without personal data.
+- [ ] Record CI URL, deploy URL, commit hash and smoke evidence.
+
+Gate:
+- [ ] Happy path works.
+- [ ] Cross-tenant access is blocked.
+- [ ] Audit, logs and DTOs do not leak sensitive data.
+
+Recommended squad: @qa, Codex and Security/LGPD.
+
+## Sprint 43 - UX/Test Feedback Hardening
+Objective: fix smoke-test friction before inviting pilot users.
+
+Checklist:
+- [ ] Review login and session errors.
+- [ ] Improve empty, loading and error states.
+- [ ] Review permission denied messages.
+- [ ] Adjust copy that could imply real issuance.
+- [ ] Review cockpit responsiveness.
+- [ ] Fix smoke-test bugs.
+- [ ] Run full regression gates.
+- [ ] Update pilot evidence log.
+
+Gate:
+- [ ] No open P0/P1.
+- [ ] Minimum beta UX is ready for accompanied users.
+
+Recommended squad: Gemini, Codex and @qa.
+
+## Sprint 44 - Pilot Go/No-Go Pack
+Objective: make the official pilot decision.
+
+Checklist:
+- [ ] Consolidate commit hash, CI URL, deploy URL, smoke result and safe screenshots.
+- [ ] Review accepted and blocking risks.
+- [ ] Confirm owners and rollback owner.
+- [ ] Confirm pilot window.
+- [ ] Record GO, NO-GO or GO with restrictions.
+- [ ] Convert blockers into the next sprint if NO-GO.
+
+Gate:
+- [ ] Decision is recorded.
+- [ ] No known P0/P1 remains open.
+
+Recommended squad: @pm, @po, @qa, @devops and Codex.
+
+## Sprint 45 - Controlled Pilot Run
+Objective: run the accompanied pilot with 1-3 tenants.
+
+Checklist:
+- [ ] Open access only to approved users.
+- [ ] Monitor login, tenant switch and cockpit usage.
+- [ ] Record user feedback.
+- [ ] Triage bugs by severity.
+- [ ] Watch audit and critical events.
+- [ ] Confirm no flow attempts real fiscal issuance.
+- [ ] Run short daily pilot checks.
+- [ ] Close the pilot window with a report.
+
+Gate:
+- [ ] Pilot completes without critical incident.
+- [ ] Feedback is collected and prioritized.
+
+Recommended squad: @pm/@po, @qa, Codex and @devops.
+
+## Sprint 46 - Pilot Findings and Stabilization
+Objective: stabilize the product after pilot feedback.
+
+Checklist:
+- [ ] Classify findings as P0/P1, P2 or P3.
+- [ ] Fix critical bugs.
+- [ ] Improve confusing flows.
+- [ ] Add or improve tests where failures occurred.
+- [ ] Update runbooks.
+- [ ] Update PRD/backlog with learnings.
+- [ ] Run full gates.
+- [ ] Create post-pilot release candidate.
+
+Gate:
+- [ ] No P0/P1 remains open.
+- [ ] Product is ready for the next beta cycle or expansion.
+
+Recommended squad: Codex, @qa and Gemini for UX changes.
+
+## Sprint 47 - PRD Fiscal Real / Homologation
+Objective: plan real fiscal homologation only after the supervised beta is stable.
+
+Checklist:
+- [ ] Create a PRD for real NFS-e issuance.
+- [ ] Create ADR for municipal provider/NFS-e adapter.
+- [ ] Define homologation scope.
+- [ ] Define certificate policy.
+- [ ] Define municipal sandbox/homologation approach.
+- [ ] Define real issuance idempotency.
+- [ ] Define rollback and fiscal contingency.
+- [ ] Define legal/accounting responsibilities.
+- [ ] Define tests with accountant or fiscal specialist.
+- [ ] Plan implementation only after explicit approval.
+
+Gate:
+- [ ] No real fiscal implementation starts without PRD, ADR, homologation and approval.
+
+Recommended squad: @pm, @po, @architect, Security/LGPD, fiscal specialist and Codex.
+
+## Global Gates
+- [ ] `npm run lint`
+- [ ] `npm run typecheck`
+- [ ] `npm test`
+- [ ] `npm run security:secrets`
+- [ ] `npx prisma validate`
+- [ ] `npm run build`
+- [ ] Two-tenant smoke before real beta usage.
+- [ ] Rollback documented before real beta usage.
+
+## Non-Negotiable Scope Guards
+- No real NFS-e issuance before Sprint 47 approval.
+- No scraping.
+- No municipal provider integration.
+- No certificate usage.
+- No fiscal queue or external fiscal job execution.
+- No real personal data in screenshots, logs or repository docs.
+
