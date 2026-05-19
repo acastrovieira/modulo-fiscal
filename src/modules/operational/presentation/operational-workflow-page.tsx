@@ -16,6 +16,7 @@ type Config = { title: string; eyebrow: string; helper: string; endpoint: string
 function asText(value: unknown): string { return value === null || value === undefined || value === "" ? "-" : String(value); }
 function asDate(value: unknown): string { if (!value) return "-"; return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(String(value))); }
 function asMoney(value: unknown): string { if (!value) return "-"; const cents = Number(value); if (!Number.isFinite(cents)) return String(value); return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100); }
+function asList(value: unknown): string { return Array.isArray(value) && value.length > 0 ? value.map(String).join(", ") : "-"; }
 function toneForStatus(value: unknown): "neutral" | "attention" | "critical" | "success" { const status = String(value ?? ""); if (["BLOCKED", "HAS_ERRORS", "OPEN", "CANCELLED"].includes(status)) return "critical"; if (["NEEDS_REVIEW", "READY_FOR_REVIEW", "IN_REVIEW", "SIMULATED", "DRAFT"].includes(status)) return "attention"; if (["READY_FOR_BATCH", "APPROVED_FOR_FUTURE_ISSUANCE", "RESOLVED", "WAIVED", "VALIDATED"].includes(status)) return "success"; return "neutral"; }
 function statusCell(row: Record<string, unknown>) { return <StatusBadge tone={toneForStatus(row.status)}>{asText(row.status)}</StatusBadge>; }
 function summaryGroup(row: Record<string, unknown>): string { return asText(row.status ?? row.eventType ?? row.fileType ?? "registros"); }
@@ -55,9 +56,11 @@ const configs: Record<ResourceKind, Config> = {
       { key: "status", label: "Status", render: statusCell },
       { key: "grossAmountCents", label: "Valor", render: (row) => asMoney(row.grossAmountCents) },
       { key: "serviceDate", label: "Servico" },
+      { key: "reviewBlockReasons", label: "Bloqueios", render: (row) => asList(row.reviewBlockReasons) },
+      { key: "reviewWarnings", label: "Warnings", render: (row) => asList(row.reviewWarnings) },
       { key: "openInconsistenciesCount", label: "Pendencias" }
     ],
-    guardrails: ["Documento sempre mascarado", "Fingerprint fiscal nao exposto", "Bloqueantes impedem lote"]
+    guardrails: ["Documento sempre mascarado", "Justificativa obrigatoria para liberar", "Motivo de bloqueio preservado"]
   },
   inconsistencies: {
     title: "Inconsistencias abertas",

@@ -10,7 +10,9 @@ export const fiscalCandidateStatusSchema = z.enum([
   "APPROVED_FOR_FUTURE_ISSUANCE"
 ]);
 
-export const readyForBatchRequestSchema = z.object({}).strict();
+export const readyForBatchRequestSchema = z.object({
+  reviewJustification: z.string().trim().min(12).max(500)
+}).strict();
 
 export function parseFiscalCandidateStatus(value: string | null) {
   if (!value) {

@@ -25,6 +25,9 @@ function makeCandidate(overrides: Partial<FiscalCandidateRecord> = {}): FiscalCa
     status: "NEEDS_REVIEW",
     fiscalFingerprintVersion: "v1",
     fiscalFingerprint: "fingerprint-1",
+    reviewBlockReasons: [],
+    reviewWarnings: [],
+    reviewJustification: null,
     reviewedBy: null,
     reviewedAt: null,
     ...overrides

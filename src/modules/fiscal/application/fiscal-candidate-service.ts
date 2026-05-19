@@ -1,5 +1,13 @@
 import type { AuditRecorder } from "@/modules/audit/application/audit-service";
-import { canMarkCandidateReadyForBatch, evaluateFiscalCandidateReviewGate, type FiscalCandidateStatus } from "@/modules/fiscal/domain/fiscal-candidate";
+import {
+  canMarkCandidateReadyForBatch,
+  evaluateFiscalCandidateReviewGate,
+  isReviewJustificationValid,
+  normalizeReviewJustification,
+  type FiscalCandidateReviewBlockReason,
+  type FiscalCandidateReviewWarning,
+  type FiscalCandidateStatus
+} from "@/modules/fiscal/domain/fiscal-candidate";
 import { createFiscalFingerprint, FISCAL_FINGERPRINT_VERSION } from "@/modules/fiscal/domain/fiscal-fingerprint";
 import { maskBrazilianDocument } from "@/modules/fiscal/domain/masking";
 import {
@@ -52,6 +60,9 @@ export type FiscalCandidateRecord = {
   status: FiscalCandidateStatus;
   fiscalFingerprintVersion: string;
   fiscalFingerprint: string;
+  reviewBlockReasons: FiscalCandidateReviewBlockReason[];
+  reviewWarnings: FiscalCandidateReviewWarning[];
+  reviewJustification: string | null;
   reviewedBy: string | null;
   reviewedAt: Date | null;
 };
@@ -70,6 +81,8 @@ export type CreateFiscalCandidateInput = {
   status: FiscalCandidateStatus;
   fiscalFingerprintVersion: string;
   fiscalFingerprint: string;
+  reviewBlockReasons: FiscalCandidateReviewBlockReason[];
+  reviewWarnings: FiscalCandidateReviewWarning[];
 };
 
 export type FiscalCandidateRepository = {
@@ -86,6 +99,7 @@ export type FiscalCandidateRepository = {
     status: FiscalCandidateStatus;
     reviewedBy?: string;
     reviewedAt?: Date;
+    reviewJustification?: string;
   }): Promise<FiscalCandidateRecord>;
 };
 
@@ -97,6 +111,7 @@ export type CreateFiscalCandidatesFromImportInput = {
 export type MarkCandidateReadyForBatchInput = {
   context: CommandContext;
   candidateId: string;
+  reviewJustification: string;
   now?: Date;
   idempotencyKey?: string | null;
 };
@@ -248,7 +263,9 @@ export function createFiscalCandidateService(dependencies: {
           grossAmountCents,
           status: reviewGate.initialStatus,
           fiscalFingerprintVersion: FISCAL_FINGERPRINT_VERSION,
-          fiscalFingerprint: fingerprint
+          fiscalFingerprint: fingerprint,
+          reviewBlockReasons: reviewGate.blockedReasons,
+          reviewWarnings: reviewGate.warnings
         });
 
         await repository.markImportRowCandidateCreated(row.id, input.context.tenantId);
@@ -281,7 +298,10 @@ export function createFiscalCandidateService(dependencies: {
         context: input.context,
         operation: "fiscal_candidate.mark_ready",
         idempotencyKey: input.idempotencyKey,
-        requestPayload: { candidateId: input.candidateId },
+        requestPayload: {
+          candidateId: input.candidateId,
+          reviewJustification: normalizeReviewJustification(input.reviewJustification)
+        },
         repository: idempotencyRepository,
         loadExisting: (candidateId) => loadCandidateForReplay(input.context, candidateId),
         getResponseRef: (candidate) => candidate.id,
@@ -297,6 +317,11 @@ export function createFiscalCandidateService(dependencies: {
             throw new InvalidStateError(`Cannot mark fiscal candidate as ready from ${candidate.status}.`);
           }
 
+          const reviewJustification = normalizeReviewJustification(input.reviewJustification);
+          if (!isReviewJustificationValid(reviewJustification)) {
+            throw new InvalidStateError("Review justification is required before marking a fiscal candidate as ready.");
+          }
+
           const openBlockingInconsistencies = await repository.countOpenBlockingInconsistenciesByCandidateId(
             candidate.id,
             input.context.tenantId
@@ -310,7 +335,8 @@ export function createFiscalCandidateService(dependencies: {
             tenantId: input.context.tenantId,
             status: "READY_FOR_BATCH",
             reviewedBy: input.context.actorId,
-            reviewedAt: input.now ?? new Date()
+            reviewedAt: input.now ?? new Date(),
+            reviewJustification
           });
 
           await audit.record(
@@ -318,8 +344,19 @@ export function createFiscalCandidateService(dependencies: {
               eventType: "fiscal_candidate.marked_ready",
               entityType: "FiscalCandidate",
               entityId: updated.id,
-              beforePayload: { status: candidate.status },
-              afterPayload: { status: updated.status, reviewedBy: updated.reviewedBy, reviewedAt: updated.reviewedAt }
+              beforePayload: {
+                status: candidate.status,
+                reviewBlockReasons: candidate.reviewBlockReasons,
+                reviewWarnings: candidate.reviewWarnings
+              },
+              afterPayload: {
+                status: updated.status,
+                reviewedBy: updated.reviewedBy,
+                reviewedAt: updated.reviewedAt,
+                reviewJustification: updated.reviewJustification,
+                reviewBlockReasons: updated.reviewBlockReasons,
+                reviewWarnings: updated.reviewWarnings
+              }
             })
           );
 

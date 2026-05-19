@@ -1,4 +1,4 @@
-import type { FiscalCandidateStatus } from "@/modules/fiscal/domain/fiscal-candidate";
+import type { FiscalCandidateReviewBlockReason, FiscalCandidateReviewWarning, FiscalCandidateStatus } from "@/modules/fiscal/domain/fiscal-candidate";
 import { assertCommandPermission, type CommandContext } from "@/shared/application/command-context";
 import { NotFoundError } from "@/shared/errors/application-error";
 import { assertTenantScope } from "@/shared/security/tenant-scope";
@@ -17,6 +17,9 @@ export type FiscalCandidateListRecord = {
   grossAmountCents: bigint | null;
   status: FiscalCandidateStatus;
   fiscalFingerprintVersion: string;
+  reviewBlockReasons: FiscalCandidateReviewBlockReason[];
+  reviewWarnings: FiscalCandidateReviewWarning[];
+  reviewJustification: string | null;
   reviewedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -52,6 +55,9 @@ export type CandidateListItemDTO = {
   grossAmountCents: string | null;
   status: FiscalCandidateStatus;
   fiscalFingerprintVersion: string;
+  reviewBlockReasons: FiscalCandidateReviewBlockReason[];
+  reviewWarnings: FiscalCandidateReviewWarning[];
+  reviewJustification: string | null;
   reviewedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -98,6 +104,9 @@ export function toCandidateListItemDTO(record: FiscalCandidateListRecord): Candi
     grossAmountCents: record.grossAmountCents?.toString() ?? null,
     status: record.status,
     fiscalFingerprintVersion: record.fiscalFingerprintVersion,
+    reviewBlockReasons: record.reviewBlockReasons,
+    reviewWarnings: record.reviewWarnings,
+    reviewJustification: record.reviewJustification,
     reviewedAt: record.reviewedAt?.toISOString() ?? null,
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),

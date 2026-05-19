@@ -27,6 +27,9 @@ function makeCandidate(overrides: Partial<FiscalCandidateRecord> = {}): FiscalCa
     status: "READY_FOR_BATCH",
     fiscalFingerprintVersion: "v1",
     fiscalFingerprint: "fingerprint-1",
+    reviewBlockReasons: [],
+    reviewWarnings: [],
+    reviewJustification: "Conferencia humana concluida",
     reviewedBy: userAId,
     reviewedAt: new Date("2026-05-13T12:00:00.000Z"),
     ...overrides

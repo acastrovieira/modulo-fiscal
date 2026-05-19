@@ -26,6 +26,9 @@ function makeCandidate(overrides: Record<string, unknown> = {}) {
     grossAmountCents: 12990n,
     status: "NEEDS_REVIEW",
     fiscalFingerprintVersion: "v1",
+    reviewBlockReasons: ["MISSING_OR_INVALID_AMOUNT"],
+    reviewWarnings: ["RAW_CUSTOMER_DOCUMENT_RECEIVED"],
+    reviewJustification: null,
     reviewedAt: null,
     createdAt: new Date("2026-05-01T10:00:00.000Z"),
     updatedAt: new Date("2026-05-01T10:10:00.000Z"),
@@ -66,6 +69,8 @@ describe("candidates API query contracts", () => {
     expect(repository.listCandidates).toHaveBeenCalledWith({ tenantId: "tenant-1", status: "NEEDS_REVIEW", importBatchId: "import-1" });
     expect(item.grossAmountCents).toBe("12990");
     expect(item.customerDocumentMasked).toBe("*******1234");
+    expect(item.reviewBlockReasons).toEqual(["MISSING_OR_INVALID_AMOUNT"]);
+    expect(item.reviewWarnings).toEqual(["RAW_CUSTOMER_DOCUMENT_RECEIVED"]);
     expect(item).not.toHaveProperty("tenantId");
     expect(item).not.toHaveProperty("fiscalFingerprint");
   });
@@ -95,5 +100,6 @@ describe("candidates API query contracts", () => {
     });
     expect(detail.inconsistencies[0]).not.toHaveProperty("tenantId");
     expect(detail).not.toHaveProperty("fiscalFingerprint");
+    expect(detail.reviewJustification).toBeNull();
   });
 });

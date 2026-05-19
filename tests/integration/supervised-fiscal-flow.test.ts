@@ -188,6 +188,9 @@ class InMemoryFiscalWorkflowRepository implements ImportRepository, FiscalCandid
       status: input.status,
       fiscalFingerprintVersion: input.fiscalFingerprintVersion,
       fiscalFingerprint: input.fiscalFingerprint,
+      reviewBlockReasons: input.reviewBlockReasons,
+      reviewWarnings: input.reviewWarnings,
+      reviewJustification: null,
       reviewedBy: null,
       reviewedAt: null
     };
@@ -219,8 +222,9 @@ class InMemoryFiscalWorkflowRepository implements ImportRepository, FiscalCandid
     status: FiscalCandidateStatus;
     reviewedBy?: string;
     reviewedAt?: Date;
+    reviewJustification?: string;
   }): Promise<FiscalCandidateRecord> {
-    return this.updateCandidateStatus(input.id, input.tenantId, input.status, input.reviewedBy, input.reviewedAt);
+    return this.updateCandidateStatus(input.id, input.tenantId, input.status, input.reviewedBy, input.reviewedAt, input.reviewJustification);
   }
 
   async findImportRowById(id: string): Promise<FiscalImportRowRecord | null> {
@@ -273,13 +277,20 @@ class InMemoryFiscalWorkflowRepository implements ImportRepository, FiscalCandid
     tenantId: string,
     status: FiscalCandidateStatus,
     reviewedBy: string | null = null,
-    reviewedAt: Date | null = null
+    reviewedAt: Date | null = null,
+    reviewJustification: string | null = null
   ): Promise<FiscalCandidateRecord> {
     const current = this.candidates.get(candidateId);
     if (!current || current.tenantId !== tenantId) {
       throw new TenantScopeError();
     }
-    const updated = { ...current, status, reviewedBy: reviewedBy ?? current.reviewedBy, reviewedAt: reviewedAt ?? current.reviewedAt };
+    const updated = {
+      ...current,
+      status,
+      reviewedBy: reviewedBy ?? current.reviewedBy,
+      reviewedAt: reviewedAt ?? current.reviewedAt,
+      reviewJustification: reviewJustification ?? current.reviewJustification
+    };
     this.candidates.set(updated.id, updated);
     return updated;
   }
@@ -404,7 +415,11 @@ describe("supervised fiscal MVP regression", () => {
       inconsistencyId: blocking.id,
       resolutionNote: "Dados conferidos com documento de origem."
     });
-    await candidateService.markCandidateReadyForBatch({ context: makeCommandContext("FISCAL_MANAGER"), candidateId: candidate.id });
+    await candidateService.markCandidateReadyForBatch({
+      context: makeCommandContext("FISCAL_MANAGER"),
+      candidateId: candidate.id,
+      reviewJustification: "Conferencia humana concluida no fluxo supervisionado."
+    });
 
     const batch = await batchService.createFiscalBatch({
       context: makeCommandContext("FISCAL_OPERATOR"),

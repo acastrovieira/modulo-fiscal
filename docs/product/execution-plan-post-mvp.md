@@ -35,7 +35,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 31 | RBAC matrix e flow permissions | Concluida | 100% | Matriz papel/acao/estado validada | Codex + @architect + @qa |
 | 32 | Audit completeness e redaction | Concluida | 100% | Acoes criticas com auditoria segura | Codex + seguranca/LGPD + @qa |
 | 33 | Import replay, quarantine e parser governance | Concluida | 100% | Reprocessamento seguro de imports | Codex + @architect + @qa |
-| 34 | Candidate review workbench hardening | Planejada | 0% | Revisao humana robusta e rastreavel | Codex + Gemini + @qa |
+| 34 | Candidate review workbench hardening | Concluida | 100% | Revisao humana robusta e rastreavel | Codex + Gemini + @qa |
 | 35 | Batch snapshot e concurrency guards | Planejada | 0% | Lotes com snapshot, lock e revalidacao | Codex + @architect + @qa |
 | 36 | Tenant isolation e abuse testing | Planejada | 0% | Zero vazamento cross-tenant | Codex + seguranca/LGPD + @qa |
 | 37 | Environments, Supabase e Vercel release prep | Planejada | 0% | Staging/beta com envs e deploy controlados | Codex + @devops |
@@ -615,17 +615,17 @@ Gate:
 ## 35. Sprint 34 - Candidate Review Workbench Hardening
 Objetivo: fortalecer a revisao humana antes de lote.
 
-Tarefas planejadas:
-- [ ] Exibir motivos de bloqueio e warnings LGPD no detalhe do candidato.
-- [ ] Permitir correcao/justificativa supervisionada sem CRUD generico.
-- [ ] Exigir justificativa para liberar candidato bloqueado quando aplicavel.
-- [ ] Adicionar limites para acoes em massa, se houver bulk review.
-- [ ] Garantir auditoria de reviewer, timestamp, motivo e estado anterior/posterior.
-- [ ] Realizar revisao visual com Gemini para UX densa e clara.
+Tarefas concluidas:
+- [x] Exibir motivos de bloqueio e warnings LGPD seguros no candidato.
+- [x] Permitir justificativa supervisionada sem CRUD generico.
+- [x] Exigir justificativa para liberar candidato para lote.
+- [x] Documentar que acoes em massa permanecem fora ate existir limite e auditoria por item.
+- [x] Garantir auditoria de reviewer, timestamp, motivo e estado anterior/posterior.
+- [x] Reforcar UX operacional densa na fila de candidatos.
 
 Gate:
-- [ ] Candidato so vira `READY_FOR_BATCH` por fluxo humano auditavel.
-- [ ] Motivo de bloqueio nunca e perdido.
+- [x] Candidato so vira `READY_FOR_BATCH` por fluxo humano auditavel.
+- [x] Motivo de bloqueio nunca e perdido.
 
 ## 36. Sprint 35 - Batch Snapshot e Concurrency Guards
 Objetivo: endurecer lotes contra corrida, mutacao posterior e inconsistencia de totais.
