@@ -29,6 +29,18 @@ export type FiscalBatchItem = {
   candidateId: string;
   status: FiscalBatchItemStatus;
   grossAmountCents: bigint;
+  candidateSnapshot: FiscalBatchCandidateSnapshot;
+};
+
+export type FiscalBatchCandidateSnapshot = {
+  customerName: string | null;
+  customerDocumentMasked: string | null;
+  serviceDate: string | null;
+  competenceDate: string | null;
+  serviceDescription: string | null;
+  grossAmountCents: string;
+  fiscalFingerprintVersion: string;
+  fiscalFingerprint: string;
 };
 
 export function canIncludeCandidateInBatch(status: FiscalCandidateStatus, grossAmountCents: bigint | null): boolean {
