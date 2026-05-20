@@ -10,8 +10,8 @@ const navigation = [
   { label: "Documentos", href: "/dashboard/documents", icon: Archive },
   { label: "Tenant", href: "/dashboard/tenant", icon: Building2 },
   { label: "Auditoria", href: "/dashboard/audit", icon: ShieldCheck },
-  { label: "Operacional", href: "#", icon: Activity },
-  { label: "Financeiro", href: "#", icon: Landmark }
+  { label: "Operacional", href: "/dashboard", icon: Activity },
+  { label: "Financeiro em breve", href: "/dashboard", icon: Landmark }
 ];
 
 export function AppSidebar() {
@@ -39,7 +39,7 @@ export function AppSidebar() {
         ))}
       </nav>
       <div className="border-t px-6 py-4 text-xs leading-5 text-muted-foreground">
-        Emissao supervisionada, audit-first e idempotency-first desde a fundacao.
+        Operacao fiscal supervisionada sem emissao real, audit-first e idempotency-first desde a fundacao.
       </div>
     </aside>
   );

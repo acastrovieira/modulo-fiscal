@@ -32,6 +32,13 @@ describe("RBAC permission checks", () => {
     expect(() => assertPermission(subject, "issuance.execute")).toThrow(ForbiddenError);
   });
 
+  it("does not expose internal permission keys in beta-facing forbidden messages", () => {
+    const subject = makePermissionSubject("AUDITOR");
+
+    expect(() => assertPermission(subject, "tenant.manage")).toThrow("Voce nao tem permissao para executar esta acao neste tenant.");
+    expect(() => assertPermission(subject, "tenant.manage")).not.toThrow(/tenant\.manage|Permission denied/);
+  });
+
   it("maps every MVP command to a backend permission", () => {
     const expectedCommands: CommandName[] = [
       "createImportFromDocument",

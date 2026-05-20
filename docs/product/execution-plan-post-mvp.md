@@ -44,7 +44,7 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 40 | Staging/Beta environment activation | Proxima | 0% | Ambiente staging/beta acessivel e seguro | Codex + @devops + seguranca/LGPD |
 | 41 | Beta users, roles e tenant setup | Concluida tecnica | 70% | Usuarios aprovados com least privilege | Codex + @qa + seguranca/LGPD |
 | 42 | Two-tenant smoke test | Concluida tecnica | 60% | Jornada completa com isolamento validado | @qa + Codex + seguranca/LGPD |
-| 43 | UX/test feedback hardening | Planejada | 0% | Zero P0/P1 e UX beta utilizavel | Gemini + Codex + @qa |
+| 43 | UX/test feedback hardening | Concluida tecnica | 70% | Zero P0/P1 e UX beta utilizavel | Gemini + Codex + @qa |
 | 44 | Pilot go/no-go pack | Planejada | 0% | Decisao formal com evidencias | @pm + @po + @qa + @devops + Codex |
 | 45 | Controlled pilot run | Planejada | 0% | Piloto com 1-3 tenants sem incidente critico | @pm/@po + @qa + Codex + @devops |
 | 46 | Pilot findings e stabilization | Planejada | 0% | Achados corrigidos ou priorizados | Codex + @qa + Gemini |

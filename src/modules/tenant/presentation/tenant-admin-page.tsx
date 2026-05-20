@@ -27,14 +27,17 @@ type TenantInvite = {
   createdAt: string;
   deliveryStatus: "NOT_CONFIGURED";
 };
+type ApiErrorPayload = { error?: { code?: string; message?: string; requestId?: string } };
 
 const inviteRoles: Role[] = ["ADMIN", "FISCAL_MANAGER", "FISCAL_OPERATOR", "FINANCIAL_OPERATOR", "ACCOUNTANT", "AUDITOR"];
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { ...init, headers: { "content-type": "application/json", ...(init?.headers ?? {}) } });
-  const payload = await response.json();
+  const payload = await response.json() as ApiErrorPayload & { data?: T };
   if (!response.ok) {
-    throw new Error(payload.error?.message ?? "Request failed");
+    const code = payload.error?.code ? ` (${payload.error.code})` : "";
+    const requestId = payload.error?.requestId ? ` Codigo de suporte: ${payload.error.requestId}.` : "";
+    throw new Error(`${payload.error?.message ?? "Request failed"}${code}.${requestId}`);
   }
   return payload.data as T;
 }
@@ -75,7 +78,7 @@ export function TenantAdminPage() {
     await fetchJson("/api/tenant/invites", { method: "POST", body: JSON.stringify({ email, role }) });
     setEmail("");
     await load();
-    setStatus("Convite registrado. Envio por e-mail segue fora do core nesta sprint.");
+    setStatus("Convite registrado. Envio por e-mail segue fora do core beta.");
   }
 
   async function resendInvite(inviteId: string) {
@@ -144,7 +147,7 @@ export function TenantAdminPage() {
               </select>
               <Button type="submit"><Send className="mr-2 h-4 w-4" /> Registrar</Button>
             </form>
-            <p className="mt-3 text-xs text-muted-foreground">Convite usa token hasheado, expira e pode ser revogado ou regenerado. Nenhum e-mail real e enviado nesta sprint.</p>
+            <p className="mt-3 text-xs text-muted-foreground">Convite usa token hasheado, expira e pode ser revogado ou regenerado. Nenhum e-mail real e enviado pelo core beta.</p>
           </CardContent>
         </Card>
       </div>
@@ -175,7 +178,7 @@ export function TenantAdminPage() {
                     <td className="px-4 py-3 text-right">
                       <div className="flex justify-end gap-2">
                         <Button variant="outline" disabled={invite.status === "ACCEPTED" || invite.status === "REVOKED"} onClick={() => resendInvite(invite.id).catch((error: Error) => setStatus(error.message))}>
-                          <RefreshCw className="mr-2 h-4 w-4" /> Reenviar
+                          <RefreshCw className="mr-2 h-4 w-4" /> Regenerar
                         </Button>
                         <Button variant="outline" disabled={invite.status !== "PENDING"} onClick={() => revokeInvite(invite.id).catch((error: Error) => setStatus(error.message))}>
                           <XCircle className="mr-2 h-4 w-4" /> Revogar

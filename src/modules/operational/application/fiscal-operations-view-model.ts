@@ -80,17 +80,17 @@ export function createFiscalOperationsViewModel(snapshot: FiscalOperationsGovern
         label: "Documentos simulados",
         value: snapshot.metrics.simulatedDocumentsCreated,
         tone: "neutral",
-        helperText: `${snapshot.metrics.simulatedDocumentsSimulatedIssued} simulacoes concluidas`
+        helperText: `${snapshot.metrics.simulatedDocumentsSimulatedIssued} simulacoes internas concluidas`
       },
       {
         label: "Flags proibidas",
         value: unsafe,
         tone: unsafe > 0 ? "critical" : "success",
-        helperText: "emissao, provider, transmissao ou valor fiscal"
+        helperText: "emissao real, provider, transmissao ou valor fiscal"
       }
     ],
     guardrails: [
-      "NFS-e real continua desativada.",
+      "Emissao fiscal real continua desativada.",
       "Cenarios sao simulados e sem transmissao externa.",
       "Governanca fiscal usa auditoria tenant-scoped.",
       "Dados sensiveis nao aparecem no cockpit."

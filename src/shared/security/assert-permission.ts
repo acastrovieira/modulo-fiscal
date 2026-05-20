@@ -9,6 +9,6 @@ export type PermissionSubject = {
 
 export function assertPermission(subject: PermissionSubject, permission: Permission): void {
   if (!hasPermission(subject.role, permission)) {
-    throw new ForbiddenError(`Permission denied: ${permission}`);
+    throw new ForbiddenError("Voce nao tem permissao para executar esta acao neste tenant.");
   }
 }

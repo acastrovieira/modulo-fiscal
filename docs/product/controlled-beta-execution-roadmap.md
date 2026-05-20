@@ -9,7 +9,7 @@ Sprint 39 is merged into `main`. The project is ready to prepare a controlled st
 | 40 | Staging/Beta Environment Activation | Next | Environment URL, login and healthcheck work without secrets in repo |
 | 41 | Beta Users, Roles and Tenant Setup | Technically prepared | Approved users can authenticate with least-privilege roles |
 | 42 | Two-Tenant Smoke Test | Technically prepared | Full journey passes with cross-tenant access blocked |
-| 43 | UX/Test Feedback Hardening | Planned | No P0/P1 and beta-facing UX is usable |
+| 43 | UX/Test Feedback Hardening | Technically prepared | No P0/P1 and beta-facing UX is usable |
 | 44 | Pilot Go/No-Go Pack | Planned | Formal decision recorded with evidence |
 | 45 | Controlled Pilot Run | Planned | 1-3 tenants complete pilot without critical incident |
 | 46 | Pilot Findings and Stabilization | Planned | Pilot findings triaged, fixed or converted into backlog |
@@ -97,10 +97,10 @@ Runbook:
 Objective: fix smoke-test friction before inviting pilot users.
 
 Checklist:
-- [ ] Review login and session errors.
-- [ ] Improve empty, loading and error states.
-- [ ] Review permission denied messages.
-- [ ] Adjust copy that could imply real issuance.
+- [x] Review login and session errors.
+- [x] Improve empty, loading and error states.
+- [x] Review permission denied messages.
+- [x] Adjust copy that could imply real issuance.
 - [ ] Review cockpit responsiveness.
 - [ ] Fix smoke-test bugs.
 - [ ] Run full regression gates.
@@ -111,6 +111,9 @@ Gate:
 - [ ] Minimum beta UX is ready for accompanied users.
 
 Recommended squad: Gemini, Codex and @qa.
+
+Story:
+- `docs/stories/sprint-43-ux-test-feedback-hardening.md`
 
 ## Sprint 44 - Pilot Go/No-Go Pack
 Objective: make the official pilot decision.

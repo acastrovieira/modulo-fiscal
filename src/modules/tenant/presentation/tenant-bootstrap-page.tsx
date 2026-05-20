@@ -6,11 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+type ApiErrorPayload = { error?: { code?: string; message?: string; requestId?: string } };
+
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { ...init, headers: { "content-type": "application/json", ...(init?.headers ?? {}) } });
-  const payload = await response.json();
+  const payload = await response.json() as ApiErrorPayload & { data?: T };
   if (!response.ok) {
-    throw new Error(payload.error?.message ?? "Request failed");
+    const code = payload.error?.code ? ` (${payload.error.code})` : "";
+    const requestId = payload.error?.requestId ? ` Codigo de suporte: ${payload.error.requestId}.` : "";
+    throw new Error(`${payload.error?.message ?? "Request failed"}${code}.${requestId}`);
   }
   return payload.data as T;
 }
@@ -68,6 +72,9 @@ export function TenantBootstrapPage() {
             <h1 className="mt-2 text-2xl font-semibold tracking-normal text-foreground">Criar primeiro tenant operacional</h1>
           </div>
           <Badge variant="outline" className="bg-muted">{status}</Badge>
+        </div>
+        <div className="rounded-md border bg-muted px-4 py-3 text-sm leading-6 text-muted-foreground">
+          Use apenas dados ficticios ou formalmente aprovados para staging/beta. CNPJ completo nao deve aparecer em screenshots, logs ou evidencias publicas.
         </div>
 
         <Card>

@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/button";
 
 export function LogoutButton() {
   async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // The local session should still be cleared by returning to login.
+    }
+
     window.location.href = "/login";
   }
 
