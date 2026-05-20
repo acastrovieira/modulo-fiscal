@@ -42,8 +42,8 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 38 | Beta release candidate e evidence pack | Concluida | 100% | Go/no-go beta com evidencias | Codex + @pm + @qa + @devops |
 | 39 | Controlled beta pilot readiness | Concluida tecnica | 70% | Piloto controlado com donos, smoke e go/no-go | Codex + @pm + @po + @qa + @devops |
 | 40 | Staging/Beta environment activation | Proxima | 0% | Ambiente staging/beta acessivel e seguro | Codex + @devops + seguranca/LGPD |
-| 41 | Beta users, roles e tenant setup | Planejada | 0% | Usuarios aprovados com least privilege | Codex + @qa + seguranca/LGPD |
-| 42 | Two-tenant smoke test | Planejada | 0% | Jornada completa com isolamento validado | @qa + Codex + seguranca/LGPD |
+| 41 | Beta users, roles e tenant setup | Concluida tecnica | 70% | Usuarios aprovados com least privilege | Codex + @qa + seguranca/LGPD |
+| 42 | Two-tenant smoke test | Concluida tecnica | 60% | Jornada completa com isolamento validado | @qa + Codex + seguranca/LGPD |
 | 43 | UX/test feedback hardening | Planejada | 0% | Zero P0/P1 e UX beta utilizavel | Gemini + Codex + @qa |
 | 44 | Pilot go/no-go pack | Planejada | 0% | Decisao formal com evidencias | @pm + @po + @qa + @devops + Codex |
 | 45 | Controlled pilot run | Planejada | 0% | Piloto com 1-3 tenants sem incidente critico | @pm/@po + @qa + Codex + @devops |
@@ -730,6 +730,8 @@ Objetivo: orientar a passagem do release candidate documentado para um beta acom
 Roadmap oficial:
 - `docs/product/controlled-beta-execution-roadmap.md`
 - `docs/operations/staging-beta-activation.md`
+- `docs/product/beta-users-roles-tenant-setup.md`
+- `docs/product/two-tenant-smoke-evidence.md`
 
 Principios:
 - [x] Sprint 39 foi mergeada antes de planejar o ambiente beta.

@@ -46,3 +46,9 @@ This smoke does not authorize real NFS-e issuance, scraping, municipal provider 
 - Record CI URL, deploy URL, commit hash and smoke date.
 - If any no-go condition appears, stop the pilot and open a blocker task.
 
+## Evidence Template
+Use `docs/product/two-tenant-smoke-evidence.md` as the canonical smoke evidence checklist.
+
+## User And Role Setup
+Use `docs/product/beta-users-roles-tenant-setup.md` before running this smoke. Do not run smoke with unapproved tenants, unapproved users or broad roles created only for convenience.
+
