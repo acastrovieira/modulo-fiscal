@@ -23,6 +23,7 @@ Checklist:
 - [ ] Link the correct Vercel project to `modulo-fiscal`.
 - [ ] Configure provider-side environment variables for database, Supabase and app environment.
 - [ ] Keep real fiscal feature flags disabled.
+- [ ] Validate pulled env vars with `npm run ops:check-beta-env -- .env.local`.
 - [ ] Configure Supabase Auth URLs, callback, site URL, templates and authorized domain.
 - [ ] Apply staging/beta database migrations.
 - [ ] Run safe demo seed only if the environment is demo.
@@ -35,6 +36,9 @@ Gate:
 - [ ] No real fiscal feature is enabled.
 
 Recommended squad: Codex, @devops and Security/LGPD.
+
+Runbook:
+- `docs/operations/staging-beta-activation.md`
 
 ## Sprint 41 - Beta Users, Roles and Tenant Setup
 Objective: prepare controlled test access with least privilege.

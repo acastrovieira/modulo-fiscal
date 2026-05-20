@@ -729,6 +729,7 @@ Objetivo: orientar a passagem do release candidate documentado para um beta acom
 
 Roadmap oficial:
 - `docs/product/controlled-beta-execution-roadmap.md`
+- `docs/operations/staging-beta-activation.md`
 
 Principios:
 - [x] Sprint 39 foi mergeada antes de planejar o ambiente beta.

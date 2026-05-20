@@ -56,6 +56,7 @@ describe("release prep smoke", () => {
     const pilot = readProjectFile("docs/product/beta-pilot-readiness-plan.md");
     const pilotEvidence = readProjectFile("docs/product/beta-pilot-evidence-log.md");
     const roadmap = readProjectFile("docs/product/controlled-beta-execution-roadmap.md");
+    const stagingActivation = readProjectFile("docs/operations/staging-beta-activation.md");
     const runbook = readProjectFile("docs/operations/runbooks/beta-release.md");
     const smoke = readProjectFile("docs/operations/runbooks/beta-pilot-smoke.md");
 
@@ -91,5 +92,9 @@ describe("release prep smoke", () => {
     expect(roadmap).toMatch(/PRD Fiscal Real \/ Homologation/i);
     expect(roadmap).toMatch(/No real NFS-e issuance before Sprint 47 approval/i);
     expect(roadmap).toMatch(/No municipal provider integration/i);
+
+    expect(stagingActivation).toMatch(/npm run ops:check-beta-env -- \.env\.local/i);
+    expect(stagingActivation).toMatch(/NEXT_PUBLIC_APP_ENV=Local/i);
+    expect(stagingActivation).toMatch(/Any real fiscal safety flag is true/i);
   });
 });
