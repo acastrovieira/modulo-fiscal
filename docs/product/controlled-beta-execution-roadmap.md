@@ -7,8 +7,8 @@ Sprint 39 is merged into `main`. The project is ready to prepare a controlled st
 | Sprint | Name | Status | Main gate |
 | --- | --- | --- | --- |
 | 40 | Staging/Beta Environment Activation | Next | Environment URL, login and healthcheck work without secrets in repo |
-| 41 | Beta Users, Roles and Tenant Setup | Planned | Approved users can authenticate with least-privilege roles |
-| 42 | Two-Tenant Smoke Test | Planned | Full journey passes with cross-tenant access blocked |
+| 41 | Beta Users, Roles and Tenant Setup | Technically prepared | Approved users can authenticate with least-privilege roles |
+| 42 | Two-Tenant Smoke Test | Technically prepared | Full journey passes with cross-tenant access blocked |
 | 43 | UX/Test Feedback Hardening | Planned | No P0/P1 and beta-facing UX is usable |
 | 44 | Pilot Go/No-Go Pack | Planned | Formal decision recorded with evidence |
 | 45 | Controlled Pilot Run | Planned | 1-3 tenants complete pilot without critical incident |
@@ -44,6 +44,8 @@ Runbook:
 Objective: prepare controlled test access with least privilege.
 
 Checklist:
+- [x] Create alias-based tenant and user setup template.
+- [x] Define least-privilege beta role matrix.
 - [ ] Name product owner, engineering owner, support owner and optional QA owner.
 - [ ] Approve 1-3 beta tenants outside the repository.
 - [ ] Approve beta users outside the repository.
@@ -61,10 +63,17 @@ Gate:
 
 Recommended squad: Codex, @qa and Security/LGPD.
 
+Runbook:
+- `docs/product/beta-users-roles-tenant-setup.md`
+
 ## Sprint 42 - Two-Tenant Smoke Test
 Objective: prove the full beta journey with two tenants.
 
 Checklist:
+- [x] Create two-tenant smoke evidence template.
+- [x] Define Tenant A and Tenant B journey.
+- [x] Define cross-tenant abuse checks.
+- [x] Define safe screenshot/evidence rules.
 - [ ] Run Tenant A journey: login, dashboard, imports, candidates, inconsistencies, batches, audit and documents.
 - [ ] Run Tenant B journey with the same route list.
 - [ ] Try direct Tenant A resource URLs while Tenant B is active.
@@ -80,6 +89,9 @@ Gate:
 - [ ] Audit, logs and DTOs do not leak sensitive data.
 
 Recommended squad: @qa, Codex and Security/LGPD.
+
+Runbook:
+- `docs/product/two-tenant-smoke-evidence.md`
 
 ## Sprint 43 - UX/Test Feedback Hardening
 Objective: fix smoke-test friction before inviting pilot users.

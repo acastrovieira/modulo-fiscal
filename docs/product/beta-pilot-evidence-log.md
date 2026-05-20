@@ -20,6 +20,8 @@ Current decision: NO-GO for real beta usage until owners, approved tenants, stag
 | Sprint 39 secret scanner | Passed | `npm run security:secrets` found no potential secrets. |
 | Sprint 39 Prisma validate | Passed | `npx prisma validate` passed with local/demo `DATABASE_URL`. |
 | Sprint 39 production build | Passed | `npm run build` passed on 2026-05-19. |
+| Sprint 41 setup template | Present | `docs/product/beta-users-roles-tenant-setup.md` |
+| Sprint 42 smoke evidence template | Present | `docs/product/two-tenant-smoke-evidence.md` |
 
 ## Pending Evidence Before Real Pilot
 | Evidence | Required Owner | Status |

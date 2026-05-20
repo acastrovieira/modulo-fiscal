@@ -57,6 +57,8 @@ describe("release prep smoke", () => {
     const pilotEvidence = readProjectFile("docs/product/beta-pilot-evidence-log.md");
     const roadmap = readProjectFile("docs/product/controlled-beta-execution-roadmap.md");
     const stagingActivation = readProjectFile("docs/operations/staging-beta-activation.md");
+    const betaUsers = readProjectFile("docs/product/beta-users-roles-tenant-setup.md");
+    const twoTenantSmoke = readProjectFile("docs/product/two-tenant-smoke-evidence.md");
     const runbook = readProjectFile("docs/operations/runbooks/beta-release.md");
     const smoke = readProjectFile("docs/operations/runbooks/beta-pilot-smoke.md");
 
@@ -96,5 +98,15 @@ describe("release prep smoke", () => {
     expect(stagingActivation).toMatch(/npm run ops:check-beta-env -- \.env\.local/i);
     expect(stagingActivation).toMatch(/NEXT_PUBLIC_APP_ENV=Local/i);
     expect(stagingActivation).toMatch(/Any real fiscal safety flag is true/i);
+
+    expect(betaUsers).toMatch(/Least-Privilege Role Matrix/i);
+    expect(betaUsers).toMatch(/Do not store real personal e-mails/i);
+    expect(betaUsers).toMatch(/User without membership cannot access dashboard/i);
+    expect(betaUsers).toMatch(/Any real e-mail, CPF, CNPJ, token or document appears in repository docs/i);
+
+    expect(twoTenantSmoke).toMatch(/Tenant A Journey/i);
+    expect(twoTenantSmoke).toMatch(/Tenant B Journey/i);
+    expect(twoTenantSmoke).toMatch(/Abuse Checks/i);
+    expect(twoTenantSmoke).toMatch(/NO-GO for real beta users until this smoke passes in staging\/beta/i);
   });
 });
