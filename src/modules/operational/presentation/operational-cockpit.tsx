@@ -26,6 +26,10 @@ function isApiError(value: unknown): value is ApiErrorResponse {
   return typeof value === "object" && value !== null && "error" in value;
 }
 
+function formatApiError(error: ApiErrorResponse["error"]): string {
+  return `${error.message} (${error.code}). Codigo de suporte: ${error.requestId}.`;
+}
+
 function formatUpdatedAt(value: string | null): string {
   if (!value) {
     return "Aguardando dados";
@@ -37,6 +41,13 @@ function formatUpdatedAt(value: string | null): string {
     day: "2-digit",
     month: "2-digit"
   }).format(new Date(value));
+}
+
+function severityLabel(value: string): string {
+  if (value === "success") return "estavel";
+  if (value === "attention") return "atencao";
+  if (value === "critical") return "critico";
+  return "informativo";
 }
 
 function MetricSkeleton() {
@@ -67,7 +78,7 @@ export function OperationalCockpit() {
       const payload: SummaryResponse | ApiErrorResponse = await response.json();
 
       if (!response.ok || isApiError(payload)) {
-        throw new Error(isApiError(payload) ? payload.error.message : "Falha ao carregar cockpit operacional.");
+        throw new Error(isApiError(payload) ? formatApiError(payload.error) : "Falha ao carregar cockpit operacional.");
       }
 
       setSummary(payload.data);
@@ -95,7 +106,7 @@ export function OperationalCockpit() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <StatusBadge tone="neutral">NFS-e real desativada</StatusBadge>
+          <StatusBadge tone="neutral">Sem emissao fiscal real</StatusBadge>
           <span className="text-xs text-muted-foreground">Atualizado: {formatUpdatedAt(summary?.generatedAt ?? null)}</span>
           <Button variant="outline" onClick={() => void loadSummary()} disabled={loading}>
             <RefreshCw className="mr-2 h-4 w-4" />
@@ -137,7 +148,7 @@ export function OperationalCockpit() {
                     <div className="flex items-end justify-between gap-4">
                       <span className="text-3xl font-semibold">{metric.value}</span>
                       <div className="flex flex-col items-end gap-2">
-                        <StatusBadge tone={metric.severity}>{metric.severity}</StatusBadge>
+                        <StatusBadge tone={metric.severity}>{severityLabel(metric.severity)}</StatusBadge>
                         <span className="text-xs font-medium text-primary">{metric.actionLabel}</span>
                       </div>
                     </div>
@@ -149,8 +160,8 @@ export function OperationalCockpit() {
 
       {!loading && summary && summary.metrics.every((metric) => metric.value === 0) ? (
         <Card className="rounded-lg">
-          <CardContent className="py-5 text-sm text-muted-foreground">
-            Nenhuma pendencia operacional encontrada para o tenant atual.
+          <CardContent className="py-5 text-sm leading-6 text-muted-foreground">
+            Nenhuma pendencia operacional encontrada para o tenant atual. Para smoke beta, confirme seed/demo, tenant ativo e roles antes de concluir o roteiro.
           </CardContent>
         </Card>
       ) : null}
@@ -162,7 +173,11 @@ export function OperationalCockpit() {
             <StatusBadge tone={hasQueue ? "attention" : "success"}>{hasQueue ? "em revisao" : "estavel"}</StatusBadge>
           </CardHeader>
           <CardContent className="space-y-3">
-            {summary?.queue.map((item) => (
+            {summary?.queue.length === 0 ? (
+              <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                Nenhum item operacional pendente para o tenant ativo.
+              </div>
+            ) : summary?.queue.map((item) => (
               <div key={item.id} className="grid gap-3 border-b pb-3 last:border-0 last:pb-0 sm:grid-cols-[1fr_auto] sm:items-center">
                 <div className="min-w-0">
                   <p className="text-sm font-medium">{item.label}</p>
@@ -171,7 +186,7 @@ export function OperationalCockpit() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 sm:justify-end">
-                  <StatusBadge tone={item.severity}>{item.severity}</StatusBadge>
+                  <StatusBadge tone={item.severity}>{severityLabel(item.severity)}</StatusBadge>
                   <Button variant="ghost">
                     {item.actionLabel}
                   </Button>
@@ -186,11 +201,15 @@ export function OperationalCockpit() {
             <CardTitle>Alertas criticos</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {summary?.alerts.map((alert) => (
+            {summary?.alerts.length === 0 ? (
+              <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                Nenhum alerta critico encontrado para o tenant ativo.
+              </div>
+            ) : summary?.alerts.map((alert) => (
               <div key={alert.id} className="rounded-md border p-3">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-sm font-medium">{alert.title}</p>
-                  <StatusBadge tone={alert.severity}>{alert.severity}</StatusBadge>
+                  <StatusBadge tone={alert.severity}>{severityLabel(alert.severity)}</StatusBadge>
                 </div>
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">{alert.message}</p>
                 <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">

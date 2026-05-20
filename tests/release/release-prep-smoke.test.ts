@@ -59,6 +59,13 @@ describe("release prep smoke", () => {
     const stagingActivation = readProjectFile("docs/operations/staging-beta-activation.md");
     const betaUsers = readProjectFile("docs/product/beta-users-roles-tenant-setup.md");
     const twoTenantSmoke = readProjectFile("docs/product/two-tenant-smoke-evidence.md");
+    const sprint43Story = readProjectFile("docs/stories/sprint-43-ux-test-feedback-hardening.md");
+    const loginPage = readProjectFile("src/app/(auth)/login/page.tsx");
+    const operationalPage = readProjectFile("src/modules/operational/presentation/operational-workflow-page.tsx");
+    const dashboardError = readProjectFile("src/app/(dashboard)/error.tsx");
+    const sidebar = readProjectFile("src/components/layout/app-sidebar.tsx");
+    const logoutButton = readProjectFile("src/components/layout/logout-button.tsx");
+    const permissionGuard = readProjectFile("src/shared/security/assert-permission.ts");
     const runbook = readProjectFile("docs/operations/runbooks/beta-release.md");
     const smoke = readProjectFile("docs/operations/runbooks/beta-pilot-smoke.md");
 
@@ -108,5 +115,17 @@ describe("release prep smoke", () => {
     expect(twoTenantSmoke).toMatch(/Tenant B Journey/i);
     expect(twoTenantSmoke).toMatch(/Abuse Checks/i);
     expect(twoTenantSmoke).toMatch(/NO-GO for real beta users until this smoke passes in staging\/beta/i);
+
+    expect(sprint43Story).toMatch(/codigo de suporte/i);
+    expect(loginPage).toMatch(/Ambiente beta supervisionado/i);
+    expect(loginPage).toMatch(/Codigo de suporte/i);
+    expect(operationalPage).toMatch(/Sem emissao fiscal real/i);
+    expect(operationalPage).toMatch(/Confirme tenant ativo, permissoes e dados demo/i);
+    expect(operationalPage).toMatch(/ID redigido/i);
+    expect(operationalPage).toMatch(/Arquivos fiscais importados/i);
+    expect(dashboardError).toMatch(/Codigo de suporte/i);
+    expect(sidebar).toMatch(/sem emissao real/i);
+    expect(logoutButton).toMatch(/window\.location\.href = "\/login"/i);
+    expect(permissionGuard).not.toMatch(/Permission denied: \$/i);
   });
 });

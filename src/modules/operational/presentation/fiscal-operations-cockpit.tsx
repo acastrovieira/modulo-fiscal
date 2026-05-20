@@ -34,6 +34,10 @@ function isApiError(value: unknown): value is ApiErrorResponse {
   return typeof value === "object" && value !== null && "error" in value;
 }
 
+function formatApiError(error: ApiErrorResponse["error"]): string {
+  return `${error.message} (${error.code}). Codigo de suporte: ${error.requestId}.`;
+}
+
 function formatDateTime(value: string | null): string {
   if (!value) return "Aguardando dados";
   return new Intl.DateTimeFormat("pt-BR", {
@@ -79,7 +83,7 @@ export function FiscalOperationsCockpit() {
       const payload: GovernanceResponse | ApiErrorResponse = await response.json();
 
       if (!response.ok || isApiError(payload)) {
-        throw new Error(isApiError(payload) ? payload.error.message : "Falha ao carregar governanca fiscal.");
+        throw new Error(isApiError(payload) ? formatApiError(payload.error) : "Falha ao carregar governanca fiscal.");
       }
 
       setSnapshot(payload.data);
@@ -163,7 +167,7 @@ export function FiscalOperationsCockpit() {
             {[
               ["Perfil simulado", "Configuracao fiscal interna do tenant para validar consistencia operacional."],
               ["Tomador mascarado", "Cadastro com documento mascarado e hash interno, sem CPF/CNPJ publico."],
-              ["Documento simulado", "Documento sem valor fiscal, sem transmissao externa e com simulationId."],
+              ["Documento simulado", "Documento sem valor fiscal, sem transmissao externa e com identificador de simulacao."],
               ["Cenarios versionados", "Avaliacao governada por vetcare-simulation-baseline@2026.05."],
               ["Governanca", "Relatorio auditavel para bloquear qualquer flag proibida."]
             ].map(([title, helper], index) => (
@@ -204,7 +208,7 @@ export function FiscalOperationsCockpit() {
 
       <section className="grid gap-3 md:grid-cols-4">
         {(viewModel?.guardrails ?? [
-          "NFS-e real continua desativada.",
+          "Emissao fiscal real continua desativada.",
           "Cenarios sao simulados e sem transmissao externa.",
           "Governanca fiscal usa auditoria tenant-scoped.",
           "Dados sensiveis nao aparecem no cockpit."

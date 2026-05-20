@@ -21,6 +21,7 @@ function toneForStatus(value: unknown): "neutral" | "attention" | "critical" | "
 function statusCell(row: Record<string, unknown>) { return <StatusBadge tone={toneForStatus(row.status)}>{asText(row.status)}</StatusBadge>; }
 function summaryGroup(row: Record<string, unknown>): string { return asText(row.status ?? row.eventType ?? row.fileType ?? "registros"); }
 function isApiError(value: unknown): value is ApiErrorEnvelope { return typeof value === "object" && value !== null && "error" in value; }
+function formatApiError(error: ApiErrorEnvelope["error"]): string { return `${error.message} (${error.code}). Codigo de suporte: ${error.requestId}.`; }
 
 const configs: Record<ResourceKind, Config> = {
   imports: {
@@ -85,7 +86,7 @@ const configs: Record<ResourceKind, Config> = {
     helper: "Controle lotes em revisao, simulacao interna e aprovacao futura sem emissao real.",
     endpoint: "/api/batches",
     icon: Layers3,
-    primaryAction: "Simular lote",
+    primaryAction: "Simular internamente",
     empty: "Nenhum lote fiscal encontrado.",
     columns: [
       { key: "batchNumber", label: "Lote" },
@@ -93,9 +94,9 @@ const configs: Record<ResourceKind, Config> = {
       { key: "itemsCount", label: "Itens" },
       { key: "totalGrossAmountCents", label: "Total", render: (row) => asMoney(row.totalGrossAmountCents) },
       { key: "simulatedAt", label: "Simulado", render: (row) => asDate(row.simulatedAt) },
-      { key: "approvedAt", label: "Aprovado", render: (row) => asDate(row.approvedAt) }
+      { key: "approvedAt", label: "Aprovacao futura", render: (row) => asDate(row.approvedAt) }
     ],
-    guardrails: ["NFS-e real desativada", "Provider externo nao chamado", "Aprovacao e apenas futura"]
+    guardrails: ["Sem emissao fiscal real", "Provider externo nao chamado", "Aprovacao e apenas futura"]
   },
   audit: {
     title: "Trilha de auditoria",
@@ -108,30 +109,30 @@ const configs: Record<ResourceKind, Config> = {
     columns: [
       { key: "eventType", label: "Evento" },
       { key: "entityType", label: "Entidade" },
-      { key: "entityId", label: "ID entidade" },
-      { key: "actorId", label: "Ator" },
-      { key: "correlationId", label: "Correlacao" },
+      { key: "entityId", label: "Entidade", render: () => "ID redigido" },
+      { key: "actorId", label: "Ator", render: () => "Ator redigido" },
+      { key: "correlationId", label: "Suporte", render: (row) => asText(row.correlationId).slice(0, 8) },
       { key: "createdAt", label: "Criado", render: (row) => asDate(row.createdAt) }
     ],
     guardrails: ["audit.view no backend", "Payloads sensiveis resumidos", "CorrelationId rastreavel"]
   },
   documents: {
-    title: "Documentos fiscais",
+    title: "Arquivos fiscais importados",
     eyebrow: "Metadados seguros",
     helper: "Acompanhe arquivos do tenant sem expor storage interno, path real ou download de producao.",
     endpoint: "/api/documents",
     icon: Archive,
-    primaryAction: "Preparar download",
+    primaryAction: "Ver metadados",
     empty: "Nenhum documento encontrado.",
     columns: [
-      { key: "fileName", label: "Arquivo" },
+      { key: "fileName", label: "Arquivo", render: (row) => asText(row.fileName).replace(/\d{3,}/g, "***") },
       { key: "fileType", label: "Tipo" },
       { key: "mimeType", label: "MIME" },
       { key: "checksumSha256Preview", label: "Checksum" },
       { key: "sizeBytes", label: "Bytes" },
       { key: "createdAt", label: "Criado", render: (row) => asDate(row.createdAt) }
     ],
-    guardrails: ["documents.download no backend", "storagePath nao exposto", "Download real ainda desativado"]
+    guardrails: ["documents.download no backend", "storagePath nao exposto", "Nomes devem ser redigidos em evidencias"]
   }
 };
 
@@ -148,7 +149,7 @@ export function OperationalWorkflowPage({ kind }: Readonly<{ kind: ResourceKind 
     try {
       const response = await fetch(config.endpoint, { cache: "no-store" });
       const payload: ApiEnvelope | ApiErrorEnvelope = await response.json();
-      if (!response.ok || isApiError(payload)) throw new Error(isApiError(payload) ? payload.error.message : "Falha ao carregar dados.");
+      if (!response.ok || isApiError(payload)) throw new Error(isApiError(payload) ? formatApiError(payload.error) : "Falha ao carregar dados.");
       setRows(payload.data);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Falha ao carregar dados.");
@@ -193,7 +194,12 @@ export function OperationalWorkflowPage({ kind }: Readonly<{ kind: ResourceKind 
         </CardHeader>
         <CardContent>
           {loading ? <div className="space-y-2">{Array.from({ length: 5 }).map((_, index) => <div key={index} className="h-10 rounded bg-muted" />)}</div> : null}
-          {!loading && !error && rows.length === 0 ? <div className="rounded-md border border-dashed p-6 text-sm text-muted-foreground">{config.empty}</div> : null}
+          {!loading && !error && rows.length === 0 ? (
+            <div className="rounded-md border border-dashed p-6 text-sm leading-6 text-muted-foreground">
+              <p>{config.empty}</p>
+              <p className="mt-2">Confirme tenant ativo, permissoes e dados demo antes de abrir o piloto.</p>
+            </div>
+          ) : null}
           {!loading && rows.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[760px] text-left text-sm">
