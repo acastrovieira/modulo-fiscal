@@ -25,6 +25,8 @@ Current decision: NO-GO for real beta usage until owners, approved tenants, stag
 | Sprint 43 UX hardening | Present | `docs/stories/sprint-43-ux-test-feedback-hardening.md` |
 | Sprint 44 go/no-go pack | Present | `docs/product/pilot-go-no-go-pack.md` records current decision as NO-GO. |
 | Sprint 45 controlled pilot runbook | Present | `docs/operations/runbooks/controlled-pilot-run.md` prepares pilot execution after GO. |
+| Sprint 46 stabilization plan | Present | `docs/product/pilot-findings-stabilization-plan.md` prepares post-pilot triage. |
+| Sprint 47 homologation PRD/ADR | Present | `docs/product/prd-real-nfse-homologation.md` and ADR 0011 plan future work without implementing real issuance. |
 
 ## Pending Evidence Before Real Pilot
 | Evidence | Required Owner | Status |
@@ -42,6 +44,9 @@ Current decision: NO-GO for real beta usage until owners, approved tenants, stag
 | Final go/no-go decision | @pm/@po | Pending |
 | Pilot window and rollback owner | @pm/@po + @devops | Pending |
 | Controlled pilot closure report | @pm/@po + @qa | Pending |
+| Pilot findings classified | @qa + Product | Pending |
+| Post-pilot release candidate | Engineering + @qa | Pending |
+| Fiscal homologation PRD approval | Product + Engineering + Fiscal + Security/LGPD | Pending |
 
 ## Manual Smoke Evidence Template
 Use this template when the staging/beta environment is available.
@@ -68,3 +73,6 @@ Use this template when the staging/beta environment is available.
 
 ## Sprint 44/45 Decision Note
 Sprint 44 and Sprint 45 are technically and operationally prepared in the repository. Real pilot execution remains blocked until the missing external owners, staging/beta deployment URL, two-tenant smoke evidence, approved users and approved tenants are recorded in the private pilot register and summarized here without secrets or personal documents.
+
+## Sprint 46/47 Decision Note
+Sprint 46 and Sprint 47 are planning-ready only. Stabilization requires real pilot findings, and fiscal homologation requires explicit PRD approval, provider-specific ADR, certificate policy, sandbox evidence and fiscal specialist review before any implementation begins.
