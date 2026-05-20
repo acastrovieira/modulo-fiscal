@@ -60,6 +60,9 @@ describe("release prep smoke", () => {
     const betaUsers = readProjectFile("docs/product/beta-users-roles-tenant-setup.md");
     const twoTenantSmoke = readProjectFile("docs/product/two-tenant-smoke-evidence.md");
     const sprint43Story = readProjectFile("docs/stories/sprint-43-ux-test-feedback-hardening.md");
+    const sprint44Story = readProjectFile("docs/stories/sprint-44-pilot-go-no-go-pack.md");
+    const sprint45Story = readProjectFile("docs/stories/sprint-45-controlled-pilot-run.md");
+    const goNoGoPack = readProjectFile("docs/product/pilot-go-no-go-pack.md");
     const loginPage = readProjectFile("src/app/(auth)/login/page.tsx");
     const operationalPage = readProjectFile("src/modules/operational/presentation/operational-workflow-page.tsx");
     const dashboardError = readProjectFile("src/app/(dashboard)/error.tsx");
@@ -68,6 +71,7 @@ describe("release prep smoke", () => {
     const permissionGuard = readProjectFile("src/shared/security/assert-permission.ts");
     const runbook = readProjectFile("docs/operations/runbooks/beta-release.md");
     const smoke = readProjectFile("docs/operations/runbooks/beta-pilot-smoke.md");
+    const controlledPilotRunbook = readProjectFile("docs/operations/runbooks/controlled-pilot-run.md");
 
     expect(evidence).toMatch(/Current decision: NO-GO for real beta users/i);
     expect(evidence).toMatch(/No real NFS-e issuance/i);
@@ -117,6 +121,16 @@ describe("release prep smoke", () => {
     expect(twoTenantSmoke).toMatch(/NO-GO for real beta users until this smoke passes in staging\/beta/i);
 
     expect(sprint43Story).toMatch(/codigo de suporte/i);
+    expect(sprint44Story).toMatch(/Current decision: NO-GO for real beta users/i);
+    expect(sprint44Story).toMatch(/Staging\/beta deployment URL and two-tenant smoke evidence are captured/i);
+    expect(sprint45Story).toMatch(/pilot execution is blocked until Sprint 44 external gates turn GO/i);
+    expect(sprint45Story).toMatch(/No real NFS-e issuance, scraping, municipal provider, certificate or fiscal job is triggered/i);
+    expect(goNoGoPack).toMatch(/Current decision: NO-GO/i);
+    expect(goNoGoPack).toMatch(/GO with restrictions/i);
+    expect(goNoGoPack).toMatch(/Any enabled path for real NFS-e issuance, scraping, municipal provider integration, certificate usage or fiscal queue execution/i);
+    expect(controlledPilotRunbook).toMatch(/Sprint 44 decision is GO or GO with restrictions/i);
+    expect(controlledPilotRunbook).toMatch(/Stop pilot immediately/i);
+    expect(controlledPilotRunbook).toMatch(/Cross-tenant data exposure/i);
     expect(loginPage).toMatch(/Ambiente beta supervisionado/i);
     expect(loginPage).toMatch(/Codigo de suporte/i);
     expect(operationalPage).toMatch(/Sem emissao fiscal real/i);
