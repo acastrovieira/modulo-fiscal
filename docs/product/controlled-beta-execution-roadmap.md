@@ -12,8 +12,8 @@ Sprint 39 is merged into `main`. The project is ready to prepare a controlled st
 | 43 | UX/Test Feedback Hardening | Technically prepared | No P0/P1 and beta-facing UX is usable |
 | 44 | Pilot Go/No-Go Pack | Technically prepared | Formal decision recorded with evidence |
 | 45 | Controlled Pilot Run | Operationally prepared | 1-3 tenants complete pilot without critical incident |
-| 46 | Pilot Findings and Stabilization | Planned | Pilot findings triaged, fixed or converted into backlog |
-| 47 | PRD Fiscal Real / Homologation | Future | No real fiscal implementation without PRD, ADR and approval |
+| 46 | Pilot Findings and Stabilization | Technically prepared | Pilot findings triaged, fixed or converted into backlog |
+| 47 | PRD Fiscal Real / Homologation | Planning prepared | No real fiscal implementation without PRD, ADR and approval |
 
 ## Sprint 40 - Staging/Beta Environment Activation
 Objective: activate a real test environment without committing secrets.
@@ -171,40 +171,56 @@ Runbook:
 Objective: stabilize the product after pilot feedback.
 
 Checklist:
-- [ ] Classify findings as P0/P1, P2 or P3.
-- [ ] Fix critical bugs.
-- [ ] Improve confusing flows.
-- [ ] Add or improve tests where failures occurred.
-- [ ] Update runbooks.
+- [x] Create pilot findings and stabilization plan.
+- [x] Define severity categories P0, P1, P2 and P3.
+- [x] Define intake fields, board columns and regression expectations.
+- [x] Define post-pilot release candidate criteria.
+- [x] Keep real fiscal paths blocked during stabilization.
+- [ ] Classify actual findings after pilot execution.
+- [ ] Fix critical bugs after pilot execution.
+- [ ] Improve confusing flows after pilot execution.
+- [ ] Add or improve tests where pilot failures occurred.
+- [ ] Update runbooks with real pilot learnings.
 - [ ] Update PRD/backlog with learnings.
-- [ ] Run full gates.
+- [ ] Run full gates after fixes.
 - [ ] Create post-pilot release candidate.
 
 Gate:
-- [ ] No P0/P1 remains open.
+- [x] Stabilization process is documented.
+- [ ] No P0/P1 remains open after pilot.
 - [ ] Product is ready for the next beta cycle or expansion.
 
 Recommended squad: Codex, @qa and Gemini for UX changes.
+
+Plan:
+- `docs/product/pilot-findings-stabilization-plan.md`
+- `docs/stories/sprint-46-pilot-findings-stabilization.md`
 
 ## Sprint 47 - PRD Fiscal Real / Homologation
 Objective: plan real fiscal homologation only after the supervised beta is stable.
 
 Checklist:
-- [ ] Create a PRD for real NFS-e issuance.
-- [ ] Create ADR for municipal provider/NFS-e adapter.
-- [ ] Define homologation scope.
-- [ ] Define certificate policy.
-- [ ] Define municipal sandbox/homologation approach.
-- [ ] Define real issuance idempotency.
-- [ ] Define rollback and fiscal contingency.
-- [ ] Define legal/accounting responsibilities.
-- [ ] Define tests with accountant or fiscal specialist.
-- [ ] Plan implementation only after explicit approval.
+- [x] Create a PRD for real NFS-e homologation planning.
+- [x] Create ADR for homologation-first real issuance.
+- [x] Define homologation scope.
+- [x] Define certificate policy requirements.
+- [x] Define municipal sandbox/homologation approach.
+- [x] Define real issuance idempotency requirements.
+- [x] Define rollback and fiscal contingency requirements.
+- [x] Define legal/accounting responsibilities.
+- [x] Define tests with accountant or fiscal specialist.
+- [x] Plan implementation only after explicit future approval.
 
 Gate:
-- [ ] No real fiscal implementation starts without PRD, ADR, homologation and approval.
+- [x] No real fiscal implementation starts without PRD, ADR, homologation and approval.
+- [x] No provider, scraping, certificate, municipal transmission or fiscal queue is implemented.
 
 Recommended squad: @pm, @po, @architect, Security/LGPD, fiscal specialist and Codex.
+
+Planning artifacts:
+- `docs/product/prd-real-nfse-homologation.md`
+- `docs/adr/0011-use-homologation-first-real-issuance.md`
+- `docs/stories/sprint-47-prd-fiscal-real-homologation.md`
 
 ## Global Gates
 - [ ] `npm run lint`

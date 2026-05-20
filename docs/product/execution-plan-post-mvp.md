@@ -47,8 +47,8 @@ A meta agora e transformar a fundacao tecnica em produto operavel: release readi
 | 43 | UX/test feedback hardening | Concluida tecnica | 70% | Zero P0/P1 e UX beta utilizavel | Gemini + Codex + @qa |
 | 44 | Pilot go/no-go pack | Concluida tecnica | 70% | Decisao formal criada; GO depende de evidencias externas | @pm + @po + @qa + @devops + Codex |
 | 45 | Controlled pilot run | Preparada operacionalmente | 60% | Runbook de piloto criado; execucao real depende de GO | @pm/@po + @qa + Codex + @devops |
-| 46 | Pilot findings e stabilization | Planejada | 0% | Achados corrigidos ou priorizados | Codex + @qa + Gemini |
-| 47 | PRD fiscal real / homologacao | Futuro | 0% | PRD/ADR antes de qualquer emissao real | @pm + @po + @architect + fiscal + Codex |
+| 46 | Pilot findings e stabilization | Concluida tecnica | 70% | Processo de estabilizacao preparado; execucao depende de achados reais do piloto | Codex + @qa + Gemini |
+| 47 | PRD fiscal real / homologacao | Planejamento preparado | 60% | PRD/ADR criados sem autorizar implementacao real | @pm + @po + @architect + fiscal + Codex |
 
 ## 3. Principios de Execucao
 - Toda nova tela deve consumir API Route ou server action fina, nunca Prisma direto.
