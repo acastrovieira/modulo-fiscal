@@ -23,6 +23,8 @@ Current decision: NO-GO for real beta usage until owners, approved tenants, stag
 | Sprint 41 setup template | Present | `docs/product/beta-users-roles-tenant-setup.md` |
 | Sprint 42 smoke evidence template | Present | `docs/product/two-tenant-smoke-evidence.md` |
 | Sprint 43 UX hardening | Present | `docs/stories/sprint-43-ux-test-feedback-hardening.md` |
+| Sprint 44 go/no-go pack | Present | `docs/product/pilot-go-no-go-pack.md` records current decision as NO-GO. |
+| Sprint 45 controlled pilot runbook | Present | `docs/operations/runbooks/controlled-pilot-run.md` prepares pilot execution after GO. |
 
 ## Pending Evidence Before Real Pilot
 | Evidence | Required Owner | Status |
@@ -38,6 +40,8 @@ Current decision: NO-GO for real beta usage until owners, approved tenants, stag
 | Two-tenant manual smoke evidence | @qa | Pending |
 | Safe screenshots without personal data | @qa | Pending |
 | Final go/no-go decision | @pm/@po | Pending |
+| Pilot window and rollback owner | @pm/@po + @devops | Pending |
+| Controlled pilot closure report | @pm/@po + @qa | Pending |
 
 ## Manual Smoke Evidence Template
 Use this template when the staging/beta environment is available.
@@ -61,3 +65,6 @@ Use this template when the staging/beta environment is available.
 - Any unapproved real tenant or user.
 - Any unredacted personal document, token, storage path or provider payload in public evidence.
 - Any enabled path for real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal jobs.
+
+## Sprint 44/45 Decision Note
+Sprint 44 and Sprint 45 are technically and operationally prepared in the repository. Real pilot execution remains blocked until the missing external owners, staging/beta deployment URL, two-tenant smoke evidence, approved users and approved tenants are recorded in the private pilot register and summarized here without secrets or personal documents.

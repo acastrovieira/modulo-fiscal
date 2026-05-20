@@ -10,8 +10,8 @@ Sprint 39 is merged into `main`. The project is ready to prepare a controlled st
 | 41 | Beta Users, Roles and Tenant Setup | Technically prepared | Approved users can authenticate with least-privilege roles |
 | 42 | Two-Tenant Smoke Test | Technically prepared | Full journey passes with cross-tenant access blocked |
 | 43 | UX/Test Feedback Hardening | Technically prepared | No P0/P1 and beta-facing UX is usable |
-| 44 | Pilot Go/No-Go Pack | Planned | Formal decision recorded with evidence |
-| 45 | Controlled Pilot Run | Planned | 1-3 tenants complete pilot without critical incident |
+| 44 | Pilot Go/No-Go Pack | Technically prepared | Formal decision recorded with evidence |
+| 45 | Controlled Pilot Run | Operationally prepared | 1-3 tenants complete pilot without critical incident |
 | 46 | Pilot Findings and Stabilization | Planned | Pilot findings triaged, fixed or converted into backlog |
 | 47 | PRD Fiscal Real / Homologation | Future | No real fiscal implementation without PRD, ADR and approval |
 
@@ -119,37 +119,53 @@ Story:
 Objective: make the official pilot decision.
 
 Checklist:
-- [ ] Consolidate commit hash, CI URL, deploy URL, smoke result and safe screenshots.
-- [ ] Review accepted and blocking risks.
-- [ ] Confirm owners and rollback owner.
-- [ ] Confirm pilot window.
-- [ ] Record GO, NO-GO or GO with restrictions.
-- [ ] Convert blockers into the next sprint if NO-GO.
+- [x] Create formal go/no-go decision pack.
+- [x] Consolidate required commit hash, CI URL, deploy URL, smoke result and safe screenshot fields.
+- [x] Review accepted and blocking risks.
+- [x] Define required owners and rollback owner.
+- [x] Define pilot window requirements.
+- [x] Record current decision as NO-GO.
+- [x] Convert missing external evidence into explicit blockers.
 
 Gate:
-- [ ] Decision is recorded.
-- [ ] No known P0/P1 remains open.
+- [x] Decision is recorded.
+- [ ] No known P0/P1 remains open in external tracker.
+- [ ] Owners, deploy URL and two-tenant smoke evidence are complete.
 
 Recommended squad: @pm, @po, @qa, @devops and Codex.
+
+Pack:
+- `docs/product/pilot-go-no-go-pack.md`
+- `docs/stories/sprint-44-pilot-go-no-go-pack.md`
 
 ## Sprint 45 - Controlled Pilot Run
 Objective: run the accompanied pilot with 1-3 tenants.
 
 Checklist:
-- [ ] Open access only to approved users.
+- [x] Create controlled pilot runbook.
+- [x] Create opening checklist.
+- [x] Create daily pilot check template.
+- [x] Create feedback and incident severity template.
+- [x] Create closure report template.
+- [x] Confirm no flow can intentionally attempt real fiscal issuance in pilot docs.
+- [ ] Open access only to approved users after Sprint 44 turns GO or GO with restrictions.
 - [ ] Monitor login, tenant switch and cockpit usage.
 - [ ] Record user feedback.
 - [ ] Triage bugs by severity.
 - [ ] Watch audit and critical events.
-- [ ] Confirm no flow attempts real fiscal issuance.
 - [ ] Run short daily pilot checks.
 - [ ] Close the pilot window with a report.
 
 Gate:
+- [x] Pilot run is operationally prepared.
 - [ ] Pilot completes without critical incident.
 - [ ] Feedback is collected and prioritized.
 
 Recommended squad: @pm/@po, @qa, Codex and @devops.
+
+Runbook:
+- `docs/operations/runbooks/controlled-pilot-run.md`
+- `docs/stories/sprint-45-controlled-pilot-run.md`
 
 ## Sprint 46 - Pilot Findings and Stabilization
 Objective: stabilize the product after pilot feedback.
