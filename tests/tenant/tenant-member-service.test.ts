@@ -5,7 +5,7 @@ import { ForbiddenError, InvalidStateError, ValidationError } from "@/shared/err
 import { makeCommandContext, tenantAId, userAId } from "../fixtures/security";
 
 const now = new Date("2026-05-14T12:00:00.000Z");
-const later = new Date("2026-05-21T12:00:00.000Z");
+const later = new Date("2099-05-21T12:00:00.000Z");
 const inviteToken = "abcdefghijklmnopqrstuvwxyzABCDEFGH1234567890_-";
 const inviteTokenHash = tenantInvitePolicy.hashInviteToken(inviteToken);
 
