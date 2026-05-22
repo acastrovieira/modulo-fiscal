@@ -1,61 +1,60 @@
-# Two-Tenant Smoke Evidence - Sprint 42
+# Evidencia de Smoke com Dois Tenants - Sprint 42
 
 ## Status
-Smoke evidence template prepared. Manual smoke remains pending until staging/beta deployment and approved users are available.
+Template de evidencia de smoke preparado. O smoke manual permanece pendente ate o deploy staging/beta e os usuarios aprovados estarem disponiveis.
 
-## Objective
-Validate the controlled beta journey with two tenants and prove that tenant isolation, RBAC, audit redaction and no-real-issuance guardrails hold in staging/beta.
+## Objetivo
+Validar a jornada beta controlada com dois tenants e provar que isolamento por tenant, RBAC, redacao de auditoria e guardrails de nao emissao real continuam funcionando em staging/beta.
 
-## Environment Evidence
-| Evidence | Status | Details |
+## Evidencias do Ambiente
+| Evidencia | Status | Detalhes |
 | --- | --- | --- |
-| Deployment URL | Pending | Capture staging/beta URL. |
-| Commit hash | Pending | Capture deployed commit. |
-| CI URL | Pending | Capture GitHub Quality Gates URL. |
-| Environment validation | Pending | Run `npm run ops:check-beta-env -- .env.local`. |
-| Supabase Auth redirects | Pending | Confirm staging/beta callback URLs. |
-| Migration status | Pending | Capture migration command/date/operator externally. |
+| URL de deploy | Pendente | Capturar URL staging/beta. |
+| Commit hash | Pendente | Capturar commit em deploy. |
+| URL do CI | Pendente | Capturar URL dos GitHub Quality Gates. |
+| Validacao de ambiente | Pendente | Rodar `npm run ops:check-beta-env -- .env.local`. |
+| Redirects Supabase Auth | Pendente | Confirmar URLs de callback staging/beta. |
+| Status de migration | Pendente | Capturar comando/data/operador externamente. |
 
-## Tenant A Journey
-| Step | Expected Result | Status | Evidence |
+## Jornada Tenant A
+| Etapa | Resultado Esperado | Status | Evidencia |
 | --- | --- | --- | --- |
-| Login | Approved user signs in without raw error | Pending | Pending |
-| Dashboard | Cockpit renders with correct tenant and environment badge | Pending | Pending |
-| Imports | Tenant-scoped imports render | Pending | Pending |
-| Candidates | Candidates render with masked sensitive fields | Pending | Pending |
-| Inconsistencies | Workflow actions respect role permissions | Pending | Pending |
-| Batches | No action implies real NFS-e issuance | Pending | Pending |
-| Audit | Audit is tenant-scoped and redacted | Pending | Pending |
-| Documents | Document metadata/download intent respects permissions | Pending | Pending |
+| Login | Usuario aprovado entra sem erro cru | Pendente | Pendente |
+| Dashboard | Cockpit renderiza com tenant correto e badge de ambiente | Pendente | Pendente |
+| Importacoes | Importacoes escopadas por tenant renderizam | Pendente | Pendente |
+| Candidatos | Candidatos renderizam com campos sensiveis mascarados | Pendente | Pendente |
+| Inconsistencias | Acoes de workflow respeitam permissoes de role | Pendente | Pendente |
+| Lotes | Nenhuma acao sugere emissao oficial de NFS-e | Pendente | Pendente |
+| Auditoria | Auditoria e escopada por tenant e redigida | Pendente | Pendente |
+| Documentos | Metadados/intencao de download respeitam permissoes | Pendente | Pendente |
 
-## Tenant B Journey
-| Step | Expected Result | Status | Evidence |
+## Jornada Tenant B
+| Etapa | Resultado Esperado | Status | Evidencia |
 | --- | --- | --- | --- |
-| Tenant switch | Active tenant changes safely | Pending | Pending |
-| Dashboard | Cockpit renders only Tenant B context | Pending | Pending |
-| Imports | Tenant A imports are not visible | Pending | Pending |
-| Candidates | Tenant A candidates are not visible | Pending | Pending |
-| Inconsistencies | Tenant A inconsistencies are not visible | Pending | Pending |
-| Batches | Tenant A batches are not visible | Pending | Pending |
-| Audit | Tenant A audit is not visible | Pending | Pending |
-| Documents | Tenant A document metadata is not visible | Pending | Pending |
+| Troca de tenant | Tenant ativo muda com seguranca | Pendente | Pendente |
+| Dashboard | Cockpit renderiza apenas contexto do Tenant B | Pendente | Pendente |
+| Importacoes | Importacoes do Tenant A nao aparecem | Pendente | Pendente |
+| Candidatos | Candidatos do Tenant A nao aparecem | Pendente | Pendente |
+| Inconsistencias | Inconsistencias do Tenant A nao aparecem | Pendente | Pendente |
+| Lotes | Lotes do Tenant A nao aparecem | Pendente | Pendente |
+| Auditoria | Auditoria do Tenant A nao aparece | Pendente | Pendente |
+| Documentos | Metadados de documentos do Tenant A nao aparecem | Pendente | Pendente |
 
-## Abuse Checks
-| Check | Expected Result | Status | Evidence |
+## Checks de Abuso
+| Check | Resultado Esperado | Status | Evidencia |
 | --- | --- | --- | --- |
-| Tenant A import URL while Tenant B active | Blocked without enumeration | Pending | Pending |
-| Tenant A candidate URL while Tenant B active | Blocked without enumeration | Pending | Pending |
-| Tenant A batch URL while Tenant B active | Blocked without enumeration | Pending | Pending |
-| Suspended membership login/session | Blocked | Pending | Pending |
-| User without membership dashboard access | Blocked | Pending | Pending |
-| Public error body | `{ error: { code, message, requestId } }` only | Pending | Pending |
+| URL de importacao do Tenant A com Tenant B ativo | Bloqueado sem enumeracao | Pendente | Pendente |
+| URL de candidato do Tenant A com Tenant B ativo | Bloqueado sem enumeracao | Pendente | Pendente |
+| URL de lote do Tenant A com Tenant B ativo | Bloqueado sem enumeracao | Pendente | Pendente |
+| Login/sessao com membership suspensa | Bloqueado | Pendente | Pendente |
+| Acesso ao dashboard sem membership | Bloqueado | Pendente | Pendente |
+| Corpo de erro publico | Apenas `{ error: { code, message, requestId } }` | Pendente | Pendente |
 
-## Evidence Rules
-- Use screenshots only with fictitious/demo or approved redacted data.
-- Do not paste secrets, tokens, raw payloads, full CPF/CNPJ, storage paths or real e-mails.
-- If a failure exposes cross-tenant data, stop the pilot and open a P0 blocker.
-- If a failure enables or suggests real NFS-e issuance, stop the pilot and open a P0 blocker.
+## Regras de Evidencia
+- Usar screenshots apenas com dados ficticios/demo ou aprovados e redigidos.
+- Nao colar secrets, tokens, payloads crus, CPF/CNPJ completo, storage paths ou e-mails reais.
+- Se uma falha expuser dados cross-tenant, parar o piloto e abrir bloqueador P0.
+- Se uma falha habilitar ou sugerir emissao oficial de NFS-e, parar o piloto e abrir bloqueador P0.
 
-## Current Decision
-NO-GO for real beta users until this smoke passes in staging/beta.
-
+## Decisao Atual
+NO-GO para usuarios beta reais ate este smoke passar em staging/beta.

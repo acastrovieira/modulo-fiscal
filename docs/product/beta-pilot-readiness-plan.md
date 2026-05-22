@@ -1,69 +1,68 @@
-# Controlled Beta Pilot Readiness Plan - Sprint 39
+# Plano de Readiness do Piloto Beta Controlado - Sprint 39
 
 ## Status
-Operational handoff prepared. Real beta usage remains NO-GO until the pending external approvals and staging/beta smoke are completed.
+Handoff operacional preparado. O uso beta real permanece NO-GO ate as aprovacoes externas pendentes e o smoke em staging/beta serem concluidos.
 
-Sprint 39 exists to move from a technical release candidate to a controlled pilot decision. It must not add real NFS-e issuance, scraping, municipal provider integration, certificate usage or fiscal background jobs.
+A Sprint 39 existe para sair de um release candidate tecnico para uma decisao de piloto controlado. Ela nao deve adicionar emissao oficial de NFS-e, scraping, integracao com provider municipal, uso de certificado ou jobs fiscais em background.
 
-## Objective
-Prepare the first controlled beta pilot with 1-3 tenants by confirming ownership, environment readiness, access boundaries, smoke evidence and support procedures.
+## Objetivo
+Preparar o primeiro piloto beta controlado com 1-3 tenants, confirmando ownership, readiness do ambiente, limites de acesso, evidencias de smoke e procedimentos de suporte.
 
 ## Checklist
-- [x] Merge the Sprint 38 release candidate PR.
-- [x] Confirm GitHub `Quality gates` are green on `main`.
-- [ ] Confirm staging/beta deployment uses the final merge commit.
-- [ ] Assign product owner for beta go/no-go.
-- [ ] Assign engineering owner for incident response.
-- [ ] Assign support owner for tenant communication.
-- [ ] Approve 1-3 beta tenants by name outside the repository.
-- [ ] Approve beta users and roles using least privilege.
-- [ ] Run the two-tenant manual smoke script from the Sprint 38 evidence pack.
-- [ ] Capture screenshots without personal data.
-- [ ] Capture safe logs and CI links.
-- [ ] Review residual risks and mark each as accepted or blocking.
-- [ ] Confirm rollback and database migration procedures.
-- [x] Record current go/no-go decision as NO-GO until external approvals and smoke pass.
+- [x] Mergear o PR do release candidate da Sprint 38.
+- [x] Confirmar GitHub `Quality gates` verdes na `main`.
+- [ ] Confirmar que o deploy staging/beta usa o merge commit final.
+- [ ] Atribuir product owner para go/no-go beta.
+- [ ] Atribuir owner de engenharia para resposta a incidentes.
+- [ ] Atribuir owner de suporte para comunicacao com tenants.
+- [ ] Aprovar 1-3 tenants beta por nome fora do repositorio.
+- [ ] Aprovar usuarios e roles beta usando least privilege.
+- [ ] Rodar roteiro de smoke manual com dois tenants do pacote de evidencias da Sprint 38.
+- [ ] Capturar screenshots sem dados pessoais.
+- [ ] Capturar logs seguros e links de CI.
+- [ ] Revisar riscos residuais e marcar cada um como aceito ou bloqueador.
+- [ ] Confirmar procedimentos de rollback e migrations de banco.
+- [x] Registrar decisao go/no-go atual como NO-GO ate aprovacoes externas e smoke passarem.
 
-## Pilot Roles
-| Responsibility | Required Before Pilot | Notes |
+## Papeis do Piloto
+| Responsabilidade | Exigido Antes do Piloto | Notas |
 | --- | --- | --- |
-| Product owner | Yes | Owns go/no-go and beta scope changes. |
-| Engineering owner | Yes | Owns incident triage, rollback and hotfix decisions. |
-| Support owner | Yes | Owns beta tenant communication and escalation. |
-| QA owner | Recommended | Owns smoke evidence and regression checklist. |
+| Product owner | Sim | Responsavel por go/no-go e mudancas de escopo beta. |
+| Owner de engenharia | Sim | Responsavel por triagem de incidente, rollback e decisoes de hotfix. |
+| Owner de suporte | Sim | Responsavel por comunicacao com tenants beta e escalacao. |
+| Owner de QA | Recomendado | Responsavel por evidencias de smoke e checklist de regressao. |
 
-## Entry Criteria
-- Sprint 38 PR merged into protected `main`.
-- Quality Gates green on `main`.
-- No open P0/P1 issue.
-- No known tenant isolation, audit, redaction or secret exposure incident.
-- Staging/beta environment configured without committing secrets.
-- Beta users and tenants approved outside the repository.
+## Criterios de Entrada
+- PR da Sprint 38 mergeado na `main` protegida.
+- Quality Gates verdes na `main`.
+- Nenhum issue P0/P1 aberto.
+- Nenhum incidente conhecido de isolamento por tenant, auditoria, redacao ou exposicao de secret.
+- Ambiente staging/beta configurado sem commit de secrets.
+- Usuarios e tenants beta aprovados fora do repositorio.
 
-## Exit Criteria
-- Manual smoke passes with at least two tenants.
-- Evidence package contains commit hash, CI URL, smoke notes, safe screenshots and risk decision.
-- Go/no-go is recorded.
-- If GO, pilot window and rollback owner are documented.
-- If NO-GO, blockers are converted into new sprint tasks.
+## Criterios de Saida
+- Smoke manual passa com pelo menos dois tenants.
+- Pacote de evidencias contem commit hash, URL de CI, notas de smoke, screenshots seguros e decisao de risco.
+- Go/no-go registrado.
+- Se GO, janela do piloto e owner de rollback documentados.
+- Se NO-GO, bloqueadores convertidos em tarefas de sprint.
 
-## Execution Evidence
-- Sprint 38 PR: `https://github.com/acastrovieira/modulo-fiscal/pull/24`
-- Sprint 38 merge commit: `5c14c9eef1cec88c70d07520afd1ff7928193728`
-- Sprint 38 Quality Gates: `https://github.com/acastrovieira/modulo-fiscal/actions/runs/26103778717/job/76761820308`
-- Pilot evidence log: `docs/product/beta-pilot-evidence-log.md`
-- Pilot smoke runbook: `docs/operations/runbooks/beta-pilot-smoke.md`
+## Evidencias de Execucao
+- PR da Sprint 38: `https://github.com/acastrovieira/modulo-fiscal/pull/24`
+- Merge commit da Sprint 38: `5c14c9eef1cec88c70d07520afd1ff7928193728`
+- Quality Gates da Sprint 38: `https://github.com/acastrovieira/modulo-fiscal/actions/runs/26103778717/job/76761820308`
+- Evidence log do piloto: `docs/product/beta-pilot-evidence-log.md`
+- Runbook de smoke do piloto: `docs/operations/runbooks/beta-pilot-smoke.md`
 
-## Current Blockers
-- Product, engineering and support owners are not named in the repository.
-- Real beta tenants and users are not approved in the repository.
-- Staging/beta deployment URL is not captured in the repository.
-- Two-tenant manual smoke has not been run in staging/beta.
+## Bloqueadores Atuais
+- Owners de produto, engenharia e suporte nao estao nomeados no repositorio.
+- Tenants e usuarios beta reais nao estao aprovados no repositorio.
+- URL de deploy staging/beta nao esta capturada no repositorio.
+- Smoke manual com dois tenants nao foi executado em staging/beta.
 
-## Recommended Squad
-- Codex: release coordination, evidence capture, PR and regression gates.
-- @pm/@po: beta tenants, go/no-go and scope control.
-- @qa: manual smoke, negative flows and evidence review.
-- @devops: Vercel/Supabase environment, deployment and rollback.
-- Seguranca/LGPD: redaction, tenant isolation and data handling review.
-
+## Squad Recomendado
+- Codex: coordenacao de release, captura de evidencias, PR e gates de regressao.
+- @pm/@po: tenants beta, go/no-go e controle de escopo.
+- @qa: smoke manual, fluxos negativos e revisao de evidencias.
+- @devops: ambiente Vercel/Supabase, deploy e rollback.
+- Seguranca/LGPD: redacao, isolamento por tenant e revisao de tratamento de dados.

@@ -1,69 +1,69 @@
-# Staging/Beta Activation - Sprint 40
+# Ativacao Staging/Beta - Sprint 40
 
-## Objective
-Activate a controlled staging/beta environment for VetFiscal OS without committing secrets and without enabling real fiscal execution.
+## Objetivo
+Ativar um ambiente staging/beta controlado para o VetFiscal OS sem commitar secrets e sem habilitar execucao fiscal real.
 
-## Current Decision
-Use a Vercel preview/staging-style environment first. Do not promote to production and do not enable real beta users until the Sprint 42 two-tenant smoke passes.
+## Decisao Atual
+Usar primeiro um ambiente Vercel preview/staging. Nao promover para producao tecnica e nao habilitar usuarios beta reais ate o smoke com dois tenants da Sprint 42 passar.
 
-## Required Provider-Side Variables
-Configure these only in Vercel/Supabase environment management. Do not commit pulled env files.
+## Variaveis Obrigatorias no Provedor
+Configure estas variaveis apenas no gerenciamento de ambiente da Vercel/Supabase. Nao commite arquivos de env puxados do provedor.
 
-| Variable | Scope | Required | Notes |
+| Variavel | Escopo | Obrigatoria | Observacoes |
 | --- | --- | --- | --- |
-| `DATABASE_URL` | Server | Yes | Staging/beta database, never local or production unless explicitly approved. |
-| `DIRECT_URL` | Server | Recommended | Required when Prisma migrations need direct DB access. |
-| `NEXT_PUBLIC_APP_ENV` | Browser | Yes | `Staging` or `Homologacao`. Never `Local`. |
-| `NEXT_PUBLIC_APP_URL` | Browser | Yes | HTTPS deployment URL. |
-| `NEXT_PUBLIC_SUPABASE_URL` | Browser | Yes | Staging/beta Supabase project URL. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser | Yes | Public anon key for staging/beta. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server | Optional | Secret manager only. Not required for the current app path. |
-| `SENTRY_DSN` | Server | Optional | Keep empty until observability is approved. |
-| `FEATURE_REAL_NFSE_ENABLED` | Server | Yes | Must be `false`. |
-| `FEATURE_SCRAPING_ENABLED` | Server | Yes | Must be `false`. |
-| `FEATURE_MUNICIPAL_PROVIDER_ENABLED` | Server | Yes | Must be `false`. |
+| `DATABASE_URL` | Server | Sim | Banco staging/beta, nunca local ou producao sem aprovacao explicita. |
+| `DIRECT_URL` | Server | Recomendada | Exigida quando migrations Prisma precisarem de acesso direto ao banco. |
+| `NEXT_PUBLIC_APP_ENV` | Browser | Sim | `Staging` ou `Homologacao`. Nunca `Local`. |
+| `NEXT_PUBLIC_APP_URL` | Browser | Sim | URL HTTPS do deploy. |
+| `NEXT_PUBLIC_SUPABASE_URL` | Browser | Sim | URL do projeto Supabase staging/beta. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser | Sim | Anon key publica de staging/beta. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server | Opcional | Apenas secret manager. Nao exigida no caminho atual do app. |
+| `SENTRY_DSN` | Server | Opcional | Manter vazio ate observabilidade ser aprovada. |
+| `FEATURE_REAL_NFSE_ENABLED` | Server | Sim | Deve ser `false`. |
+| `FEATURE_SCRAPING_ENABLED` | Server | Sim | Deve ser `false`. |
+| `FEATURE_MUNICIPAL_PROVIDER_ENABLED` | Server | Sim | Deve ser `false`. |
 
-## Activation Checklist
-- [ ] Confirm PR #26 is merged into `main`.
-- [ ] Link local workspace to the correct Vercel project with `vercel link --yes`.
-- [ ] Configure provider-side env vars in Vercel.
-- [ ] Pull env vars locally into `.env.local` with `vercel env pull .env.local --yes`.
-- [ ] Run `npm run ops:check-beta-env -- .env.local`.
-- [ ] Run `npm run security:secrets`.
-- [ ] Apply staging/beta migrations with an approved database URL.
-- [ ] Deploy preview/staging from the Sprint 40 branch or protected staging branch.
-- [ ] Confirm `/api/health` returns public health without secrets.
-- [ ] Confirm `/login` renders.
-- [ ] Confirm authenticated `/dashboard` renders with the expected environment badge.
+## Checklist de Ativacao
+- [ ] Confirmar que o PR da sprint base esta mergeado na `main`.
+- [ ] Vincular workspace local ao projeto Vercel correto com `vercel link --yes`.
+- [ ] Configurar env vars no provedor Vercel.
+- [ ] Puxar env vars localmente para `.env.local` com `vercel env pull .env.local --yes`.
+- [ ] Rodar `npm run ops:check-beta-env -- .env.local`.
+- [ ] Rodar `npm run security:secrets`.
+- [ ] Aplicar migrations staging/beta com URL de banco aprovada.
+- [ ] Fazer deploy preview/staging a partir da branch da sprint ou branch staging protegida.
+- [ ] Confirmar que `/api/health` retorna health publico sem secrets.
+- [ ] Confirmar que `/login` renderiza.
+- [ ] Confirmar que `/dashboard` autenticado renderiza com badge de ambiente esperado.
 
-## Supabase Auth Checklist
-- [ ] Configure Site URL to the staging/beta HTTPS URL.
-- [ ] Configure redirect URL ending in `/auth/callback`.
-- [ ] Confirm local, preview, staging and production callbacks are environment-specific.
-- [ ] Confirm invitation/recovery emails do not include CPF, CNPJ, storage path, raw payload or tenant internals.
-- [ ] Validate login/logout with fictitious users before approving real beta users.
+## Checklist Supabase Auth
+- [ ] Configurar Site URL para a URL HTTPS staging/beta.
+- [ ] Configurar redirect URL terminando em `/auth/callback`.
+- [ ] Confirmar que callbacks local, preview, staging e producao sao especificos por ambiente.
+- [ ] Confirmar que e-mails de convite/recuperacao nao incluem CPF, CNPJ, storage path, payload cru ou internals de tenant.
+- [ ] Validar login/logout com usuarios ficticios antes de aprovar usuarios beta reais.
 
-## Migration Checklist
-- [ ] Confirm target database is staging/beta.
-- [ ] Run `npx prisma validate`.
-- [ ] Review pending migrations before applying them.
-- [ ] Apply migrations with the approved staging/beta connection.
-- [ ] Record migration command, timestamp and operator in the pilot evidence log.
-- [ ] Prefer forward-fix for failures unless a rollback plan was approved before migration.
+## Checklist de Migration
+- [ ] Confirmar que o banco alvo e staging/beta.
+- [ ] Rodar `npx prisma validate`.
+- [ ] Revisar migrations pendentes antes de aplicar.
+- [ ] Aplicar migrations com conexao staging/beta aprovada.
+- [ ] Registrar comando, timestamp e operador no evidence log do piloto.
+- [ ] Preferir forward-fix para falhas, salvo se rollback tiver sido aprovado antes da migration.
 
-## No-Go Conditions
-- `NEXT_PUBLIC_APP_ENV=Local` in Vercel preview/staging/beta.
-- `DATABASE_URL` points to localhost or production by accident.
-- Any required env var is missing.
-- Any real fiscal safety flag is true.
-- Any secret appears in repository files, screenshots, PR comments or logs.
-- Any path enables real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal jobs.
+## Condicoes de No-Go
+- `NEXT_PUBLIC_APP_ENV=Local` em Vercel preview/staging/beta.
+- `DATABASE_URL` aponta por acidente para localhost ou producao.
+- Qualquer env var obrigatoria ausente.
+- Qualquer flag de seguranca fiscal real como `true`.
+- Qualquer secret aparece em arquivos do repositorio, screenshots, comentarios de PR ou logs.
+- Qualquer caminho habilita emissao oficial de NFS-e, scraping, chamadas a provider municipal, certificados ou jobs fiscais.
 
-## Evidence To Capture
-- Vercel deployment URL.
-- GitHub Quality Gates URL.
+## Evidencias a Capturar
+- URL do deploy Vercel.
+- URL dos GitHub Quality Gates.
 - Commit hash.
-- `npm run ops:check-beta-env -- .env.local` result without printing env values.
-- `/api/health` result with no secrets.
-- Login/dashboard smoke notes.
+- Resultado de `npm run ops:check-beta-env -- .env.local` sem imprimir valores de env.
+- Resultado de `/api/health` sem secrets.
+- Notas de smoke de login/dashboard.
 

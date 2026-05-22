@@ -1,34 +1,34 @@
-# Supabase Setup - Controlled Beta
+# Setup Supabase - Beta Controlado
 
-## Objective
-Prepare Supabase Auth and future Storage usage without introducing real fiscal issuance, scraping or provider integrations.
+## Objetivo
+Preparar Supabase Auth e uso futuro de Storage sem introduzir emissao fiscal real, scraping ou integracoes com providers.
 
-## Auth Checklist
-- Configure the site URL for the active environment.
-- Configure redirect URLs for `/auth/callback`.
-- Use environment-specific URLs: local, preview, staging and production must not share an accidental callback target.
-- Confirm `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are scoped to the correct environment.
-- Store `SUPABASE_SERVICE_ROLE_KEY` only in Vercel or Supabase secret management. Never commit it.
-- Confirm `NEXT_PUBLIC_APP_ENV` is not `Local` outside local development.
+## Checklist de Auth
+- Configurar a site URL para o ambiente ativo.
+- Configurar redirect URLs para `/auth/callback`.
+- Usar URLs especificas por ambiente: local, preview, staging e producao nao devem compartilhar callback acidental.
+- Confirmar que `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` pertencem ao ambiente correto.
+- Armazenar `SUPABASE_SERVICE_ROLE_KEY` apenas no gerenciamento de secrets da Vercel ou Supabase. Nunca commitar.
+- Confirmar que `NEXT_PUBLIC_APP_ENV` nao e `Local` fora do desenvolvimento local.
 
-## Email And Templates
-- Keep templates neutral and operational.
-- Do not include CPF, CNPJ, document names, storage paths or tenant internals in email templates.
-- Validate invitation and recovery flows with fictitious users before beta.
+## E-mails e Templates
+- Manter templates neutros e operacionais.
+- Nao incluir CPF, CNPJ, nomes de documentos, storage paths ou detalhes internos de tenant em templates de e-mail.
+- Validar fluxos de convite e recuperacao com usuarios ficticios antes do beta.
 
-## Storage Policy
-Supabase Storage remains future-facing for this beta track. Until explicit implementation:
+## Politica de Storage
+Supabase Storage permanece futuro para esta trilha beta. Ate existir implementacao explicita:
 
-- no signed upload URLs are exposed;
-- no storage path is accepted from client payloads;
-- no production document download is enabled;
-- storage paths remain server-generated and redacted in DTOs/audit.
+- nenhuma signed upload URL e exposta;
+- nenhum storage path e aceito via payload de client;
+- nenhum download de documento de producao e habilitado;
+- storage paths permanecem gerados no servidor e redigidos em DTOs/auditoria.
 
-## Database And RLS
-The MVP uses application-layer tenant guards with Prisma. If Supabase RLS is introduced later, it must be covered by a separate ADR and tests. For this beta prep, Prisma migrations and application tenant isolation remain the source of truth.
+## Banco e RLS
+O MVP usa guards de tenant na camada de aplicacao com Prisma. Se Supabase RLS for introduzido depois, deve ter ADR e testes separados. Para esta preparacao beta, migrations Prisma e isolamento por tenant na aplicacao seguem como fonte de verdade.
 
-## Required Gates
-- GitHub Quality gates green.
+## Gates Obrigatorios
+- GitHub Quality gates verdes.
 - `npm run lint`.
 - `npm run typecheck`.
 - `npm test`.
@@ -36,9 +36,9 @@ The MVP uses application-layer tenant guards with Prisma. If Supabase RLS is int
 - `npx prisma validate`.
 - `npm run build`.
 
-## Explicit Non-Goals
-- No real NFS-e issuance.
-- No scraping.
-- No municipal provider integration.
-- No certificate handling.
-- No fiscal queue/job execution.
+## Fora de Escopo Explicito
+- Sem emissao oficial de NFS-e.
+- Sem scraping.
+- Sem integracao com provider municipal.
+- Sem tratamento de certificado.
+- Sem execucao de fila/job fiscal.

@@ -1,38 +1,37 @@
-# Sprint 45 - Controlled Pilot Run
+# Sprint 45 - Execucao do Piloto Controlado
 
 ## Status
-Operationally prepared.
+Operacionalmente preparada.
 
-Current decision: pilot execution is blocked until Sprint 44 external gates turn GO or GO with restrictions.
+Decisao atual: a execucao do piloto esta bloqueada ate os gates externos da Sprint 44 mudarem para GO ou GO com restricoes.
 
-## Objective
-Prepare the accompanied pilot run for 1-3 approved tenants, with safe access opening, daily checks, feedback intake, incident triage, rollback procedure and closure report.
+## Objetivo
+Preparar a execucao acompanhada do piloto para 1-3 tenants aprovados, com abertura segura de acesso, checks diarios, entrada de feedback, triagem de incidentes, procedimento de rollback e relatorio de encerramento.
 
 ## Checklist
-- [x] Create controlled pilot runbook.
-- [x] Create pilot opening checklist.
-- [x] Create daily pilot check template.
-- [x] Create feedback and incident triage template.
-- [x] Create closure report template.
-- [x] Require explicit confirmation that no flow attempts real fiscal issuance.
-- [x] Update controlled beta roadmap.
-- [x] Update pilot evidence log.
-- [ ] Open access only to approved users after GO.
-- [ ] Monitor login, tenant switch and cockpit usage during real pilot window.
-- [ ] Record user feedback from accompanied sessions.
-- [ ] Triage bugs by severity.
-- [ ] Close pilot window with final report.
+- [x] Criar runbook de execucao do piloto controlado.
+- [x] Criar checklist de abertura do piloto.
+- [x] Criar template de check diario do piloto.
+- [x] Criar template de feedback e triagem de incidentes.
+- [x] Criar template de relatorio de encerramento.
+- [x] Exigir confirmacao explicita de que nenhum fluxo tenta emissao fiscal real.
+- [x] Atualizar o roadmap do beta controlado.
+- [x] Atualizar o evidence log do piloto.
+- [ ] Abrir acesso apenas para usuarios aprovados depois de GO.
+- [ ] Monitorar login, troca de tenant e uso do cockpit durante a janela real do piloto.
+- [ ] Registrar feedback de usuarios em sessoes acompanhadas.
+- [ ] Triar bugs por severidade.
+- [ ] Encerrar janela do piloto com relatorio final.
 
 ## Gate
-- [x] Pilot run is operationally ready.
-- [ ] Pilot completes without critical incident.
-- [ ] Feedback is collected and prioritized.
-- [ ] No real NFS-e issuance, scraping, municipal provider, certificate or fiscal job is triggered.
+- [x] Execucao do piloto esta operacionalmente pronta.
+- [ ] Piloto conclui sem incidente critico.
+- [ ] Feedback coletado e priorizado.
+- [ ] Nenhuma emissao oficial de NFS-e, scraping, provider municipal, certificado ou job fiscal e acionado.
 
-## Squad Review Notes
-- PM/PO: own pilot window, communications and final closure.
-- QA: owns evidence capture and severity triage.
-- DevOps: owns deploy status, rollback readiness and incident support.
-- Codex: owns hotfix implementation and regression gates.
-- Security/LGPD: reviews any evidence before it is shared outside the private pilot group.
-
+## Notas de Revisao do Squad
+- PM/PO: responsaveis pela janela do piloto, comunicacoes e encerramento final.
+- QA: responsavel por captura de evidencias e triagem de severidade.
+- DevOps: responsavel por status de deploy, readiness de rollback e suporte a incidentes.
+- Codex: responsavel por implementacao de hotfixes e gates de regressao.
+- Seguranca/LGPD: revisa qualquer evidencia antes de compartilhamento fora do grupo privado do piloto.

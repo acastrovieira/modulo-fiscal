@@ -1,48 +1,48 @@
-# Database Migrations
+# Migrations de Banco
 
-## Objective
-Define how VetFiscal OS applies Prisma migrations across local, staging and future production environments.
+## Objetivo
+Definir como o VetFiscal OS aplica migrations Prisma em ambientes local, staging e futura producao tecnica.
 
 ## Local
-Developers may use:
+Desenvolvedores podem usar:
 ```bash
 npx prisma migrate dev
 npm run db:seed
 ```
 
-Destructive reset is allowed only against local/demo databases:
+Reset destrutivo e permitido apenas contra bancos local/demo:
 ```bash
 npx prisma migrate reset
 ```
 
-## Staging And Production
-Use reviewed migrations only:
+## Staging e Producao
+Usar apenas migrations revisadas:
 ```bash
 npx prisma migrate deploy
 npx prisma validate
 ```
 
-Before applying migrations:
-- confirm the target environment;
-- confirm the database URL is not local by mistake;
-- confirm GitHub Quality gates are green;
-- confirm backup/restore ownership;
-- confirm beta safety flags remain disabled;
-- confirm no real NFS-e issuance, scraping or provider integration is enabled.
+Antes de aplicar migrations:
+- confirmar o ambiente alvo;
+- confirmar que a database URL nao e local por engano;
+- confirmar GitHub Quality gates verdes;
+- confirmar ownership de backup/restore;
+- confirmar que flags de seguranca beta permanecem desabilitadas;
+- confirmar que nenhuma emissao oficial de NFS-e, scraping ou integracao com provider esta habilitada.
 
-## Rollback Policy
-Prefer forward-fix migrations. Schema rollback must be planned before deploy, with a named owner and data impact review. Do not use `migrate reset` outside local/demo.
+## Politica de Rollback
+Preferir migrations forward-fix. Rollback de schema deve ser planejado antes do deploy, com owner nomeado e revisao de impacto em dados. Nao usar `migrate reset` fora de local/demo.
 
-## Evidence To Capture
+## Evidencias a Capturar
 - commit hash;
-- migration directory names;
-- CI URL;
-- command output summary;
-- reviewer/approver;
-- rollback or forward-fix decision.
+- nomes dos diretorios de migration;
+- URL do CI;
+- resumo da saida dos comandos;
+- reviewer/aprovador;
+- decisao de rollback ou forward-fix.
 
-## Blockers
-- Missing `DATABASE_URL` or ambiguous environment.
-- `NEXT_PUBLIC_APP_ENV=Local` in preview/staging/production.
-- Secrets present in git.
-- P0/P1 tenant isolation, audit, LGPD or data leakage issue.
+## Bloqueadores
+- `DATABASE_URL` ausente ou ambiente ambiguo.
+- `NEXT_PUBLIC_APP_ENV=Local` em preview/staging/producao.
+- Secrets presentes no git.
+- Issue P0/P1 de isolamento por tenant, auditoria, LGPD ou vazamento de dados.

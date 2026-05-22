@@ -36,7 +36,7 @@ describe("release prep smoke", () => {
       const content = readProjectFile(file);
       expect(content.length, file).toBeGreaterThan(500);
       expect(content, file).toMatch(/Quality gates|npm run lint|npm test|prisma validate|migrate deploy/i);
-      expect(content, file).toMatch(/No real NFS-e|sem emissao real|scraping|provider/i);
+      expect(content, file).toMatch(/No real NFS-e|sem emissao|scraping|provider/i);
     }
   });
 
@@ -78,64 +78,64 @@ describe("release prep smoke", () => {
     const smoke = readProjectFile("docs/operations/runbooks/beta-pilot-smoke.md");
     const controlledPilotRunbook = readProjectFile("docs/operations/runbooks/controlled-pilot-run.md");
 
-    expect(evidence).toMatch(/Current decision: NO-GO for real beta users/i);
-    expect(evidence).toMatch(/No real NFS-e issuance/i);
-    expect(evidence).toMatch(/No scraping/i);
-    expect(evidence).toMatch(/No municipal provider integration/i);
+    expect(evidence).toMatch(/Decisao atual: NO-GO para usuarios beta reais/i);
+    expect(evidence).toMatch(/Sem emissao oficial de NFS-e/i);
+    expect(evidence).toMatch(/Sem scraping/i);
+    expect(evidence).toMatch(/Sem integracao com provider municipal/i);
     expect(evidence).toMatch(/Quality Gates/i);
-    expect(evidence).toMatch(/two tenants/i);
+    expect(evidence).toMatch(/dois tenants/i);
 
     expect(pilot).toMatch(/Product owner/i);
-    expect(pilot).toMatch(/Engineering owner/i);
-    expect(pilot).toMatch(/Support owner/i);
+    expect(pilot).toMatch(/Owner de engenharia/i);
+    expect(pilot).toMatch(/Owner de suporte/i);
     expect(pilot).toMatch(/least privilege/i);
     expect(pilot).toMatch(/go\/no-go/i);
-    expect(pilot).toMatch(/Current Blockers/i);
+    expect(pilot).toMatch(/Bloqueadores Atuais/i);
 
-    expect(pilotEvidence).toMatch(/Current decision: NO-GO for real beta usage/i);
+    expect(pilotEvidence).toMatch(/Decisao atual: NO-GO para uso beta real/i);
     expect(pilotEvidence).toMatch(/5c14c9eef1cec88c70d07520afd1ff7928193728/i);
-    expect(pilotEvidence).toMatch(/Manual Smoke Evidence Template/i);
-    expect(pilotEvidence).toMatch(/Any enabled path for real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal jobs/i);
+    expect(pilotEvidence).toMatch(/Template de Evidencia de Smoke Manual/i);
+    expect(pilotEvidence).toMatch(/Qualquer caminho habilitado para emissao oficial de NFS-e, scraping, chamadas a provider municipal, certificados ou jobs fiscais/i);
 
-    expect(runbook).toMatch(/No-Go Conditions/i);
-    expect(runbook).toMatch(/real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal jobs/i);
+    expect(runbook).toMatch(/Condicoes de No-Go/i);
+    expect(runbook).toMatch(/emissao oficial de NFS-e, scraping, chamadas a provider municipal, certificados ou jobs fiscais/i);
 
-    expect(smoke).toMatch(/Tenant A Flow/i);
-    expect(smoke).toMatch(/Tenant B Flow/i);
-    expect(smoke).toMatch(/Abuse Checks/i);
-    expect(smoke).toMatch(/Do not paste secrets, tokens, raw payloads or full personal documents/i);
+    expect(smoke).toMatch(/Fluxo Tenant A/i);
+    expect(smoke).toMatch(/Fluxo Tenant B/i);
+    expect(smoke).toMatch(/Checks de Abuso/i);
+    expect(smoke).toMatch(/Nao colar secrets, tokens, payloads crus ou documentos pessoais completos/i);
 
-    expect(roadmap).toMatch(/Staging\/Beta Environment Activation/i);
-    expect(roadmap).toMatch(/Two-Tenant Smoke Test/i);
-    expect(roadmap).toMatch(/PRD Fiscal Real \/ Homologation/i);
-    expect(roadmap).toMatch(/No real NFS-e issuance before Sprint 47 approval/i);
-    expect(roadmap).toMatch(/No municipal provider integration/i);
+    expect(roadmap).toMatch(/Ativacao do Ambiente Staging\/Beta/i);
+    expect(roadmap).toMatch(/Smoke com Dois Tenants/i);
+    expect(roadmap).toMatch(/PRD Fiscal Real \/ Homologacao/i);
+    expect(roadmap).toMatch(/Sem emissao oficial de NFS-e antes de aprovacao futura pos-Sprint 47/i);
+    expect(roadmap).toMatch(/Sem integracao com provider municipal/i);
 
     expect(stagingActivation).toMatch(/npm run ops:check-beta-env -- \.env\.local/i);
     expect(stagingActivation).toMatch(/NEXT_PUBLIC_APP_ENV=Local/i);
-    expect(stagingActivation).toMatch(/Any real fiscal safety flag is true/i);
+    expect(stagingActivation).toMatch(/Qualquer flag de seguranca fiscal real como `true`/i);
 
-    expect(betaUsers).toMatch(/Least-Privilege Role Matrix/i);
-    expect(betaUsers).toMatch(/Do not store real personal e-mails/i);
-    expect(betaUsers).toMatch(/User without membership cannot access dashboard/i);
-    expect(betaUsers).toMatch(/Any real e-mail, CPF, CNPJ, token or document appears in repository docs/i);
+    expect(betaUsers).toMatch(/Matriz de Roles de Menor Privilegio/i);
+    expect(betaUsers).toMatch(/Nao armazenar e-mails pessoais reais/i);
+    expect(betaUsers).toMatch(/Usuario sem membership nao acessa dashboard/i);
+    expect(betaUsers).toMatch(/Qualquer e-mail real, CPF, CNPJ, token ou documento aparece em docs do repositorio/i);
 
-    expect(twoTenantSmoke).toMatch(/Tenant A Journey/i);
-    expect(twoTenantSmoke).toMatch(/Tenant B Journey/i);
-    expect(twoTenantSmoke).toMatch(/Abuse Checks/i);
-    expect(twoTenantSmoke).toMatch(/NO-GO for real beta users until this smoke passes in staging\/beta/i);
+    expect(twoTenantSmoke).toMatch(/Jornada Tenant A/i);
+    expect(twoTenantSmoke).toMatch(/Jornada Tenant B/i);
+    expect(twoTenantSmoke).toMatch(/Checks de Abuso/i);
+    expect(twoTenantSmoke).toMatch(/NO-GO para usuarios beta reais ate este smoke passar em staging\/beta/i);
 
     expect(sprint43Story).toMatch(/codigo de suporte/i);
-    expect(sprint44Story).toMatch(/Current decision: NO-GO for real beta users/i);
-    expect(sprint44Story).toMatch(/Staging\/beta deployment URL and two-tenant smoke evidence are captured/i);
-    expect(sprint45Story).toMatch(/pilot execution is blocked until Sprint 44 external gates turn GO/i);
-    expect(sprint45Story).toMatch(/No real NFS-e issuance, scraping, municipal provider, certificate or fiscal job is triggered/i);
-    expect(goNoGoPack).toMatch(/Current decision: NO-GO/i);
-    expect(goNoGoPack).toMatch(/GO with restrictions/i);
-    expect(goNoGoPack).toMatch(/Any enabled path for real NFS-e issuance, scraping, municipal provider integration, certificate usage or fiscal queue execution/i);
-    expect(controlledPilotRunbook).toMatch(/Sprint 44 decision is GO or GO with restrictions/i);
-    expect(controlledPilotRunbook).toMatch(/Stop pilot immediately/i);
-    expect(controlledPilotRunbook).toMatch(/Cross-tenant data exposure/i);
+    expect(sprint44Story).toMatch(/Decisao atual: NO-GO para usuarios beta reais/i);
+    expect(sprint44Story).toMatch(/URL de deploy staging\/beta e evidencia de smoke com dois tenants estao capturadas/i);
+    expect(sprint45Story).toMatch(/a execucao do piloto esta bloqueada ate os gates externos da Sprint 44 mudarem para GO/i);
+    expect(sprint45Story).toMatch(/Nenhuma emissao oficial de NFS-e, scraping, provider municipal, certificado ou job fiscal e acionado/i);
+    expect(goNoGoPack).toMatch(/Decisao atual: NO-GO/i);
+    expect(goNoGoPack).toMatch(/GO com restricoes/i);
+    expect(goNoGoPack).toMatch(/Qualquer caminho habilitado para emissao oficial de NFS-e, scraping, integracao com provider municipal, uso de certificado ou execucao de fila fiscal/i);
+    expect(controlledPilotRunbook).toMatch(/Decisao da Sprint 44 e GO ou GO com restricoes/i);
+    expect(controlledPilotRunbook).toMatch(/Parar piloto imediatamente/i);
+    expect(controlledPilotRunbook).toMatch(/Exposicao de dados cross-tenant/i);
     expect(sprint46Story).toMatch(/Processo de estabilizacao documentado/i);
     expect(sprint46Story).toMatch(/emissao real de NFS-e, scraping, provider municipal, certificado e job fiscal/i);
     expect(stabilizationPlan).toMatch(/P0 \| Vazamento entre tenants, vazamento de segredo, acao fiscal real/i);

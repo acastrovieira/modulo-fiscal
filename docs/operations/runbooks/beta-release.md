@@ -1,45 +1,45 @@
-﻿# Runbook - Beta Release
+# Runbook - Release Beta
 
-## Objective
-Release VetFiscal OS to a controlled beta without enabling real NFS-e issuance, scraping, municipal providers, certificates or fiscal jobs.
+## Objetivo
+Liberar o VetFiscal OS para beta controlado sem habilitar emissao oficial de NFS-e, scraping, providers municipais, certificados ou jobs fiscais.
 
-Release candidate evidence must be collected in `docs/product/beta-release-candidate-evidence-pack.md` before any real beta tenant is enabled.
+Evidencias do release candidate devem ser coletadas em `docs/product/beta-release-candidate-evidence-pack.md` antes de qualquer tenant beta real ser habilitado.
 
-## Pre-Release Gates
-- [ ] Branch is clean.
-- [ ] Pull request targets protected `main`.
-- [ ] GitHub `Quality gates` check is green.
-- [ ] `npm run lint` passed.
-- [ ] `npm run typecheck` passed.
-- [ ] `npm test` passed.
-- [ ] `npm run build` passed.
-- [ ] `npx prisma validate` passed with local/demo env.
-- [ ] No secrets are versioned.
-- [ ] `.env.example` contains only fictitious/local values.
+## Gates Pre-Release
+- [ ] Branch limpa.
+- [ ] Pull request aponta para `main` protegida.
+- [ ] Check GitHub `Quality gates` verde.
+- [ ] `npm run lint` aprovado.
+- [ ] `npm run typecheck` aprovado.
+- [ ] `npm test` aprovado.
+- [ ] `npm run build` aprovado.
+- [ ] `npx prisma validate` aprovado com env local/demo.
+- [ ] Nenhum secret versionado.
+- [ ] `.env.example` contem apenas valores ficticios/locais.
 
-## Product Gates
-- [ ] Beta tenants are explicitly approved.
-- [ ] Roles are reviewed for every beta user.
-- [ ] Support and incident contacts are defined.
-- [ ] Residual risks are accepted or blocked.
-- [ ] Rollback owner is assigned.
+## Gates de Produto
+- [ ] Tenants beta explicitamente aprovados.
+- [ ] Roles revisadas para cada usuario beta.
+- [ ] Contatos de suporte e incidente definidos.
+- [ ] Riscos residuais aceitos ou bloqueados.
+- [ ] Responsavel por rollback definido.
 
-## Technical Smoke
-- [ ] `/api/health` returns public health report without secrets.
-- [ ] `/dashboard` renders cockpit summary.
-- [ ] Workflow pages render: imports, candidates, inconsistencies, batches, audit and documents.
-- [ ] API errors return `{ error: { code, message, requestId } }`.
-- [ ] Audit/document APIs do not expose raw payloads or storage path.
+## Smoke Tecnico
+- [ ] `/api/health` retorna health publico sem secrets.
+- [ ] `/dashboard` renderiza resumo do cockpit.
+- [ ] Paginas de workflow renderizam: importacoes, candidatos, inconsistencias, lotes, auditoria e documentos.
+- [ ] Erros de API retornam `{ error: { code, message, requestId } }`.
+- [ ] APIs de auditoria/documentos nao expoem payload cru nem storage path.
 
-## Explicit Non-Goals
-- [ ] No real NFS-e issuance.
-- [ ] No scraping.
-- [ ] No municipal provider call.
-- [ ] No certificate usage.
-- [ ] No fiscal queue/job execution.
+## Fora de Escopo Explicito
+- [ ] Sem emissao oficial de NFS-e.
+- [ ] Sem scraping.
+- [ ] Sem chamada a provider municipal.
+- [ ] Sem uso de certificado.
+- [ ] Sem execucao de fila/job fiscal.
 
-## No-Go Conditions
-- Any failed GitHub Quality Gate.
-- Any open P0/P1 tenant isolation, audit, redaction or secret exposure issue.
-- Any unapproved real tenant or user.
-- Any enabled path for real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal jobs.
+## Condicoes de No-Go
+- Qualquer GitHub Quality Gate falho.
+- Qualquer P0/P1 aberto de isolamento por tenant, auditoria, redacao ou exposicao de secrets.
+- Qualquer tenant ou usuario real nao aprovado.
+- Qualquer caminho habilitado para emissao oficial de NFS-e, scraping, chamadas a provider municipal, certificados ou jobs fiscais.
