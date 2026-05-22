@@ -1,66 +1,66 @@
-# Pilot Go/No-Go Pack - Sprint 44
+# Pacote Go/No-Go do Piloto - Sprint 44
 
 ## Status
-NO-GO for real beta users.
+NO-GO para usuarios beta reais.
 
-This pack records the current pilot decision for VetFiscal OS controlled beta. It is intentionally conservative: the product is technically prepared for a supervised beta workflow, but real users must not be enabled until all external evidence and owners are confirmed.
+Este pacote registra a decisao atual do piloto beta controlado do VetFiscal OS. Ele e intencionalmente conservador: o produto esta tecnicamente preparado para um workflow beta supervisionado, mas usuarios reais nao devem ser habilitados ate todas as evidencias externas e owners serem confirmados.
 
-## Decision
-Current decision: NO-GO.
+## Decisao
+Decisao atual: NO-GO.
 
-Reason:
-- Product, engineering, support, QA and rollback owners are not named in committed evidence.
-- Approved beta tenants and users are not recorded in the private pilot register.
-- Staging/beta deployment URL is not captured in the evidence log.
-- Two-tenant smoke has not been executed against the final staging/beta deployment.
+Motivos:
+- Owners de produto, engenharia, suporte, QA e rollback nao estao nomeados em evidencia commitada.
+- Tenants e usuarios beta aprovados nao estao registrados no cadastro privado do piloto.
+- URL de deploy staging/beta nao foi capturada no evidence log.
+- Smoke com dois tenants nao foi executado contra o deploy staging/beta final.
 
-## Decision Options
-| Decision | When to use | Required follow-up |
+## Opcoes de Decisao
+| Decisao | Quando usar | Acao obrigatoria |
 | --- | --- | --- |
-| GO | All gates passed and no P0/P1 remains open | Open access only to approved users and start Sprint 45 pilot run |
-| GO with restrictions | Minor P2/P3 issues exist and are accepted by owners | Record restrictions, mitigation, support owner and stop conditions |
-| NO-GO | Any blocking evidence is missing or any P0/P1 exists | Convert blockers into Sprint 46 or a dedicated fix sprint |
+| GO | Todos os gates passaram e nenhum P0/P1 permanece aberto | Abrir acesso apenas a usuarios aprovados e iniciar execucao da Sprint 45 |
+| GO com restricoes | Existem P2/P3 menores aceitos pelos owners | Registrar restricoes, mitigacao, responsavel de suporte e condicoes de parada |
+| NO-GO | Qualquer evidencia bloqueadora ausente ou qualquer P0/P1 existente | Converter bloqueadores em Sprint 46 ou sprint dedicada de correcao |
 
-## Required Owners
-| Owner | Required Before GO | Responsibility |
+## Owners Obrigatorios
+| Owner | Exigido Antes do GO | Responsabilidade |
 | --- | --- | --- |
-| Product owner | Yes | Pilot scope, go/no-go decision and accepted risks |
-| Engineering owner | Yes | Incident triage, hotfix and technical stop decision |
-| Support owner | Yes | Tenant communication and user support |
-| QA owner | Yes | Smoke evidence, regression evidence and bug severity |
-| Rollback owner | Yes | Vercel rollback and database migration response |
-| Security/LGPD reviewer | Yes | Evidence redaction, tenant isolation and data handling |
+| PO | Sim | Escopo do piloto, decisao go/no-go e riscos aceitos |
+| Responsavel de engenharia | Sim | Triagem de incidente, hotfix e decisao tecnica de parada |
+| Responsavel de suporte | Sim | Comunicacao com tenants e suporte aos usuarios |
+| Responsavel de QA | Sim | Evidencia de smoke, regressao e severidade de bugs |
+| Responsavel por rollback | Sim | Rollback Vercel e resposta a migration de banco |
+| Revisor Seguranca/LGPD | Sim | Redacao de evidencias, isolamento por tenant e tratamento de dados |
 
-## Evidence Checklist
-- [ ] Final deployed commit hash is recorded.
-- [ ] GitHub Quality Gates URL is recorded.
-- [ ] Staging/beta deployment URL is recorded.
-- [ ] `/api/health` is verified in staging/beta.
-- [ ] `/login` is verified in staging/beta.
-- [ ] Authenticated `/dashboard` is verified in staging/beta.
-- [ ] Two-tenant smoke evidence is complete.
-- [ ] Safe screenshots contain no real CPF/CNPJ, token, raw payload or storage path.
-- [ ] Residual risk matrix is reviewed and accepted by owner.
-- [ ] Rollback route is rehearsed or explicitly accepted.
-- [ ] No real NFS-e issuance, scraping, municipal provider, certificate or fiscal job is enabled.
+## Checklist de Evidencias
+- [ ] Commit hash final do deploy registrado.
+- [ ] URL dos GitHub Quality Gates registrada.
+- [ ] URL de deploy staging/beta registrada.
+- [ ] `/api/health` verificado em staging/beta.
+- [ ] `/login` verificado em staging/beta.
+- [ ] `/dashboard` autenticado verificado em staging/beta.
+- [ ] Evidencia de smoke com dois tenants completa.
+- [ ] Screenshots seguras sem CPF/CNPJ real, token, payload cru ou storage path.
+- [ ] Matriz de risco residual revisada e aceita pelo owner.
+- [ ] Caminho de rollback ensaiado ou explicitamente aceito.
+- [ ] Nenhuma emissao oficial de NFS-e, scraping, provider municipal, certificado ou job fiscal habilitado.
 
-## Blocking Conditions
-- Any failed Quality Gate.
-- Any tenant isolation failure.
-- Any public leak of CPF/CNPJ, token, storage path, provider payload or raw import payload.
-- Any unclear ownership for incident response or rollback.
-- Any user or tenant enabled without explicit approval.
-- Any enabled path for real NFS-e issuance, scraping, municipal provider integration, certificate usage or fiscal queue execution.
+## Condicoes Bloqueadoras
+- Qualquer Quality Gate falho.
+- Qualquer falha de isolamento por tenant.
+- Qualquer vazamento publico de CPF/CNPJ, token, storage path, payload de provider ou payload cru de importacao.
+- Ownership indefinido para incidente ou rollback.
+- Qualquer usuario ou tenant habilitado sem aprovacao explicita.
+- Qualquer caminho habilitado para emissao oficial de NFS-e, scraping, integracao com provider municipal, uso de certificado ou execucao de fila fiscal.
 
-## Evidence Sources
-- Release candidate evidence: `docs/product/beta-release-candidate-evidence-pack.md`
-- Pilot readiness plan: `docs/product/beta-pilot-readiness-plan.md`
-- Pilot evidence log: `docs/product/beta-pilot-evidence-log.md`
-- Two-tenant smoke evidence: `docs/product/two-tenant-smoke-evidence.md`
-- Residual risk matrix: `docs/product/beta-residual-risk-matrix.md`
-- Beta release runbook: `docs/operations/runbooks/beta-release.md`
-- Pilot runbook: `docs/operations/runbooks/controlled-pilot-run.md`
+## Fontes de Evidencia
+- Evidencias do release candidate: `docs/product/beta-release-candidate-evidence-pack.md`
+- Plano de readiness do piloto: `docs/product/beta-pilot-readiness-plan.md`
+- Evidence log do piloto: `docs/product/beta-pilot-evidence-log.md`
+- Evidencia de smoke com dois tenants: `docs/product/two-tenant-smoke-evidence.md`
+- Matriz de risco residual: `docs/product/beta-residual-risk-matrix.md`
+- Runbook de release beta: `docs/operations/runbooks/beta-release.md`
+- Runbook do piloto: `docs/operations/runbooks/controlled-pilot-run.md`
 
-## Current Result
-Sprint 44 is technically prepared, but the official pilot decision remains NO-GO until the missing external approvals and staging/beta smoke evidence are complete.
+## Resultado Atual
+A Sprint 44 esta tecnicamente preparada, mas a decisao oficial do piloto permanece NO-GO ate as aprovacoes externas e a evidencia de smoke staging/beta ausentes estarem completas.
 

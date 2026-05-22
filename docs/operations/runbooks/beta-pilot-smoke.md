@@ -1,54 +1,54 @@
-# Runbook - Controlled Beta Pilot Smoke
+# Runbook - Smoke do Piloto Beta Controlado
 
-## Objective
-Validate the controlled beta journey with two tenants before allowing real beta usage.
+## Objetivo
+Validar a jornada beta controlada com dois tenants antes de permitir uso beta real.
 
-This smoke does not authorize real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal queue execution.
+Este smoke nao autoriza emissao oficial de NFS-e, scraping, chamadas a provider municipal, certificados ou fila fiscal.
 
-## Preconditions
-- Sprint 38 PR is merged into protected `main`.
-- GitHub Quality Gates are green on `main`.
-- Staging/beta deployment uses the final merge commit.
-- Product, engineering and support owners are named.
-- Beta tenants and users are approved outside the repository.
-- Secrets are configured only in the provider environment, never committed.
+## Pre-condicoes
+- PR da Sprint 38 mergeado na `main` protegida.
+- GitHub Quality Gates verdes na `main`.
+- Deploy staging/beta usando o merge commit final.
+- Owners de produto, engenharia e suporte nomeados.
+- Tenants e usuarios beta aprovados fora do repositorio.
+- Secrets configurados apenas no ambiente do provedor, nunca commitados.
 
-## Tenant A Flow
-- [ ] Sign in as an approved OWNER or ADMIN.
-- [ ] Confirm active tenant badge and environment badge.
-- [ ] Open dashboard.
-- [ ] Open imports.
-- [ ] Open candidates.
-- [ ] Open inconsistencies.
-- [ ] Open batches.
-- [ ] Open audit.
-- [ ] Open documents.
-- [ ] Confirm sensitive fields are masked.
-- [ ] Confirm no action implies real NFS-e issuance.
+## Fluxo Tenant A
+- [ ] Entrar como OWNER ou ADMIN aprovado.
+- [ ] Confirmar badge de tenant ativo e badge de ambiente.
+- [ ] Abrir dashboard.
+- [ ] Abrir importacoes.
+- [ ] Abrir candidatos.
+- [ ] Abrir inconsistencias.
+- [ ] Abrir lotes.
+- [ ] Abrir auditoria.
+- [ ] Abrir documentos.
+- [ ] Confirmar campos sensiveis mascarados.
+- [ ] Confirmar que nenhuma acao sugere emissao oficial de NFS-e.
 
-## Tenant B Flow
-- [ ] Switch to Tenant B using the tenant switch flow.
-- [ ] Confirm active tenant badge changed.
-- [ ] Repeat dashboard, imports, candidates, inconsistencies, batches, audit and documents.
-- [ ] Confirm only Tenant B records are visible.
-- [ ] Confirm sensitive fields are masked.
+## Fluxo Tenant B
+- [ ] Trocar para Tenant B pelo fluxo de troca de tenant.
+- [ ] Confirmar que o badge de tenant ativo mudou.
+- [ ] Repetir dashboard, importacoes, candidatos, inconsistencias, lotes, auditoria e documentos.
+- [ ] Confirmar que apenas registros do Tenant B estao visiveis.
+- [ ] Confirmar campos sensiveis mascarados.
 
-## Abuse Checks
-- [ ] Try a direct Tenant A import URL while Tenant B is active.
-- [ ] Try a direct Tenant A candidate URL while Tenant B is active.
-- [ ] Try a direct Tenant A batch URL while Tenant B is active.
-- [ ] Confirm requests are blocked without revealing whether the resource exists.
-- [ ] Confirm audit does not expose full CPF/CNPJ, token, storage path or raw payload.
+## Checks de Abuso
+- [ ] Tentar URL direta de importacao do Tenant A enquanto Tenant B esta ativo.
+- [ ] Tentar URL direta de candidato do Tenant A enquanto Tenant B esta ativo.
+- [ ] Tentar URL direta de lote do Tenant A enquanto Tenant B esta ativo.
+- [ ] Confirmar que requests sao bloqueados sem revelar se o recurso existe.
+- [ ] Confirmar que auditoria nao expoe CPF/CNPJ completo, token, storage path ou payload cru.
 
-## Evidence Rules
-- Capture screenshots only with fictitious/demo or approved redacted data.
-- Do not paste secrets, tokens, raw payloads or full personal documents into tickets or docs.
-- Record CI URL, deploy URL, commit hash and smoke date.
-- If any no-go condition appears, stop the pilot and open a blocker task.
+## Regras de Evidencia
+- Capturar screenshots apenas com dados ficticios/demo ou aprovados e redigidos.
+- Nao colar secrets, tokens, payloads crus ou documentos pessoais completos em tickets ou docs.
+- Registrar URL de CI, URL de deploy, commit hash e data do smoke.
+- Se qualquer condicao de no-go aparecer, parar o piloto e abrir tarefa bloqueadora.
 
-## Evidence Template
-Use `docs/product/two-tenant-smoke-evidence.md` as the canonical smoke evidence checklist.
+## Template de Evidencia
+Use `docs/product/two-tenant-smoke-evidence.md` como checklist canonico de evidencia de smoke.
 
-## User And Role Setup
-Use `docs/product/beta-users-roles-tenant-setup.md` before running this smoke. Do not run smoke with unapproved tenants, unapproved users or broad roles created only for convenience.
+## Setup de Usuarios e Roles
+Use `docs/product/beta-users-roles-tenant-setup.md` antes de rodar este smoke. Nao rode smoke com tenants nao aprovados, usuarios nao aprovados ou roles amplas criadas apenas por conveniencia.
 

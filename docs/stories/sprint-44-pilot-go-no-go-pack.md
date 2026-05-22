@@ -1,33 +1,32 @@
-# Sprint 44 - Pilot Go/No-Go Pack
+# Sprint 44 - Pacote Go/No-Go do Piloto
 
 ## Status
-Technically prepared.
+Tecnicamente preparada.
 
-Current decision: NO-GO for real beta users.
+Decisao atual: NO-GO para usuarios beta reais.
 
-## Objective
-Create the formal decision package for the controlled beta pilot, consolidating evidence, owners, residual risks, rollback requirements and explicit scope guards before any real tenant is enabled.
+## Objetivo
+Criar o pacote formal de decisao para o piloto beta controlado, consolidando evidencias, owners, riscos residuais, requisitos de rollback e guardrails explicitos de escopo antes de qualquer tenant real ser habilitado.
 
 ## Checklist
-- [x] Create formal go/no-go decision pack.
-- [x] Link release candidate evidence, pilot readiness, smoke evidence and residual risk matrix.
-- [x] Keep current decision as NO-GO until external approvals are complete.
-- [x] Define required owners: product, engineering, support, QA and rollback.
-- [x] Define GO, GO with restrictions and NO-GO criteria.
-- [x] Confirm no real NFS-e issuance, scraping, municipal provider, certificate or fiscal job is enabled.
-- [x] Update controlled beta roadmap.
-- [x] Update pilot evidence log.
+- [x] Criar pacote formal de decisao go/no-go.
+- [x] Referenciar evidencias do release candidate, readiness do piloto, smoke e matriz de risco residual.
+- [x] Manter a decisao atual como NO-GO ate as aprovacoes externas estarem completas.
+- [x] Definir owners obrigatorios: produto, engenharia, suporte, QA e rollback.
+- [x] Definir criterios de GO, GO com restricoes e NO-GO.
+- [x] Confirmar que nenhuma emissao oficial de NFS-e, scraping, provider municipal, certificado ou job fiscal esta habilitado.
+- [x] Atualizar o roadmap do beta controlado.
+- [x] Atualizar o evidence log do piloto.
 
 ## Gate
-- [x] Decision is recorded.
-- [x] No repository evidence enables real fiscal operation.
-- [ ] No known P0/P1 remains open in external tracker.
-- [ ] Product, engineering, support, QA and rollback owners are named outside the repository.
-- [ ] Staging/beta deployment URL and two-tenant smoke evidence are captured.
+- [x] Decisao registrada.
+- [x] Nenhuma evidencia do repositorio habilita operacao fiscal real.
+- [ ] Nenhum P0/P1 conhecido permanece aberto em tracker externo.
+- [ ] Owners de produto, engenharia, suporte, QA e rollback estao nomeados fora do repositorio.
+- [ ] URL de deploy staging/beta e evidencia de smoke com dois tenants estao capturadas.
 
-## Squad Review Notes
-- Product/PM: decision remains blocked until owners and pilot window are explicitly approved.
-- QA: two-tenant smoke evidence is mandatory before GO.
-- DevOps: deployment URL, migration status and rollback owner are mandatory before GO.
-- Security/LGPD: screenshots and logs must stay redacted and tenant-scoped.
-
+## Notas de Revisao do Squad
+- Produto/PM: a decisao permanece bloqueada ate owners e janela do piloto serem aprovados explicitamente.
+- QA: evidencia de smoke com dois tenants e obrigatoria antes de GO.
+- DevOps: URL de deploy, status de migrations e owner de rollback sao obrigatorios antes de GO.
+- Seguranca/LGPD: screenshots e logs devem permanecer redigidos e escopados por tenant.

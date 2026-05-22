@@ -1,78 +1,78 @@
-# Controlled Beta Pilot Evidence Log - Sprint 39
+# Log de Evidencias do Piloto Beta Controlado - Sprint 39
 
 ## Status
-Pilot readiness documentation prepared.
+Documentacao de readiness do piloto preparada.
 
-Current decision: NO-GO for real beta usage until owners, approved tenants, staging/beta deployment and two-tenant manual smoke are completed.
+Decisao atual: NO-GO para uso beta real ate owners, tenants aprovados, deploy staging/beta e smoke manual com dois tenants estarem completos.
 
-## Confirmed Evidence
-| Evidence | Status | Details |
+## Evidencias Confirmadas
+| Evidencia | Status | Detalhes |
 | --- | --- | --- |
-| Sprint 38 PR | Merged | PR #24 merged on 2026-05-19. |
-| Sprint 38 merge commit | Captured | `5c14c9eef1cec88c70d07520afd1ff7928193728`. |
-| Sprint 38 Quality Gates | Passed | `https://github.com/acastrovieira/modulo-fiscal/actions/runs/26103778717/job/76761820308` |
-| Release candidate evidence pack | Present | `docs/product/beta-release-candidate-evidence-pack.md` |
-| Pilot readiness plan | Present | `docs/product/beta-pilot-readiness-plan.md` |
-| Beta runbook | Present | `docs/operations/runbooks/beta-release.md` |
-| Sprint 39 local lint | Passed | `npm run lint` passed on 2026-05-19. |
-| Sprint 39 local typecheck | Passed | `npm run typecheck` passed on 2026-05-19. |
-| Sprint 39 local tests | Passed | `npm test` passed on 2026-05-19 with 305 tests. |
-| Sprint 39 secret scanner | Passed | `npm run security:secrets` found no potential secrets. |
-| Sprint 39 Prisma validate | Passed | `npx prisma validate` passed with local/demo `DATABASE_URL`. |
-| Sprint 39 production build | Passed | `npm run build` passed on 2026-05-19. |
-| Sprint 41 setup template | Present | `docs/product/beta-users-roles-tenant-setup.md` |
-| Sprint 42 smoke evidence template | Present | `docs/product/two-tenant-smoke-evidence.md` |
-| Sprint 43 UX hardening | Present | `docs/stories/sprint-43-ux-test-feedback-hardening.md` |
-| Sprint 44 go/no-go pack | Present | `docs/product/pilot-go-no-go-pack.md` records current decision as NO-GO. |
-| Sprint 45 controlled pilot runbook | Present | `docs/operations/runbooks/controlled-pilot-run.md` prepares pilot execution after GO. |
-| Sprint 46 stabilization plan | Present | `docs/product/pilot-findings-stabilization-plan.md` prepares post-pilot triage. |
-| Sprint 47 homologation PRD/ADR | Present | `docs/product/prd-real-nfse-homologation.md` and ADR 0011 plan future work without implementing real issuance. |
+| PR da Sprint 38 | Mergeado | PR #24 mergeado em 2026-05-19. |
+| Merge commit da Sprint 38 | Capturado | `5c14c9eef1cec88c70d07520afd1ff7928193728`. |
+| Quality Gates da Sprint 38 | Aprovado | `https://github.com/acastrovieira/modulo-fiscal/actions/runs/26103778717/job/76761820308` |
+| Pacote de evidencias do release candidate | Presente | `docs/product/beta-release-candidate-evidence-pack.md` |
+| Plano de readiness do piloto | Presente | `docs/product/beta-pilot-readiness-plan.md` |
+| Runbook beta | Presente | `docs/operations/runbooks/beta-release.md` |
+| Lint local da Sprint 39 | Aprovado | `npm run lint` passou em 2026-05-19. |
+| Typecheck local da Sprint 39 | Aprovado | `npm run typecheck` passou em 2026-05-19. |
+| Testes locais da Sprint 39 | Aprovado | `npm test` passou em 2026-05-19 com 305 testes. |
+| Scanner de secrets da Sprint 39 | Aprovado | `npm run security:secrets` nao encontrou potenciais secrets. |
+| Prisma validate da Sprint 39 | Aprovado | `npx prisma validate` passou com `DATABASE_URL` local/demo. |
+| Build de producao tecnica da Sprint 39 | Aprovado | `npm run build` passou em 2026-05-19. |
+| Template de setup Sprint 41 | Presente | `docs/product/beta-users-roles-tenant-setup.md` |
+| Template de smoke Sprint 42 | Presente | `docs/product/two-tenant-smoke-evidence.md` |
+| Hardening UX Sprint 43 | Presente | `docs/stories/sprint-43-ux-test-feedback-hardening.md` |
+| Pacote go/no-go Sprint 44 | Presente | `docs/product/pilot-go-no-go-pack.md` registra decisao atual como NO-GO. |
+| Runbook piloto controlado Sprint 45 | Presente | `docs/operations/runbooks/controlled-pilot-run.md` prepara execucao apos GO. |
+| Plano de estabilizacao Sprint 46 | Presente | `docs/product/pilot-findings-stabilization-plan.md` prepara triagem pos-piloto. |
+| PRD/ADR de homologacao Sprint 47 | Presente | `docs/product/prd-real-nfse-homologation.md` e ADR 0011 planejam trabalho futuro sem implementar emissao real. |
 
-## Pending Evidence Before Real Pilot
-| Evidence | Required Owner | Status |
+## Evidencias Pendentes Antes de Piloto Real
+| Evidencia | Responsavel exigido | Status |
 | --- | --- | --- |
-| Product owner named | @pm/@po | Pending |
-| Engineering owner named | Engineering | Pending |
-| Support owner named | Support | Pending |
-| Approved beta tenants | @pm/@po | Pending |
-| Approved beta users and roles | @pm/@po + Security/LGPD | Pending |
-| Staging/beta deployment URL | @devops | Pending |
-| Supabase staging/beta auth redirects checked | @devops | Pending |
-| Database migrations applied in staging/beta | @devops | Pending |
-| Two-tenant manual smoke evidence | @qa | Pending |
-| Safe screenshots without personal data | @qa | Pending |
-| Final go/no-go decision | @pm/@po | Pending |
-| Pilot window and rollback owner | @pm/@po + @devops | Pending |
-| Controlled pilot closure report | @pm/@po + @qa | Pending |
-| Pilot findings classified | @qa + Product | Pending |
-| Post-pilot release candidate | Engineering + @qa | Pending |
-| Fiscal homologation PRD approval | Product + Engineering + Fiscal + Security/LGPD | Pending |
+| PO nomeado | @pm/@po | Pendente |
+| Responsavel de engenharia nomeado | Engenharia | Pendente |
+| Responsavel de suporte nomeado | Suporte | Pendente |
+| Tenants beta aprovados | @pm/@po | Pendente |
+| Usuarios beta e roles aprovados | @pm/@po + Seguranca/LGPD | Pendente |
+| URL de deploy staging/beta | @devops | Pendente |
+| Redirects do Supabase staging/beta verificados | @devops | Pendente |
+| Migrations aplicadas no staging/beta | @devops | Pendente |
+| Evidencia de smoke manual com dois tenants | @qa | Pendente |
+| Screenshots seguros sem dados pessoais | @qa | Pendente |
+| Decisao go/no-go final | @pm/@po | Pendente |
+| Janela de piloto e responsavel por rollback | @pm/@po + @devops | Pendente |
+| Relatorio de encerramento do piloto controlado | @pm/@po + @qa | Pendente |
+| Achados do piloto classificados | @qa + Produto | Pendente |
+| Release candidate pos-piloto | Engenharia + @qa | Pendente |
+| Aprovacao do PRD de homologacao fiscal | Produto + Engenharia + Fiscal + Seguranca/LGPD | Pendente |
 
-## Manual Smoke Evidence Template
-Use this template when the staging/beta environment is available.
+## Template de Evidencia de Smoke Manual
+Use este template quando o ambiente staging/beta estiver disponivel.
 
-| Step | Expected Result | Result | Evidence Link |
+| Etapa | Resultado Esperado | Resultado | Link de Evidencia |
 | --- | --- | --- | --- |
-| Sign in as approved user | Authenticated session without raw error | Pending | Pending |
-| Confirm active tenant badge | Correct tenant and environment badge | Pending | Pending |
-| Open dashboard | Operational cockpit renders | Pending | Pending |
-| Open imports | Tenant-scoped data only | Pending | Pending |
-| Open candidates | Masked sensitive fields | Pending | Pending |
-| Open inconsistencies | Workflow actions gated by role | Pending | Pending |
-| Open batches | No real issuance action | Pending | Pending |
-| Open audit | Redacted tenant-scoped audit | Pending | Pending |
-| Switch to second tenant | Tenant context changes safely | Pending | Pending |
-| Try cross-tenant direct URL | Request is blocked without enumeration | Pending | Pending |
+| Entrar como usuario aprovado | Sessao autenticada sem erro cru | Pendente | Pendente |
+| Conferir badge de tenant ativo | Tenant e ambiente corretos | Pendente | Pendente |
+| Abrir dashboard | Cockpit operacional renderiza | Pendente | Pendente |
+| Abrir importacoes | Apenas dados do tenant ativo | Pendente | Pendente |
+| Abrir candidatos | Campos sensiveis mascarados | Pendente | Pendente |
+| Abrir inconsistencias | Acoes de workflow respeitam role | Pendente | Pendente |
+| Abrir lotes | Nenhuma acao de emissao oficial | Pendente | Pendente |
+| Abrir auditoria | Auditoria redigida e tenant-scoped | Pendente | Pendente |
+| Trocar para segundo tenant | Contexto de tenant muda com seguranca | Pendente | Pendente |
+| Tentar URL direta cross-tenant | Request bloqueado sem enumeracao | Pendente | Pendente |
 
-## No-Go Conditions
-- Any failed Quality Gate.
-- Any P0/P1 tenant isolation, audit, redaction or secret exposure issue.
-- Any unapproved real tenant or user.
-- Any unredacted personal document, token, storage path or provider payload in public evidence.
-- Any enabled path for real NFS-e issuance, scraping, municipal provider calls, certificates or fiscal jobs.
+## Condicoes de NO-GO
+- Qualquer Quality Gate falho.
+- Qualquer P0/P1 de isolamento por tenant, auditoria, redacao ou exposicao de secrets.
+- Qualquer tenant ou usuario real nao aprovado.
+- Qualquer documento pessoal, token, storage path ou payload de provider sem redacao em evidencia publica.
+- Qualquer caminho habilitado para emissao oficial de NFS-e, scraping, chamadas a provider municipal, certificados ou jobs fiscais.
 
-## Sprint 44/45 Decision Note
-Sprint 44 and Sprint 45 are technically and operationally prepared in the repository. Real pilot execution remains blocked until the missing external owners, staging/beta deployment URL, two-tenant smoke evidence, approved users and approved tenants are recorded in the private pilot register and summarized here without secrets or personal documents.
+## Nota de Decisao Sprint 44/45
+As Sprints 44 e 45 estao tecnicamente e operacionalmente preparadas no repositorio. A execucao real do piloto continua bloqueada ate owners externos, URL de staging/beta, evidencia de smoke com dois tenants, usuarios aprovados e tenants aprovados serem registrados no cadastro privado do piloto e resumidos aqui sem secrets ou documentos pessoais.
 
-## Sprint 46/47 Decision Note
-Sprint 46 and Sprint 47 are planning-ready only. Stabilization requires real pilot findings, and fiscal homologation requires explicit PRD approval, provider-specific ADR, certificate policy, sandbox evidence and fiscal specialist review before any implementation begins.
+## Nota de Decisao Sprint 46/47
+As Sprints 46 e 47 estao apenas prontas para planejamento. A estabilizacao exige achados reais do piloto, e a homologacao fiscal exige aprovacao explicita do PRD, ADR especifica de provider, politica de certificado, evidencia de sandbox e revisao de especialista fiscal antes de qualquer implementacao.

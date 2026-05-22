@@ -1,41 +1,41 @@
-# Vercel Release Prep
+# Preparacao de Release Vercel
 
-## Objective
-Define the controlled Vercel release path for VetFiscal OS beta without committing secrets or bypassing GitHub Quality gates.
+## Objetivo
+Definir o caminho controlado de release Vercel para o beta do VetFiscal OS sem commitar secrets ou contornar GitHub Quality gates.
 
-## Project Mapping
-- Preview deployments are created from pull request branches.
-- Staging should use an explicitly scoped preview/staging environment.
-- Production promotion requires a go/no-go decision and no P0/P1 beta blockers.
+## Mapeamento do Projeto
+- Deploys de preview sao criados a partir de branches de pull request.
+- Staging deve usar ambiente preview/staging explicitamente escopado.
+- Promocao para producao tecnica exige decisao go/no-go e nenhum bloqueador beta P0/P1.
 
-## Environment Variables
-Use Vercel environment variables instead of committed env files.
+## Variaveis de Ambiente
+Usar variaveis de ambiente da Vercel em vez de arquivos `.env` commitados.
 
-Recommended local sync:
+Sincronizacao local recomendada:
 ```bash
 vercel link --yes
 vercel env pull .env.local --yes
 npm run security:secrets
 ```
 
-Never commit `.env.local`, `.vercel/project.json`, service role keys, database credentials, tokens or provider credentials.
+Nunca commitar `.env.local`, `.vercel/project.json`, service role keys, credenciais de banco, tokens ou credenciais de provider.
 
-## Release Gates
-- Pull request targets protected `main`.
-- GitHub `Quality gates` check is green.
-- `npm run lint` passed.
-- `npm run typecheck` passed.
-- `npm test` passed.
-- `npm run security:secrets` passed.
-- `npx prisma validate` passed.
-- `npm run build` passed.
-- `NEXT_PUBLIC_APP_ENV` is `Staging`, `Homologação` or `Produção`, never `Local`.
-- Safety flags remain disabled: real NFS-e, scraping and municipal provider.
+## Gates de Release
+- Pull request aponta para `main` protegida.
+- Check GitHub `Quality gates` verde.
+- `npm run lint` aprovado.
+- `npm run typecheck` aprovado.
+- `npm test` aprovado.
+- `npm run security:secrets` aprovado.
+- `npx prisma validate` aprovado.
+- `npm run build` aprovado.
+- `NEXT_PUBLIC_APP_ENV` e `Staging`, `Homologacao` ou `Producao`, nunca `Local`.
+- Flags de seguranca permanecem desabilitadas: NFS-e real, scraping e provider municipal.
 
 ## Rollback
-Use Vercel rollback or promote the last known-good deployment. Database changes are handled through forward-fix unless a rollback plan was explicitly approved before migration.
+Usar rollback da Vercel ou promover o ultimo deploy bom conhecido. Mudancas de banco devem ser tratadas por forward-fix, salvo se um plano de rollback tiver sido explicitamente aprovado antes da migration.
 
-Commands for operators:
+Comandos para operadores:
 ```bash
 vercel ls
 vercel inspect <deployment-url>
@@ -43,9 +43,9 @@ vercel logs <deployment-url>
 vercel rollback
 ```
 
-## Post-Deploy Smoke
-- `/api/health` returns a public health report without secrets.
-- `/dashboard` renders.
-- Workflow pages render: imports, candidates, inconsistencies, batches, audit, documents.
-- API errors keep `{ error: { code, message, requestId } }`.
-- No real NFS-e issuance, scraping, provider calls, certificates or fiscal queues run.
+## Smoke Pos-Deploy
+- `/api/health` retorna health report publico sem secrets.
+- `/dashboard` renderiza.
+- Paginas de workflow renderizam: importacoes, candidatos, inconsistencias, lotes, auditoria, documentos.
+- Erros de API mantem `{ error: { code, message, requestId } }`.
+- Nenhuma emissao oficial de NFS-e, scraping, chamada a provider, certificado ou fila fiscal roda.
