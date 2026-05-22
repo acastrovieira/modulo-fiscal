@@ -1,125 +1,125 @@
-# PRD - Real NFS-e Homologation Planning
+# PRD - Planejamento de Homologacao Real de NFS-e
 
 ## Status
-Draft for future planning only.
+Rascunho apenas para planejamento futuro.
 
-This PRD does not authorize implementation. It defines the minimum product, fiscal, legal and technical questions that must be answered before VetFiscal OS starts any real NFS-e homologation work.
+Este PRD nao autoriza implementacao. Ele define as perguntas minimas de produto, fiscal, juridico e tecnologia que precisam ser respondidas antes do VetFiscal OS iniciar qualquer trabalho de homologacao real de NFS-e.
 
-## Problem
-Clinics need supervised fiscal operation that can eventually issue valid NFS-e through municipal providers. The current product intentionally stops before real issuance. Moving from simulation to real homologation introduces legal, fiscal, certificate, provider, idempotency, audit and contingency risks that require a dedicated planning and approval cycle.
+## Problema
+Clinicas precisam de uma operacao fiscal supervisionada que, no futuro, possa emitir NFS-e valida por meio de provedores municipais. O produto atual para intencionalmente antes da emissao real. A passagem de simulacao para homologacao real introduz riscos legais, fiscais, de certificado, provider, idempotencia, auditoria e contingencia que exigem um ciclo dedicado de planejamento e aprovacao.
 
-## Goals
-- Define the scope for a future real NFS-e homologation pilot.
-- Preserve human-in-the-loop approval before any fiscal transmission.
-- Keep tenant isolation, RBAC, audit, idempotency and LGPD as hard gates.
-- Define provider adapter boundaries before integrating any municipality.
-- Define certificate and secret handling before storing or using credentials.
-- Define fiscal contingency and rollback strategy before live usage.
+## Objetivos
+- Definir o escopo de um futuro piloto de homologacao real de NFS-e.
+- Preservar aprovacao humana antes de qualquer transmissao fiscal.
+- Manter isolamento por tenant, RBAC, auditoria, idempotencia e LGPD como gates duros.
+- Definir fronteiras de adapter de provider antes de integrar qualquer municipio.
+- Definir tratamento de certificados e secrets antes de armazenar ou usar credenciais.
+- Definir contingencia fiscal e rollback antes de uso real.
 
-## Non-Goals
-- No implementation in this sprint.
-- No real NFS-e issuance.
-- No municipal provider call.
-- No scraping.
-- No certificate upload or storage.
-- No fiscal queue or external fiscal background job.
-- No production release.
+## Fora de Escopo
+- Nenhuma implementacao nesta sprint.
+- Nenhuma emissao real de NFS-e.
+- Nenhuma chamada a provider municipal.
+- Nenhum scraping.
+- Nenhum upload ou armazenamento de certificado.
+- Nenhuma fila fiscal ou job fiscal externo.
+- Nenhum release de producao.
 
-## Primary Users
-| User | Need |
+## Usuarios Principais
+| Usuario | Necessidade |
 | --- | --- |
-| Fiscal manager | Approve only reviewed and compliant service notes |
-| Fiscal operator | Prepare candidates, resolve inconsistencies and assemble batches |
-| Accountant | Review fiscal assumptions, municipal rules and edge cases |
-| Auditor | Inspect audit trail and evidence without sensitive leakage |
-| Support/operations | Monitor failures, retries and contingency paths |
+| Gestor fiscal | Aprovar apenas notas revisadas e conformes |
+| Operador fiscal | Preparar candidatos, resolver inconsistencias e montar lotes |
+| Contador | Revisar premissas fiscais, regras municipais e casos de borda |
+| Auditor | Inspecionar trilha de auditoria e evidencias sem vazamento sensivel |
+| Suporte/operacoes | Monitorar falhas, retentativas e contingencias |
 
-## Future Homologation Scope
-- One municipality at a time.
-- One approved test tenant.
-- Homologation/sandbox environment only.
-- Controlled service catalog.
-- Limited batch size.
-- Manual approval before transmission.
-- No automatic issuance on import.
-- No customer-facing fiscal document delivery until homologation is approved.
+## Escopo Futuro de Homologacao
+- Um municipio por vez.
+- Um tenant de teste aprovado.
+- Ambiente de homologacao/sandbox apenas.
+- Catalogo de servicos controlado.
+- Tamanho de lote limitado.
+- Aprovacao manual antes da transmissao.
+- Nenhuma emissao automatica no momento da importacao.
+- Nenhuma entrega de documento fiscal ao cliente final ate a homologacao ser aprovada.
 
-## Required Capabilities Before Implementation
-- Provider adapter interface with no provider code in React.
-- State machine for real issuance separated from simulated flows.
-- Idempotency contract per tenant, provider, operation and fiscal intent.
-- Correlation id propagated through command, audit and provider adapter.
-- Audit events for approve, transmit, provider response, retry, cancel/void when supported and failure.
-- Redaction policy for provider request/response payloads.
-- Certificate storage and access policy approved by Security/LGPD.
-- Fiscal contingency runbook approved by product, engineering and accountant.
+## Capacidades Exigidas Antes da Implementacao
+- Interface de adapter de provider sem codigo de provider em React.
+- State machine de emissao real separada dos fluxos simulados.
+- Contrato de idempotencia por tenant, provider, operacao e intencao fiscal.
+- Correlation id propagado por comando, auditoria e adapter de provider.
+- Eventos de auditoria para aprovar, transmitir, resposta do provider, retry, cancelar/anular quando suportado e falha.
+- Politica de redacao para payloads de request/response do provider.
+- Politica de armazenamento e acesso a certificado aprovada por Seguranca/LGPD.
+- Runbook de contingencia fiscal aprovado por produto, engenharia e contador.
 
-## Provider Adapter Requirements
-- Each municipality/provider must live behind an adapter boundary.
-- Adapter must expose explicit capabilities such as submit, consult, cancel and status check only when supported.
-- Adapter must never be called directly from UI components.
-- Adapter must never receive tenant id from client input as source of truth.
-- Adapter must return sanitized domain results, not raw provider payloads.
-- Raw provider payload retention must be explicitly approved before storage.
+## Requisitos do Adapter de Provider
+- Cada municipio/provider deve ficar atras de uma fronteira de adapter.
+- O adapter deve expor capacidades explicitas como transmitir, consultar, cancelar e verificar status apenas quando suportadas.
+- O adapter nunca deve ser chamado diretamente por componentes de UI.
+- O adapter nunca deve receber `tenantId` vindo do client como fonte de verdade.
+- O adapter deve retornar resultados de dominio sanitizados, nao payloads crus do provider.
+- Retencao de payload cru do provider exige aprovacao explicita antes de armazenamento.
 
-## Certificate and Secrets Policy
-- No certificate or provider credential is committed to the repository.
-- No certificate is uploaded until storage, encryption, access control and rotation are approved.
-- Service-role or privileged credentials must be scoped by environment.
-- Access to certificate material must be audited.
-- Any certificate-related incident blocks homologation.
+## Politica de Certificados e Secrets
+- Nenhum certificado ou credencial de provider deve ser commitado no repositorio.
+- Nenhum certificado deve ser enviado ate armazenamento, criptografia, controle de acesso e rotacao estarem aprovados.
+- Service role ou credenciais privilegiadas devem ser escopadas por ambiente.
+- Acesso a material de certificado deve ser auditado.
+- Qualquer incidente envolvendo certificado bloqueia a homologacao.
 
-## Idempotency and Fiscal Safety
-- Every real issuance command requires an idempotency key.
-- Replay with the same key and same request hash must return the same result reference.
-- Replay with same key and different request hash must be blocked.
-- Tenant A keys must never affect Tenant B.
-- Provider timeout must not automatically create a second fiscal transmission.
-- Retrying must use provider status consultation when available before resubmission.
+## Idempotencia e Seguranca Fiscal
+- Todo comando de emissao real exige chave de idempotencia.
+- Replay com a mesma chave e mesmo hash de request deve retornar a mesma referencia de resultado.
+- Replay com a mesma chave e hash diferente deve ser bloqueado.
+- Chaves do Tenant A nunca podem afetar o Tenant B.
+- Timeout do provider nao pode criar automaticamente uma segunda transmissao fiscal.
+- Retentativa deve consultar status no provider, quando disponivel, antes de reenviar.
 
-## Audit Requirements
-Every critical action must record:
+## Requisitos de Auditoria
+Toda acao critica deve registrar:
 - tenant id.
 - actor id.
-- role.
-- event type.
-- entity type and id.
-- previous state and next state.
+- papel.
+- tipo de evento.
+- tipo e id da entidade.
+- estado anterior e proximo estado.
 - correlation id.
-- idempotency key reference.
-- provider adapter name and version when applicable.
-- sanitized provider status, never raw sensitive payload by default.
+- referencia da chave de idempotencia.
+- nome e versao do adapter de provider quando aplicavel.
+- status sanitizado do provider, nunca payload sensivel cru por padrao.
 
-## Legal and Accounting Responsibilities
-- Accountant/fiscal specialist validates municipal rules and homologation scenarios.
-- Product owner approves user-facing scope and accepted residual risks.
-- Engineering owner approves technical implementation and rollback plan.
-- Security/LGPD approves certificate, secret and data handling.
-- Support owner approves incident communication and escalation.
+## Responsabilidades Juridicas e Contabeis
+- Contador/especialista fiscal valida regras municipais e cenarios de homologacao.
+- PO aprova escopo visivel ao usuario e riscos residuais aceitos.
+- Responsavel de engenharia aprova implementacao tecnica e plano de rollback.
+- Seguranca/LGPD aprova certificado, secrets e tratamento de dados.
+- Responsavel de suporte aprova comunicacao de incidentes e escalonamento.
 
-## Homologation Test Plan
-- Happy path issuance in municipal homologation/sandbox.
-- Duplicate idempotency replay.
-- Provider timeout and status consultation.
-- Provider rejection with human-readable inconsistency.
-- Tenant isolation negative tests.
-- RBAC negative tests by role.
-- Audit redaction tests.
-- Certificate access audit test.
-- Rollback/forward-fix drill.
+## Plano de Testes de Homologacao
+- Caminho feliz de emissao em homologacao/sandbox municipal.
+- Replay de idempotencia duplicado.
+- Timeout do provider e consulta de status.
+- Rejeicao do provider com inconsistencia compreensivel.
+- Testes negativos de isolamento por tenant.
+- Testes negativos de RBAC por papel.
+- Testes de redacao em auditoria.
+- Teste de auditoria de acesso a certificado.
+- Simulado de rollback/forward-fix.
 
-## Go Criteria For Future Implementation
-- Controlled beta is stable with no open P0/P1.
-- This PRD is approved by product, engineering, Security/LGPD and fiscal specialist.
-- Provider-specific ADR is accepted.
-- Certificate policy is accepted.
-- Homologation environment is available.
-- Test plan is accepted.
+## Criterios de GO Para Implementacao Futura
+- Beta controlado estavel sem P0/P1 aberto.
+- Este PRD aprovado por produto, engenharia, Seguranca/LGPD e especialista fiscal.
+- ADR especifica do provider aprovada.
+- Politica de certificado aprovada.
+- Ambiente de homologacao disponivel.
+- Plano de testes aprovado.
 
-## No-Go Criteria
-- Any uncertainty about legal/fiscal responsibility.
-- Any unresolved tenant isolation, audit or secret handling issue.
-- Any missing rollback or contingency owner.
-- Any need to use scraping as core fiscal mechanism.
-- Any request to bypass human approval before first real fiscal transmissions.
+## Criterios de NO-GO
+- Qualquer incerteza sobre responsabilidade legal/fiscal.
+- Qualquer problema pendente de isolamento por tenant, auditoria ou secrets.
+- Falta de responsavel por rollback ou contingencia.
+- Necessidade de usar scraping como mecanismo core fiscal.
+- Pedido para pular aprovacao humana antes das primeiras transmissoes fiscais reais.
 

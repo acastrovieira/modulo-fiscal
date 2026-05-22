@@ -66,20 +66,21 @@ Interprete os atalhos abaixo carregando o arquivo correspondente em `.aiox-core/
 <!-- VETFISCAL-START: architecture -->
 ## VetFiscal OS Architecture Rules
 
-- Keep this repository as a modular Next.js monolith. Do not split into root-level `frontend/` and `backend/` apps unless a later ADR changes this decision.
-- Treat frontend work as `src/app`, `src/components`, and `src/modules/*/presentation`.
-- Treat backend/domain work as `src/modules/*/domain`, `src/modules/*/application`, `src/modules/*/infrastructure`, `src/shared`, `prisma`, and `tests`.
-- Frontend agents must not access Prisma directly and must not implement fiscal logic in React components.
-- Backend agents must not place fiscal rules in React and must validate tenant, RBAC, state, and audit requirements in backend/application code.
-- Any critical action must preserve tenant isolation, permission checks, auditability, correlation ids, and future idempotency.
-- Do not implement real NFS-e issuance, scraping, generic CRUD without workflow, or n8n-based core fiscal automation in this phase.
+- Use portugues do Brasil como idioma padrao para respostas, documentos, planos, stories, PRDs, ADRs e runbooks do VetFiscal OS.
+- Mantenha este repositorio como um monolito modular Next.js. Nao separe em apps raiz `frontend/` e `backend/` sem uma ADR futura mudando essa decisao.
+- Trate trabalho de frontend como `src/app`, `src/components` e `src/modules/*/presentation`.
+- Trate trabalho de backend/dominio como `src/modules/*/domain`, `src/modules/*/application`, `src/modules/*/infrastructure`, `src/shared`, `prisma` e `tests`.
+- Agentes de frontend nao devem acessar Prisma diretamente nem implementar logica fiscal em componentes React.
+- Agentes de backend nao devem colocar regras fiscais em React e devem validar tenant, RBAC, estado e auditoria no backend/camada de aplicacao.
+- Qualquer acao critica deve preservar isolamento por tenant, permissoes, auditoria, correlation ids e idempotencia futura.
+- Nao implemente emissao real de NFS-e, scraping, CRUD generico sem workflow ou automacao fiscal core baseada em n8n nesta fase.
 <!-- VETFISCAL-END: architecture -->
 
 <!-- VETFISCAL-START: agent-routing -->
 ## VetFiscal Agent and Model Routing
 
-- Use Codex for architecture, implementation, refactors, Prisma, tests, commits, pushes, and full-stack integration.
-- Use Gemini for UI, layout, dashboard polish, visual QA, shadcn/ui, lucide-react, Tailwind, and responsive behavior.
-- Use Claude for fiscal domain modeling, PRD writing, DDD, workflows, backend reasoning, risk analysis, and long-form documentation.
-- Every delegated task must state the affected module, affected layer, operational goal, acceptance criteria, and fiscal/security constraints.
+- Use Codex para arquitetura, implementacao, refactors, Prisma, testes, commits, pushes e integracao full-stack.
+- Use Gemini para UI, layout, refinamento de dashboard, QA visual, shadcn/ui, lucide-react, Tailwind e responsividade.
+- Use Claude para modelagem de dominio fiscal, PRDs, DDD, workflows, raciocinio backend, analise de risco e documentacao longa.
+- Toda tarefa delegada deve informar modulo afetado, camada afetada, objetivo operacional, criterios de aceite e restricoes fiscais/de seguranca.
 <!-- VETFISCAL-END: agent-routing -->
