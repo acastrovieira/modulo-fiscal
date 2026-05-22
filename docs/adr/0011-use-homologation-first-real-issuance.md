@@ -1,33 +1,33 @@
-# 0011 - Use Homologation-First Real Issuance
+# 0011 - Usar Homologacao Antes de Emissao Real
 
 ## Status
 Accepted
 
 ## Context
-VetFiscal OS currently supports supervised fiscal simulation and operational review without real NFS-e issuance. Real municipal NFS-e integrations introduce provider variability, legal responsibility, certificate handling, idempotency hazards and audit requirements that cannot be treated as a small extension of the simulated workflow.
+O VetFiscal OS hoje suporta simulacao fiscal supervisionada e revisao operacional sem emissao real de NFS-e. Integracoes municipais reais de NFS-e introduzem variacao de provider, responsabilidade legal, tratamento de certificados, riscos de idempotencia e requisitos de auditoria que nao podem ser tratados como uma extensao pequena do workflow simulado.
 
 ## Decision
-Any future real NFS-e work must start with a homologation-first approach. The system must plan and validate one municipality/provider at a time in an approved homologation or sandbox environment before production use. Real issuance must remain behind a provider adapter, state machine, RBAC checks, idempotency ledger, audit trail and human approval gate.
+Qualquer trabalho futuro de NFS-e real deve comecar por uma abordagem homologation-first. O sistema deve planejar e validar um municipio/provider por vez em ambiente aprovado de homologacao ou sandbox antes de qualquer uso em producao. Emissao real deve permanecer atras de adapter de provider, state machine, verificacoes de RBAC, ledger de idempotencia, trilha de auditoria e gate de aprovacao humana.
 
-This ADR does not authorize implementation. It creates the architectural precondition for future work.
+Esta ADR nao autoriza implementacao. Ela cria a pre-condicao arquitetural para trabalho futuro.
 
 ## Consequences
-Positive consequences:
-- Reduces fiscal risk before any production transmission.
-- Keeps provider-specific behavior isolated behind adapters.
-- Preserves audit-first and idempotency-first guarantees.
-- Makes certificate, secret and LGPD requirements explicit before implementation.
-- Prevents simulated workflows from silently becoming real fiscal workflows.
+Consequencias positivas:
+- Reduz risco fiscal antes de qualquer transmissao em producao.
+- Mantem comportamento especifico de provider isolado atras de adapters.
+- Preserva garantias audit-first e idempotency-first.
+- Torna requisitos de certificado, secrets e LGPD explicitos antes da implementacao.
+- Impede que workflows simulados virem workflows fiscais reais silenciosamente.
 
 Trade-offs:
-- Slower path to production issuance.
-- More documentation and approval steps before coding.
-- Requires fiscal/accounting review per municipality.
-- Requires provider-specific test evidence before expanding scope.
+- Caminho mais lento ate emissao em producao.
+- Mais etapas de documentacao e aprovacao antes de codar.
+- Exige revisao fiscal/contabil por municipio.
+- Exige evidencia de teste por provider antes de ampliar escopo.
 
-Non-negotiable constraints:
-- No scraping as core fiscal mechanism.
-- No certificate handling without approved security policy.
-- No provider call from React components.
-- No real issuance without explicit PRD, provider ADR, homologation evidence and go/no-go approval.
+Restricoes nao negociaveis:
+- Sem scraping como mecanismo core fiscal.
+- Sem tratamento de certificado sem politica de seguranca aprovada.
+- Sem chamada de provider por componentes React.
+- Sem emissao real sem PRD explicito, ADR de provider, evidencia de homologacao e aprovacao go/no-go.
 
