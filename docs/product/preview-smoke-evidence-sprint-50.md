@@ -1,7 +1,7 @@
 # Evidencia de Smoke do Preview - Sprint 50
 
 ## Status
-NO-GO operacional para promocao beta ate o preview do PR da Sprint 50 ser validado com acesso aprovado.
+NO-GO operacional para promocao beta.
 
 ## Contexto
 A Sprint 50 iniciou o smoke guiado usando o preview Vercel mais recente disponivel da Sprint 49:
@@ -11,19 +11,32 @@ A Sprint 50 iniciou o smoke guiado usando o preview Vercel mais recente disponiv
 - Merge commit da Sprint 49: `cd2097bec05e86a29d7f15f232c683b9480d33b0`
 - Data/hora local da tentativa: 2026-05-22
 
-O preview especifico da Sprint 50 deve ser testado novamente depois que o PR desta sprint for aberto e a Vercel publicar o novo deployment.
+O PR da Sprint 50 gerou dois deployments Vercel. Isso confirma uma ambiguidade operacional que precisa ser resolvida antes de qualquer promocao beta.
+
+## Deployments Observados no PR #35
+| Projeto Vercel | URL | Resultado |
+| --- | --- | --- |
+| `modulo-fiscal` | `https://modulo-fiscal-git-codex-sprint-5-a7904e-acastrovieiras-projects.vercel.app` | Deploy pronto, mas protegido por Vercel Authentication |
+| `vetfiscal` | `https://vetfiscal.vercel.app` | Deploy pronto e publico, mas health indica ambiente `Local` e banco ausente |
 
 ## Resultado do Smoke HTTP
 | Check | Resultado | Decisao |
 | --- | --- | --- |
-| `GET /api/health` via HTTP publico | Bloqueado por Vercel Authentication | Pendente |
-| `GET /login` via HTTP publico | Bloqueado por Vercel Authentication | Pendente |
-| `GET /dashboard` sem sessao | HTTP `401 Unauthorized`/bloqueio sem dados internos | Parcialmente aceitavel |
+| `GET /api/health` no `modulo-fiscal` | HTTP `401 Unauthorized` por Vercel Authentication | Pendente |
+| `GET /login` no `modulo-fiscal` | HTTP `401 Unauthorized` por Vercel Authentication | Pendente |
+| `GET /api/health` no `vetfiscal` | HTTP `200`, `status: degraded`, `environment: Local`, `databaseConfiguration: missing` | NO-GO |
+| `GET /login` no `vetfiscal` | HTTP `200` | Parcial |
+| `GET /dashboard` sem sessao no `vetfiscal` | HTTP `500 InternalServerError` | NO-GO |
+| Dois projetos Vercel para o mesmo PR | `modulo-fiscal` e `vetfiscal` publicados | NO-GO |
 | Vercel CLI | Instalada, versao `53.3.2` | Disponivel |
 | `vercel curl` | Requer contexto/bypass aprovado do projeto correto para validar health/login | Pendente |
 
 ## Achado Principal
-O preview esta protegido por autenticacao da Vercel. Isso e positivo para seguranca, mas bloqueia o smoke externo de `/api/health` e `/login` enquanto nao houver um metodo aprovado de acesso:
+Existem dois projetos Vercel reagindo ao mesmo PR. O projeto `modulo-fiscal` parece ser o alvo esperado do repositorio, mas esta protegido por Vercel Authentication. O projeto `vetfiscal` esta publico, porem responde como ambiente `Local`, com banco ausente e erro 500 no dashboard.
+
+Isso impede qualquer promocao beta ate a configuracao de deploy ser desambiguada.
+
+O preview protegido por autenticacao da Vercel pode ser aceitavel, mas bloqueia o smoke externo de `/api/health` e `/login` enquanto nao houver um metodo aprovado de acesso:
 
 - `vercel curl` autenticado no projeto Vercel correto;
 - bypass token gerenciado pelo owner, sem registro em docs/logs;
@@ -35,15 +48,21 @@ Nenhum secret foi registrado nesta evidencia.
 NO-GO para promocao para beta real.
 
 Motivos:
-- `/api/health` nao foi validado no app por causa da protecao Vercel.
-- `/login` nao foi validado no app por causa da protecao Vercel.
+- O PR publica em dois projetos Vercel.
+- O projeto `vetfiscal` publico esta com `NEXT_PUBLIC_APP_ENV`/ambiente reportado como `Local`.
+- O projeto `vetfiscal` publico esta sem configuracao de banco no healthcheck.
+- O dashboard do projeto `vetfiscal` retorna erro 500 sem sessao.
+- `/api/health` do projeto `modulo-fiscal` nao foi validado no app por causa da protecao Vercel.
+- `/login` do projeto `modulo-fiscal` nao foi validado no app por causa da protecao Vercel.
 - Ainda nao ha smoke autenticado com usuario beta/demo aprovado.
 - Ainda nao ha evidencia de logs do preview sem erros criticos.
 
 ## Proximas Acoes
-- [ ] Abrir PR da Sprint 50 e aguardar o preview Vercel especifico da branch.
-- [ ] Confirmar o projeto Vercel correto para `modulo-fiscal`.
-- [ ] Validar acesso ao preview via `vercel curl` ou bypass token autorizado.
+- [ ] Escolher um unico projeto Vercel canonico para o VetFiscal OS.
+- [ ] Desabilitar ou desconectar o projeto Vercel duplicado antes de qualquer promocao beta.
+- [ ] Corrigir env vars do projeto canonico para que o healthcheck nao reporte `Local` em preview/staging.
+- [ ] Confirmar o projeto Vercel correto para `modulo-fiscal` e o root directory esperado.
+- [ ] Validar acesso ao preview canonico via `vercel curl` ou bypass token autorizado.
 - [ ] Rodar `GET /api/health`, `GET /login` e `GET /dashboard` sem sessao.
 - [ ] Registrar deployment id candidato e deployment id anterior para rollback.
 - [ ] Repetir smoke visual e autenticado quando houver usuario beta/demo aprovado.

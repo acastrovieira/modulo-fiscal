@@ -15,9 +15,11 @@ Criar e iniciar um processo seguro de smoke para Preview/Staging Vercel antes de
 - [x] Criar checklist operacional de smoke do Preview Vercel.
 - [x] Registrar evidencia inicial do preview mais recente disponivel.
 - [x] Registrar bloqueio por Vercel Authentication como NO-GO operacional.
+- [x] Identificar ambiguidade de dois projetos Vercel publicando o mesmo PR.
+- [x] Registrar `vetfiscal.vercel.app` como NO-GO por health `Local`, banco ausente e dashboard `500`.
 - [x] Confirmar que `.vercel/` permanece ignorado pelo Git.
-- [ ] Repetir smoke no preview especifico do PR da Sprint 50.
-- [ ] Validar `/api/health` e `/login` com acesso aprovado ao preview.
+- [x] Repetir smoke HTTP no preview especifico do PR da Sprint 50.
+- [ ] Validar `/api/health` e `/login` com acesso aprovado ao preview canonico.
 - [ ] Capturar deployment id candidato e rollback target.
 
 ## Gate
@@ -25,6 +27,7 @@ Criar e iniciar um processo seguro de smoke para Preview/Staging Vercel antes de
 - [ ] `/api/health` validado sem secrets.
 - [ ] `/login` validado.
 - [ ] Rota protegida bloqueia acesso anonimo.
+- [ ] Projeto Vercel canonico definido sem deploy duplicado.
 - [ ] Quality Gates do PR aprovados.
 
 ## Fora de Escopo

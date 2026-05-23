@@ -65,9 +65,12 @@ Executar apenas com usuario beta/demo aprovado.
 - Evidencias estao redigidas e com acesso restrito.
 
 ## Criterios NO-GO
+- Mais de um projeto Vercel publica deploy para o mesmo PR sem decisao operacional explicita.
 - Preview protegido sem metodo aprovado para smoke.
 - `/api/health` inacessivel ou expondo detalhe sensivel.
+- `/api/health` reporta `Local` fora do ambiente local.
 - `/login` indisponivel.
+- `/dashboard` retorna `500` no preview/staging.
 - Rota protegida acessivel sem autenticacao/autorizacao.
 - Preview apontando para banco, filas, provider fiscal, e-mail/SMS ou qualquer recurso de producao sem aprovacao explicita.
 - Qualquer possibilidade de emissao oficial de NFS-e, scraping, provider municipal, certificado ou job fiscal real.
