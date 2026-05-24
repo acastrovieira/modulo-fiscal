@@ -30,3 +30,5 @@ external/
 .aiox-core/local/
 .aiox/install-log.txt
 .claude/settings.local.json
+.vercel
+.vercel
