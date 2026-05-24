@@ -35,6 +35,9 @@ Em 2026-05-24, durante a Sprint 51:
 - O projeto `modulo-fiscal` foi confirmado conectado ao repositorio `acastrovieira/modulo-fiscal`.
 - O root directory `vetfiscal` foi testado e rejeitado pelo build da Vercel porque a raiz do repositorio ja contem o app Next.js. A configuracao correta e deixar Root Directory vazio.
 - O projeto `vetfiscal` foi confirmado sem repositorio Git conectado.
+- Apos deixar Root Directory vazio, o PR #36 publicou apenas um deployment Vercel no projeto `modulo-fiscal`.
+- O deployment canonico `modulo-fiscal` passou na Vercel.
+- O preview canonico permaneceu protegido por Vercel Authentication, retornando `401 Unauthorized` para `/api/health`, `/login` e `/dashboard` quando acessado sem bypass/autenticacao Vercel.
 
 ## Motivo
 A Sprint 50 identificou deploy duplicado em dois projetos Vercel para o mesmo PR:
@@ -67,14 +70,16 @@ SENTRY_DSN
 ```
 
 ## Checks Obrigatorios No Proximo PR
-- [ ] GitHub mostra `Vercel - modulo-fiscal`.
-- [ ] GitHub nao mostra `Vercel - vetfiscal`.
-- [ ] Build Vercel nao falha com "Root Directory vetfiscal does not exist".
+- [x] GitHub mostra apenas status Vercel do projeto `modulo-fiscal`.
+- [x] GitHub nao mostra `Vercel - vetfiscal`.
+- [x] Build Vercel nao falha com "Root Directory vetfiscal does not exist".
 - [ ] `/api/health` no preview canonico nao reporta `Local`.
 - [ ] `/api/health` nao expoe secrets, connection string, CPF/CNPJ completo ou stack trace.
 - [ ] `/login` renderiza.
 - [ ] `/dashboard` sem sessao bloqueia ou redireciona sem erro 500.
 - [ ] Nenhuma emissao oficial de NFS-e, scraping, provider municipal, certificado ou fila fiscal real esta habilitada.
+
+Observacao: os checks de app acima exigem acesso aprovado ao preview protegido, via Vercel Authentication, `vercel curl` ou bypass token autorizado. Sem esse acesso, o comportamento esperado e `401 Unauthorized`.
 
 ## Criterios NO-GO
 - Qualquer PR volta a criar deploy em `vetfiscal`.

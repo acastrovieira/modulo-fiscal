@@ -15,13 +15,18 @@ Eliminar ambiguidade de deploy Vercel antes do beta controlado, definindo `modul
 - [x] Documentar configuracao canonica em `docs/operations/vercel-canonical-project.md`.
 - [x] Atualizar runbook de release Vercel com checklist de projeto canonico.
 - [ ] Abrir novo PR e confirmar que apenas `Vercel - modulo-fiscal` aparece nos checks.
+- [x] Reexecutar deploy apos Root Directory ficar vazio.
+- [x] Confirmar Vercel passando apenas no projeto `modulo-fiscal`.
+- [x] Confirmar preview protegido por Vercel Authentication para acesso publico.
 
 ## Gate
-- [ ] Proximo PR nao gera deploy em `vetfiscal`.
-- [ ] Proximo PR gera deploy somente em `modulo-fiscal`.
-- [ ] Build Vercel nao falha com "Root Directory vetfiscal does not exist".
+- [x] Proximo PR nao gera deploy em `vetfiscal`.
+- [x] Proximo PR gera deploy somente em `modulo-fiscal`.
+- [x] Build Vercel nao falha com "Root Directory vetfiscal does not exist".
 - [ ] Healthcheck do preview canonico nao reporta `Local`.
 - [ ] Quality Gates do PR aprovados.
+
+Observacao: healthcheck de app permanece pendente porque o preview canonico esta protegido por Vercel Authentication e retorna `401 Unauthorized` sem bypass/autenticacao aprovada.
 
 ## Fora de Escopo
 - Nenhum secret versionado.
