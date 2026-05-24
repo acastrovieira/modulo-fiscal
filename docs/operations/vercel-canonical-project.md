@@ -23,7 +23,7 @@ deve permanecer desconectado do GitHub e nao deve criar deploy automatico para `
 | Repositorio GitHub | `acastrovieira/modulo-fiscal` |
 | Production branch | `main` |
 | Framework preset | `Next.js` |
-| Root directory | `vetfiscal` |
+| Root directory | Vazio |
 | Build command | Padrao Next.js ou `npm run build` |
 | Install command | Padrao Vercel ou `npm install` |
 | Output directory | Padrao Next.js `.next` |
@@ -33,7 +33,7 @@ deve permanecer desconectado do GitHub e nao deve criar deploy automatico para `
 Em 2026-05-24, durante a Sprint 51:
 
 - O projeto `modulo-fiscal` foi confirmado conectado ao repositorio `acastrovieira/modulo-fiscal`.
-- O root directory do projeto `modulo-fiscal` foi confirmado como `vetfiscal`.
+- O root directory `vetfiscal` foi testado e rejeitado pelo build da Vercel porque a raiz do repositorio ja contem o app Next.js. A configuracao correta e deixar Root Directory vazio.
 - O projeto `vetfiscal` foi confirmado sem repositorio Git conectado.
 
 ## Motivo
@@ -69,6 +69,7 @@ SENTRY_DSN
 ## Checks Obrigatorios No Proximo PR
 - [ ] GitHub mostra `Vercel - modulo-fiscal`.
 - [ ] GitHub nao mostra `Vercel - vetfiscal`.
+- [ ] Build Vercel nao falha com "Root Directory vetfiscal does not exist".
 - [ ] `/api/health` no preview canonico nao reporta `Local`.
 - [ ] `/api/health` nao expoe secrets, connection string, CPF/CNPJ completo ou stack trace.
 - [ ] `/login` renderiza.
@@ -77,6 +78,7 @@ SENTRY_DSN
 
 ## Criterios NO-GO
 - Qualquer PR volta a criar deploy em `vetfiscal`.
+- Root Directory configurado como `vetfiscal` no projeto `modulo-fiscal`.
 - `NEXT_PUBLIC_APP_ENV=Local` aparece em preview/staging.
 - `/dashboard` retorna 500 sem sessao.
 - `/api/health` expoe segredo ou retorna informacao sensivel.

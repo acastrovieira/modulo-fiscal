@@ -7,7 +7,7 @@ Definir o caminho controlado de release Vercel para o beta do VetFiscal OS sem c
 - Projeto Vercel canonico: `modulo-fiscal`.
 - Workspace Vercel: `acastrovieiras-projects`.
 - Repositorio GitHub conectado: `acastrovieira/modulo-fiscal`.
-- Root directory do projeto: `vetfiscal`.
+- Root directory do projeto: vazio, porque o repositorio `acastrovieira/modulo-fiscal` ja aponta para a raiz do app Next.js.
 - Projeto duplicado `vetfiscal`: deve permanecer desconectado do GitHub e nao deve gerar deploy automatico para este repositorio.
 - Deploys de preview sao criados a partir de branches de pull request.
 - Staging deve usar ambiente preview/staging explicitamente escopado.
@@ -15,7 +15,7 @@ Definir o caminho controlado de release Vercel para o beta do VetFiscal OS sem c
 
 ## Checklist de Projeto Canonico
 - [ ] O projeto `modulo-fiscal` esta conectado ao repositorio `acastrovieira/modulo-fiscal`.
-- [ ] O projeto `modulo-fiscal` usa root directory `vetfiscal`.
+- [ ] O projeto `modulo-fiscal` usa root directory vazio.
 - [ ] O projeto `modulo-fiscal` usa framework preset Next.js.
 - [ ] O projeto `vetfiscal` nao esta conectado ao GitHub.
 - [ ] Em novos PRs, GitHub mostra apenas o status `Vercel - modulo-fiscal`.

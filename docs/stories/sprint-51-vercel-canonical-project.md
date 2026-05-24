@@ -9,7 +9,8 @@ Eliminar ambiguidade de deploy Vercel antes do beta controlado, definindo `modul
 ## Entregas
 - [x] Confirmar `modulo-fiscal` como projeto Vercel oficial.
 - [x] Confirmar repositorio GitHub `acastrovieira/modulo-fiscal` conectado ao projeto `modulo-fiscal`.
-- [x] Confirmar root directory `vetfiscal` no projeto `modulo-fiscal`.
+- [x] Identificar que root directory `vetfiscal` quebra o build porque a raiz do repositorio ja contem o app Next.js.
+- [x] Documentar que o Root Directory correto do projeto `modulo-fiscal` deve ficar vazio.
 - [x] Confirmar projeto duplicado `vetfiscal` sem repositorio Git conectado.
 - [x] Documentar configuracao canonica em `docs/operations/vercel-canonical-project.md`.
 - [x] Atualizar runbook de release Vercel com checklist de projeto canonico.
@@ -18,6 +19,7 @@ Eliminar ambiguidade de deploy Vercel antes do beta controlado, definindo `modul
 ## Gate
 - [ ] Proximo PR nao gera deploy em `vetfiscal`.
 - [ ] Proximo PR gera deploy somente em `modulo-fiscal`.
+- [ ] Build Vercel nao falha com "Root Directory vetfiscal does not exist".
 - [ ] Healthcheck do preview canonico nao reporta `Local`.
 - [ ] Quality Gates do PR aprovados.
 
