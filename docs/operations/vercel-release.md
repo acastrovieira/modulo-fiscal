@@ -4,9 +4,23 @@
 Definir o caminho controlado de release Vercel para o beta do VetFiscal OS sem commitar secrets ou contornar GitHub Quality gates.
 
 ## Mapeamento do Projeto
+- Projeto Vercel canonico: `modulo-fiscal`.
+- Workspace Vercel: `acastrovieiras-projects`.
+- Repositorio GitHub conectado: `acastrovieira/modulo-fiscal`.
+- Root directory do projeto: `vetfiscal`.
+- Projeto duplicado `vetfiscal`: deve permanecer desconectado do GitHub e nao deve gerar deploy automatico para este repositorio.
 - Deploys de preview sao criados a partir de branches de pull request.
 - Staging deve usar ambiente preview/staging explicitamente escopado.
 - Promocao para producao tecnica exige decisao go/no-go e nenhum bloqueador beta P0/P1.
+
+## Checklist de Projeto Canonico
+- [ ] O projeto `modulo-fiscal` esta conectado ao repositorio `acastrovieira/modulo-fiscal`.
+- [ ] O projeto `modulo-fiscal` usa root directory `vetfiscal`.
+- [ ] O projeto `modulo-fiscal` usa framework preset Next.js.
+- [ ] O projeto `vetfiscal` nao esta conectado ao GitHub.
+- [ ] Em novos PRs, GitHub mostra apenas o status `Vercel - modulo-fiscal`.
+- [ ] Em novos PRs, GitHub nao mostra mais `Vercel - vetfiscal`.
+- [ ] O healthcheck do preview canonico nao reporta `Local` fora de desenvolvimento local.
 
 ## Variaveis de Ambiente
 Usar variaveis de ambiente da Vercel em vez de arquivos `.env` commitados.
