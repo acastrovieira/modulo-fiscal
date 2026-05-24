@@ -14,7 +14,7 @@ Este checklist complementa:
 - [ ] URL do preview registrada.
 - [ ] Commit SHA registrado.
 - [ ] Preview usa ambiente `preview`, `staging` ou `staging-candidate`, nunca producao fiscal.
-- [ ] Integrações fiscais reais permanecem desabilitadas:
+- [ ] Integracoes fiscais reais permanecem desabilitadas:
   - `FEATURE_REAL_NFSE_ENABLED=false`
   - `FEATURE_SCRAPING_ENABLED=false`
   - `FEATURE_MUNICIPAL_PROVIDER_ENABLED=false`
