@@ -122,6 +122,26 @@ function normalizedPayload(row) {
   };
 }
 
+function candidateSnapshot(candidateId) {
+  const row = normalizedRows.find((candidateRow) => candidateRow.candidateId === candidateId);
+
+  if (!row) {
+    throw new Error(`Missing demo candidate snapshot source for ${candidateId}.`);
+  }
+
+  return {
+    snapshotVersion: "demo-v1",
+    candidateId: row.candidateId,
+    fiscalFingerprintVersion: "v1",
+    fiscalFingerprint: row.fingerprint,
+    customerDocumentMasked: row.customerDocumentMasked,
+    serviceDate: "2026-05-13",
+    competenceDate: "2026-05-01",
+    serviceDescription: row.serviceDescription,
+    grossAmountCents: row.grossAmountCents.toString()
+  };
+}
+
 async function upsertProfiles() {
   await prisma.tenant.upsert({
     where: { id: ids.tenant },
@@ -435,7 +455,8 @@ async function upsertBatches() {
       batchId: ids.batchReview,
       candidateId: ids.candidateSimulated,
       status: "INCLUDED",
-      grossAmountCents: 12000n
+      grossAmountCents: 12000n,
+      candidateSnapshot: candidateSnapshot(ids.candidateSimulated)
     },
     create: {
       id: ids.batchReviewItem,
@@ -443,7 +464,8 @@ async function upsertBatches() {
       batchId: ids.batchReview,
       candidateId: ids.candidateSimulated,
       status: "INCLUDED",
-      grossAmountCents: 12000n
+      grossAmountCents: 12000n,
+      candidateSnapshot: candidateSnapshot(ids.candidateSimulated)
     }
   });
 
@@ -454,7 +476,8 @@ async function upsertBatches() {
       batchId: ids.batchApproved,
       candidateId: ids.candidateApproved,
       status: "INCLUDED",
-      grossAmountCents: 30000n
+      grossAmountCents: 30000n,
+      candidateSnapshot: candidateSnapshot(ids.candidateApproved)
     },
     create: {
       id: ids.batchApprovedItem,
@@ -462,7 +485,8 @@ async function upsertBatches() {
       batchId: ids.batchApproved,
       candidateId: ids.candidateApproved,
       status: "INCLUDED",
-      grossAmountCents: 30000n
+      grossAmountCents: 30000n,
+      candidateSnapshot: candidateSnapshot(ids.candidateApproved)
     }
   });
 }
@@ -567,6 +591,6 @@ if (require.main === module) {
     });
 }
 
-module.exports = { ids, normalizedRows, seed };
+module.exports = { candidateSnapshot, ids, normalizedRows, seed };
 
 
