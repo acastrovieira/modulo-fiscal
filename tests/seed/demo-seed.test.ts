@@ -5,6 +5,12 @@ import { join } from "node:path";
 
 const requireSeed = createRequire(import.meta.url);
 const seedModule = requireSeed("../../prisma/seed.js") as {
+  candidateSnapshot: (candidateId: string) => {
+    candidateId: string;
+    fiscalFingerprint: string;
+    customerDocumentMasked: string;
+    grossAmountCents: string;
+  };
   ids: Record<string, string>;
   normalizedRows: Array<{
     customerName: string;
@@ -41,6 +47,18 @@ describe("demo seed safety", () => {
       expect(row.customerDocumentMasked).toMatch(/^\*{7}\d{4}$/);
       expect(row.customerDocumentMasked).not.toMatch(/^\d{11}$|^\d{14}$/);
     }
+  });
+
+  it("creates deterministic batch item snapshots without raw personal data", () => {
+    const snapshot = seedModule.candidateSnapshot(seedModule.ids.candidateSimulated);
+
+    expect(snapshot).toMatchObject({
+      candidateId: seedModule.ids.candidateSimulated,
+      grossAmountCents: "12000"
+    });
+    expect(snapshot.fiscalFingerprint).toBe("demo-fingerprint-simulated");
+    expect(snapshot.customerDocumentMasked).toBe("*******0004");
+    expect(snapshot.customerDocumentMasked).not.toMatch(/^\d{11}$|^\d{14}$/);
   });
 
   it("does not contain real issuance, scraping or external fiscal provider calls", () => {
