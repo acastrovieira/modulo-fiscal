@@ -1,4 +1,4 @@
-﻿CREATE TABLE "tenant_bootstrap_requests" (
+CREATE TABLE "tenant_bootstrap_requests" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "userId" UUID NOT NULL,
     "tenantId" UUID NOT NULL,
