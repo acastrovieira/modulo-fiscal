@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const allowedBetaEnvironments = new Set(["Staging", "Homologacao", "Homologação"]);
+const allowedBetaEnvironments = new Set(["Staging", "Homologacao"]);
 const requiredKeys = [
   "DATABASE_URL",
   "NEXT_PUBLIC_APP_ENV",
@@ -63,6 +63,32 @@ export function validateBetaEnvContent(content) {
     errors.push("DATABASE_URL must not point to localhost for staging/beta.");
   }
 
+  const directUrl = values.get("DIRECT_URL");
+  if (directUrl && /localhost|127\.0\.0\.1/i.test(directUrl)) {
+    errors.push("DIRECT_URL must not point to localhost for staging/beta.");
+  }
+
+  const supabaseUrl = values.get("NEXT_PUBLIC_SUPABASE_URL");
+  if (supabaseUrl && !/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(supabaseUrl)) {
+    errors.push("NEXT_PUBLIC_SUPABASE_URL must be a Supabase project HTTPS URL.");
+  }
+
+  const anonKey = values.get("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  if (anonKey && /^(public-anon-key|anon|changeme|placeholder|test)$/i.test(anonKey)) {
+    errors.push("NEXT_PUBLIC_SUPABASE_ANON_KEY must not be a placeholder value for staging/beta.");
+  }
+
+  for (const key of values.keys()) {
+    if (/^NEXT_PUBLIC_.*(SERVICE_ROLE|SECRET|TOKEN|PASSWORD|PRIVATE|DIRECT_URL|DATABASE_URL)/i.test(key)) {
+      errors.push(`${key} must not expose server-side or sensitive configuration to the browser.`);
+    }
+  }
+
+  const serviceRoleKey = values.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (serviceRoleKey && /^(service-role|changeme|placeholder|test)$/i.test(serviceRoleKey)) {
+    errors.push("SUPABASE_SERVICE_ROLE_KEY must be empty or a real secret managed outside the repository.");
+  }
+
   for (const key of ["FEATURE_REAL_NFSE_ENABLED", "FEATURE_SCRAPING_ENABLED", "FEATURE_MUNICIPAL_PROVIDER_ENABLED"]) {
     if (values.get(key) !== "false") {
       errors.push(`${key} must remain false for controlled beta.`);
@@ -97,4 +123,3 @@ function runCli() {
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   runCli();
 }
-
