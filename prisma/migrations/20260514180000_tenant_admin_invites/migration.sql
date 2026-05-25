@@ -1,4 +1,4 @@
-﻿CREATE TYPE "TenantInviteStatus" AS ENUM ('PENDING', 'ACCEPTED', 'EXPIRED', 'REVOKED');
+CREATE TYPE "TenantInviteStatus" AS ENUM ('PENDING', 'ACCEPTED', 'EXPIRED', 'REVOKED');
 
 CREATE TABLE "tenant_invites" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
