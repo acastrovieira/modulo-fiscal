@@ -27,6 +27,8 @@ Decisao atual: NO-GO para uso beta real ate owners, tenants aprovados, deploy st
 | Runbook piloto controlado Sprint 45 | Presente | `docs/operations/runbooks/controlled-pilot-run.md` prepara execucao apos GO. |
 | Plano de estabilizacao Sprint 46 | Presente | `docs/product/pilot-findings-stabilization-plan.md` prepara triagem pos-piloto. |
 | PRD/ADR de homologacao Sprint 47 | Presente | `docs/product/prd-real-nfse-homologation.md` e ADR 0011 planejam trabalho futuro sem implementar emissao real. |
+| Preparacao Supabase staging Sprint 52 | Presente | `docs/operations/supabase-staging-beta.md` documenta envs, migrations, redirects e service role fora do repo. |
+| Supabase Auth smoke Sprint 53 | Presente | `docs/operations/runbooks/supabase-auth-smoke.md` e `docs/product/supabase-auth-smoke-evidence.md` preparam smoke seguro com dois tenants. |
 
 ## Evidencias Pendentes Antes de Piloto Real
 | Evidencia | Responsavel exigido | Status |
@@ -39,6 +41,9 @@ Decisao atual: NO-GO para uso beta real ate owners, tenants aprovados, deploy st
 | URL de deploy staging/beta | @devops | Pendente |
 | Redirects do Supabase staging/beta verificados | @devops | Pendente |
 | Migrations aplicadas no staging/beta | @devops | Pendente |
+| Smoke Supabase Auth com usuarios aprovados | @qa + @devops | Pendente |
+| Bloqueio de usuario sem membership em staging/beta | @qa | Pendente |
+| Bloqueio cross-tenant por URL direta em staging/beta | @qa + Seguranca/LGPD | Pendente |
 | Evidencia de smoke manual com dois tenants | @qa | Pendente |
 | Screenshots seguros sem dados pessoais | @qa | Pendente |
 | Decisao go/no-go final | @pm/@po | Pendente |

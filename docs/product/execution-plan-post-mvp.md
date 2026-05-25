@@ -738,3 +738,23 @@ Principios:
 - [x] O proximo uso/teste continua sendo beta controlado, nao producao.
 - [x] Dados reais so entram depois de owners, ambiente e go/no-go.
 - [x] NFS-e real, scraping, provider municipal, certificado digital e fila fiscal real continuam fora ate PRD/ADR de homologacao.
+
+## 42. Sprint 53 - Supabase Auth Smoke Staging/Beta
+Objetivo: preparar o smoke operacional de Supabase Auth em staging/beta com dois tenants, cenarios negativos e evidencias seguras.
+
+Tarefas concluidas tecnicamente:
+- [x] Criar runbook `docs/operations/runbooks/supabase-auth-smoke.md`.
+- [x] Criar template de evidencia `docs/product/supabase-auth-smoke-evidence.md`.
+- [x] Atualizar o log de evidencias do piloto beta com referencias da Sprint 52/53.
+- [x] Adicionar teste de documentacao para garantir guardrails de auth, tenant, secrets e ausencia de emissao real.
+
+Tarefas pendentes externas:
+- [ ] Configurar projeto Supabase staging/beta real fora do repositorio.
+- [ ] Configurar envs staging/beta na Vercel canonica `modulo-fiscal`.
+- [ ] Criar usuarios beta aprovados no Supabase Auth.
+- [ ] Alinhar `Profile.id` aos UUIDs reais dos usuarios Supabase Auth.
+- [ ] Rodar smoke com dois tenants e registrar evidencias seguras.
+
+Gate:
+- [x] Piloto real permanece NO-GO ate smoke Supabase Auth externo concluido.
+- [x] Service role, secrets e dados pessoais completos continuam fora do repositorio e das evidencias publicas.
