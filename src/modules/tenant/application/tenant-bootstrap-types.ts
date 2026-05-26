@@ -31,6 +31,7 @@ export type TenantBootstrapUserInput = {
 
 export type TenantBootstrapRepository = {
   findProfileById(userId: string): Promise<TenantBootstrapProfileRecord | null>;
+  findProfileByEmail(email: string): Promise<TenantBootstrapProfileRecord | null>;
   hasActiveMembership(userId: string): Promise<boolean>;
   findTenantByCnpj(cnpj: string): Promise<TenantBootstrapRecord | null>;
   bootstrapTenant(input: {

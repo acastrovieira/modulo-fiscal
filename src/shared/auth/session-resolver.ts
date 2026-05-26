@@ -5,13 +5,16 @@ import type { AuthProviderUser, SessionRepository } from "@/shared/auth/session-
 
 export async function resolveCurrentUser(input: {
   authUser: AuthProviderUser | null;
-  repository: Pick<SessionRepository, "findProfileById">;
+  repository: Pick<SessionRepository, "findProfileById" | "findProfileByEmail">;
 }): Promise<CurrentUser> {
   if (!input.authUser) {
     throw new UnauthorizedError("Authentication required.");
   }
 
-  const profile = await input.repository.findProfileById(input.authUser.id);
+  const email = input.authUser.email?.toLowerCase() ?? null;
+  const profile = await input.repository.findProfileById(input.authUser.id)
+    ?? (email ? await input.repository.findProfileByEmail(email) : null);
+
   if (!profile) {
     throw new UnauthorizedError("Authenticated profile not found.");
   }

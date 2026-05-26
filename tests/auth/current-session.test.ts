@@ -16,6 +16,7 @@ function makeRepository(overrides: Partial<SessionRepository> = {}): SessionRepo
       name: "Operador VetFiscal",
       status: "ACTIVE"
     }),
+    findProfileByEmail: vi.fn().mockResolvedValue(null),
     findActiveMembership: vi.fn().mockResolvedValue({
       id: "membership-1",
       tenantId: "11111111-1111-4111-8111-111111111111",
@@ -111,6 +112,28 @@ describe("currentUser/currentTenant contracts", () => {
       name: "Operador VetFiscal"
     });
     expect(repository.findProfileById).toHaveBeenCalledWith("00000000-0000-4000-8000-000000000001");
+  });
+
+  it("resolves a confirmed auth user by email when the provider id changed during staging setup", async () => {
+    const repository = makeRepository({
+      findProfileById: vi.fn().mockResolvedValue(null),
+      findProfileByEmail: vi.fn().mockResolvedValue({
+        id: "profile-id-from-staging",
+        email: "owner@vetfiscal.local",
+        name: "Operador VetFiscal",
+        status: "ACTIVE"
+      })
+    });
+
+    await expect(resolveCurrentUser({
+      authUser: { id: "supabase-auth-id", email: "OWNER@VETFISCAL.LOCAL", name: "Auth Name" },
+      repository
+    })).resolves.toEqual({
+      id: "profile-id-from-staging",
+      email: "owner@vetfiscal.local",
+      name: "Operador VetFiscal"
+    });
+    expect(repository.findProfileByEmail).toHaveBeenCalledWith("owner@vetfiscal.local");
   });
 
   it("blocks disabled authenticated profiles", async () => {

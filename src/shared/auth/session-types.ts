@@ -29,5 +29,6 @@ export type SessionTenantMembershipRecord = {
 
 export type SessionRepository = {
   findProfileById(userId: string): Promise<SessionProfileRecord | null>;
+  findProfileByEmail(email: string): Promise<SessionProfileRecord | null>;
   findActiveMembership(input: { userId: string; tenantId?: string }): Promise<SessionTenantMembershipRecord | null>;
 };

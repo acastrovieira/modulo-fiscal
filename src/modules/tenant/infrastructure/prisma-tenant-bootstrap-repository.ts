@@ -12,6 +12,10 @@ export function createPrismaTenantBootstrapRepository(): TenantBootstrapReposito
       return prisma.profile.findUnique({ where: { id: userId } });
     },
 
+    async findProfileByEmail(email) {
+      return prisma.profile.findUnique({ where: { email: email.toLowerCase() } });
+    },
+
     async hasActiveMembership(userId) {
       const count = await prisma.tenantMembership.count({ where: { userId, status: "ACTIVE", tenant: { status: "ACTIVE" } } });
       return count > 0;

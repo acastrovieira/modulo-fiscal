@@ -9,6 +9,9 @@ function makeRepository(overrides: Partial<TenantBootstrapRepository> = {}): Ten
     async findProfileById() {
       return { id: userAId, email: "owner@vetfiscal.local", name: "Owner", status: "ACTIVE" };
     },
+    async findProfileByEmail() {
+      return null;
+    },
     async hasActiveMembership() {
       return false;
     },
@@ -45,6 +48,24 @@ describe("tenant bootstrap service", () => {
     await expect(service.getOnboardingStatus({ authUser })).resolves.toEqual({ status: "READY", nextPath: "/dashboard" });
   });
 
+  it("reconciles onboarding status by authenticated email when auth uid drifts", async () => {
+    const profileId = "profile-by-email";
+    const repository = makeRepository({
+      async findProfileById() {
+        return null;
+      },
+      async findProfileByEmail(email) {
+        return { id: profileId, email, name: "Owner", status: "ACTIVE" };
+      },
+      async hasActiveMembership(userId) {
+        return userId === profileId;
+      }
+    });
+    const service = createTenantBootstrapService({ repository, audit: makeAudit() });
+
+    await expect(service.getOnboardingStatus({ authUser })).resolves.toEqual({ status: "READY", nextPath: "/dashboard" });
+  });
+
   it("creates the first tenant and OWNER membership with audit redaction", async () => {
     const audit = makeAudit();
     const service = createTenantBootstrapService({ repository: makeRepository(), audit });
@@ -64,6 +85,33 @@ describe("tenant bootstrap service", () => {
     });
     expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ eventType: "tenant.bootstrap.created", metadata: expect.objectContaining({ cnpjMasked: "12.***.***/****-95" }) }));
     expect(JSON.stringify(audit.record.mock.calls)).not.toContain("12345678000195");
+  });
+
+  it("uses an existing email profile when creating a tenant after auth uid drift", async () => {
+    const profileId = "profile-by-email";
+    const bootstrapTenant = vi.fn(async (input: Parameters<TenantBootstrapRepository["bootstrapTenant"]>[0]) => ({
+      tenant: { id: tenantAId, name: input.name, legalName: input.legalName, cnpj: input.cnpj, status: "ACTIVE" as const },
+      membership: { id: "membership-1", tenantId: tenantAId, userId: input.user.id, role: "OWNER" as const, status: "ACTIVE" as const },
+      replayed: false
+    }));
+    const audit = makeAudit();
+    const service = createTenantBootstrapService({
+      repository: makeRepository({
+        async findProfileById() {
+          return null;
+        },
+        async findProfileByEmail(email) {
+          return { id: profileId, email, name: "Owner", status: "ACTIVE" };
+        },
+        bootstrapTenant
+      }),
+      audit
+    });
+
+    await service.bootstrapTenant({ authUser, name: "Clinica", idempotencyKey: "bootstrap-key-0010", correlationId: "corr" });
+
+    expect(bootstrapTenant).toHaveBeenCalledWith(expect.objectContaining({ user: expect.objectContaining({ id: profileId }) }));
+    expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ actorId: profileId }));
   });
 
   it("blocks unauthenticated and disabled users", async () => {

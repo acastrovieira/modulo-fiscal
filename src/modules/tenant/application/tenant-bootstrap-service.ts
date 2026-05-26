@@ -41,13 +41,17 @@ function assertIdempotencyKey(value: string): string {
   return key;
 }
 
+async function findProfileForAuthUser(repository: Pick<TenantBootstrapRepository, "findProfileById" | "findProfileByEmail">, authUser: AuthProviderUser & { id: string; email: string }) {
+  return await repository.findProfileById(authUser.id) ?? await repository.findProfileByEmail(authUser.email.toLowerCase());
+}
+
 export function createTenantBootstrapService(dependencies: { repository: TenantBootstrapRepository; audit: AuditRecorder }) {
   const { repository, audit } = dependencies;
 
   return {
     async getOnboardingStatus(input: { authUser: AuthProviderUser | null }): Promise<OnboardingStatusDTO> {
       assertAuthUser(input.authUser);
-      const profile = await repository.findProfileById(input.authUser.id);
+      const profile = await findProfileForAuthUser(repository, input.authUser);
       assertActiveProfile(profile);
 
       if (!profile) {
@@ -60,7 +64,7 @@ export function createTenantBootstrapService(dependencies: { repository: TenantB
 
     async bootstrapTenant(input: BootstrapTenantInput): Promise<TenantBootstrapDTO> {
       assertAuthUser(input.authUser);
-      const profile = await repository.findProfileById(input.authUser.id);
+      const profile = await findProfileForAuthUser(repository, input.authUser);
       assertActiveProfile(profile);
 
       if (profile && (await repository.hasActiveMembership(profile.id))) {
@@ -80,8 +84,14 @@ export function createTenantBootstrapService(dependencies: { repository: TenantB
         throw new InvalidStateError("Tenant could not be created with the provided registration data.");
       }
 
+      const bootstrapUser = {
+        id: profile?.id ?? input.authUser.id,
+        email: input.authUser.email.toLowerCase(),
+        name: input.authUser.name
+      };
+
       const result = await repository.bootstrapTenant({
-        user: { id: input.authUser.id, email: input.authUser.email.toLowerCase(), name: input.authUser.name },
+        user: bootstrapUser,
         name,
         legalName,
         cnpj,
@@ -91,7 +101,7 @@ export function createTenantBootstrapService(dependencies: { repository: TenantB
       if (!result.replayed) {
         await audit.record({
           tenantId: result.tenant.id,
-          actorId: input.authUser.id,
+          actorId: bootstrapUser.id,
           correlationId: input.correlationId,
           eventType: "tenant.bootstrap.created",
           entityType: "Tenant",
