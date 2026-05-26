@@ -7,6 +7,10 @@ export function createPrismaSessionRepository(): SessionRepository {
       return prisma.profile.findUnique({ where: { id: userId } });
     },
 
+    async findProfileByEmail(email) {
+      return prisma.profile.findUnique({ where: { email: email.toLowerCase() } });
+    },
+
     async findActiveMembership(input) {
       return prisma.tenantMembership.findFirst({
         where: {
